@@ -1,0 +1,184 @@
+cond Point_Restraints
+5
+global
+cond(int,1)+cond(int,2)+cond(int,3)+cond(int,4)+cond(int,5)+cond(int,6)==6
+1
+0
+0
+geo/FixXYZ.geo
+global
+cond(int,1)+(cond(int,2))+cond(int,3)==2 && (cond(int,1)+cond(int,2)+cond(int,6)==3 || cond(int,1)+cond(int,3)+cond(int,5)==3 || cond(int,2)+cond(int,3)+cond(int,4)==3)
+cond(int,2)*cond(int,3)
+cond(int,1)*cond(int,3)*(-1)
+cond(int,1)*cond(int,2)
+geo/FixYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==3 && cond(int,4)+cond(int,5)+cond(int,6)==0
+1
+0
+0
+geo/PinXYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==2
+cond(int,2)*cond(int,3)
+cond(int,1)*cond(int,3)*(-1)
+cond(int,1)*cond(int,2)
+geo/PinYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==1
+cond(int,1)
+cond(int,2)
+cond(int,3)
+geo/PinX.geo
+cond Line_Restraints
+5
+global
+cond(int,1)+cond(int,2)+cond(int,3)+cond(int,4)+cond(int,5)+cond(int,6)==6
+1
+0
+0
+geo/FixXYZ.geo
+global
+cond(int,1)+(cond(int,2))+cond(int,3)==2 && (cond(int,1)+cond(int,2)+cond(int,6)==3 || cond(int,1)+cond(int,3)+cond(int,5)==3 || cond(int,2)+cond(int,3)+cond(int,4)==3)
+cond(int,2)*cond(int,3)
+cond(int,1)*cond(int,3)*(-1)
+cond(int,1)*cond(int,2)
+geo/FixYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==3 && cond(int,4)+cond(int,5)+cond(int,6)==0
+1
+0
+0
+geo/PinXYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==2
+cond(int,2)*cond(int,3)
+cond(int,1)*cond(int,3)*(-1)
+cond(int,1)*cond(int,2)
+geo/PinYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==1
+cond(int,1)
+cond(int,2)
+cond(int,3)
+geo/PinX.geo
+cond Surface_Restraints
+5
+global
+cond(int,1)+cond(int,2)+cond(int,3)+cond(int,4)+cond(int,5)+cond(int,6)==6
+1
+0
+0
+geo/FixXYZ.geo
+global
+cond(int,1)+(cond(int,2))+cond(int,3)==2 && (cond(int,1)+cond(int,2)+cond(int,6)==3 || cond(int,1)+cond(int,3)+cond(int,5)==3 || cond(int,2)+cond(int,3)+cond(int,4)==3)
+cond(int,2)*cond(int,3)
+cond(int,1)*cond(int,3)*(-1)
+cond(int,1)*cond(int,2)
+geo/FixYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==3 && cond(int,4)+cond(int,5)+cond(int,6)==0
+1
+0
+0
+geo/PinXYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==2
+cond(int,2)*cond(int,3)
+cond(int,1)*cond(int,3)*(-1)
+cond(int,1)*cond(int,2)
+geo/PinYZ.geo
+global
+cond(int,1)+cond(int,2)+cond(int,3)==1
+cond(int,1)
+cond(int,2)
+cond(int,3)
+geo/PinX.geo
+cond Point_Forces
+1
+global
+fabs(cond(real,1))!=0.0 || fabs(cond(real,2))!=0.0 || fabs(cond(real,3))!=0.0
+cond(real,1)
+cond(real,2)
+cond(real,3)
+geo/Force.geo
+cond Line_Forces
+1
+global
+fabs(cond(real,1))!=0.0 || fabs(cond(real,2))!=0.0 || fabs(cond(real,3))!=0.0
+cond(real,1)
+cond(real,2)
+cond(real,3)
+geo/Force.geo
+cond Surface_Forces
+1
+global
+fabs(cond(real,1))!=0.0 || fabs(cond(real,2))!=0.0 || fabs(cond(real,3))!=0.0
+cond(real,1)
+cond(real,2)
+cond(real,3)
+geo/Force.geo
+cond Point_Mass
+1
+global
+1
+1
+0
+0
+geo/Mass.geo
+cond Point_Equal_constraint_master_node
+1
+global
+1
+1
+0
+0
+geo/Constraint.geo
+cond Point_Equal_constraint_slave_nodes
+1
+global
+1
+1
+0
+0
+geo/Constraint.geo
+cond Line_Equal_constraint_slave_nodes
+1
+global
+1
+1
+0
+0
+geo/Constraint.geo
+cond Point_Rigid_diaphragm_master_node
+1
+global
+1
+1
+0
+0
+geo/Diaphragm.geo
+cond Point_Rigid_diaphragm_slave_nodes
+1
+global
+1
+1
+0
+0
+geo/Diaphragm.geo
+cond Line_Rigid_diaphragm_slave_nodes
+1
+global
+1
+1
+0
+0
+geo/Diaphragm.geo
+cond Point_ZeroLength
+1
+global
+1
+1
+0
+0
+geo/ZeroLength.geo

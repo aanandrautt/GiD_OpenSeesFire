@@ -12,6 +12,8 @@
 # Project coordinator
 # V.K. Papanikolaou, Assistant Professor AUTh
 #
+# With contributions from Tejeswar Yarlagadda for Thermo-mechanical analysis
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -24,6 +26,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 
 #
 # Materials file
@@ -1885,13 +1889,15 @@ VALUE: 0.0ton/m^3
 TKWIDGET: TK_SectionWikiInfo
 END MATERIAL
 
-MATERIAL: LayeredShell
+MATERIAL: LayeredShellThermal
 COMMENT: \n\tEnter the properties of the rectangular section to be modelled with Shell elements\n\tusing a layered/composite integrated section for each in-plane integration point.\n\tMaterial properties and thicknesses are assigned by 10 layers according to the\n\tsize of the wall and the reinforcement distribution.\n
 TITLE: General
 QUESTION: Section:#CB#(LayeredShell)
 VALUE: LayeredShell
 TKWIDGET: TK_SectionWikiInfo
 TITLE: Section_properties
+QUESTION: Offset#UNITS#
+VALUE: 0 m
 QUESTION: Height#UNITS#
 VALUE: 3 m
 QUESTION: Thickness#UNITS#

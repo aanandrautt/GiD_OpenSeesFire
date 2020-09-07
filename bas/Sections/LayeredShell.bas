@@ -14,7 +14,7 @@ nDMaterial PlaneStressUserMaterial *PlaneStressUserMaterialTag 40 7 *MatProp(Con
 *MatProp(Shear_retention_factor,real)
 *# define PlateFromPlaneStress material
 *format "%6d%6d%6g"
-nDMaterial PlateFromPlaneStress *PlateFromPlaneStressMaterialTag *PlaneStressUserMaterialTag *MatProp(Shear_modulus_of_out_plane,real)
+nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneStressUserMaterialTag *MatProp(Shear_modulus_of_out_plane,real)
 *# define PlateRebar for longitudinal reinforcement
 *set var SelectedLongRBMaterial=tcl(FindMaterialNumber *MatProp(Longitudinal_bar_material) *DomainNum)
 *set var MaterialExists=tcl(CheckUsedMaterials *SelectedLongRBMaterial )
@@ -42,7 +42,7 @@ nDMaterial PlateFromPlaneStress *PlateFromPlaneStressMaterialTag *PlaneStressUse
 *endif
 # PlateRebar for longitudinal reinforcement
 *format "%6d%6d%6d"
-nDMaterial PlateRebar *PlateRebarLongTag *SelectedLongRBMaterial 90
+nDMaterial PlateRebarThermal *PlateRebarLongTag *SelectedLongRBMaterial 90
 *set var SelectedTransverseRBMaterial=tcl(FindMaterialNumber *MatProp(Transverse_bar_material) *DomainNum)
 *set var MaterialExists=tcl(CheckUsedMaterials *SelectedTransverseRBMaterial )
 *if(MaterialExists==-1)
@@ -69,7 +69,8 @@ nDMaterial PlateRebar *PlateRebarLongTag *SelectedLongRBMaterial 90
 *endif
 # PlateRebar for transverse reinforcement
 *format "%6d%6d%6d"
-nDMaterial PlateRebar *PlateRebarTransvTag *SelectedTransverseRBMaterial 0
+nDMaterial PlateRebarThermal *PlateRebarTransvTag *SelectedTransverseRBMaterial 0
+*set var offset=MatProp(Offset,real)
 *set var height=MatProp(Height,real)
 *set var totalThick=MatProp(Thickness,real)
 *set var width=MatProp(Width,real)
@@ -95,9 +96,15 @@ nDMaterial PlateRebar *PlateRebarTransvTag *SelectedTransverseRBMaterial 0
 *set var TransBarThick=operation(TotalTransBarArea/height)
 *set var coreArea=operation((totalArea-coverArea-TotalLongBarArea))
 *set var coreThick=operation(coreArea/(width*nlayersCore))
-# section LayeredShell $sectionTag $nLayers $matTag1 $thickness1...$matTagn $thicknessn
+*if(offset==0)
+# section LayeredShellThermal $sectionTag $nLayers $matTag1 $thickness1...$matTagn $thicknessn
 *format "%6d%6d%6d%6g"
-section LayeredShell *LayeredShellTag *nlayers *PlateFromPlaneStressMaterialTag *coverThick *\
+section LayeredShellThermal *LayeredShellTag *nlayers *PlateFromPlaneStressMaterialTag *coverThick *\
+*else
+# section LayeredShellThermal -offset $offset $sectionTag $nLayers $matTag1 $thickness1...$matTagn $thicknessn
+*format "%6d%6g%6d%6d%6g"
+section LayeredShellThermal *LayeredShellTag -offset *offset *nlayers *PlateFromPlaneStressMaterialTag *coverThick *\
+*endif
 *format "%6d%6g%6d%6g"
 *PlateRebarTransvTag *TransBarThick *PlateRebarLongTag *LongBarThick *\
 *format "%6d%6g%6d%6g%6d%6g%6d%6g"

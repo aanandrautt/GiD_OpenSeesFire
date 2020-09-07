@@ -51,11 +51,11 @@
 *endif
 *end materials
 
-# ShellDKGQ Elements Definition: element ShellDKGQ $eleTag $iNode $jNode $kNode $lNode $secTag
+# ShellNLDKGQThermal Elements Definition: element ShellNLDKGQThermal $eleTag $iNode $jNode $kNode $lNode $secTag
 
 *endif
 *format "%6d%6d%6d%6d%6d   "
-element ShellDKGQ *ElemsNum *ElemsConec *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
+element ShellNLDKGQThermal *ElemsNum *ElemsConec *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
 *set var VarCount=VarCount+1
 *endif
 *end elems

@@ -2587,7 +2587,7 @@ QUESTION: Mass_density#UNITS#
 VALUE: 0.0 ton/m^3
 END MATERIAL
 
-MATERIAL: Shell
+MATERIAL: ShellMITC4GNLThermal
 COMMENT: \n
 TITLE: General
 QUESTION: Element_type:#CB#(Shell)
@@ -2606,7 +2606,7 @@ QUESTION: Weight_density#UNITS#
 VALUE: 25 kN/m^3
 END MATERIAL
 
-MATERIAL: ShellDKGQ
+MATERIAL: ShellNLDKGQThermal
 COMMENT: \n
 TITLE: General
 QUESTION: Element_type:#CB#(ShellDKGQ)

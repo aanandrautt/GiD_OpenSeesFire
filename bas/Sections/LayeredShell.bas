@@ -3,15 +3,18 @@
 *set var PlateFromPlaneStressMaterialTag=PlateFromPlaneStressMaterialTag+1
 *set var PlateRebarLongTag=PlateRebarLongTag+1
 *set var PlateRebarTransvTag=PlateRebarTransvTag+1
-*# define PlaneStressUserMaterial for concrete
-*format "%6d%6g%6g"
-nDMaterial PlaneStressUserMaterial *PlaneStressUserMaterialTag 40 7 *MatProp(Concrete_compressive_strength,real) *MatProp(Concrete_tensile_strength,real) *\
-*format "%6g%6g"
-*MatProp(Concrete_crushing_strength,real) *MatProp(Concrete_strain_at_maximum_strength,real) *\
-*format "%6g%6g"
-*MatProp(Concrete_strain_at_crushing_strength,real) *MatProp(Ultimate_tensile_strain,real) *\
-*format "%6g%6g"
-*MatProp(Shear_retention_factor,real)
+*set var fc=MatProp(Concrete_compressive_strength,real)
+*set var fct=MatProp(Concrete_tensile_strength,real)
+*set var epsc0=MatProp(Concrete_strain_at_maximum_strength,real)
+*set var Ec=operation(1.5*fc/epsc0)
+*set var n=MatProp(Compressive_cracking_energy_multiplier_n,real)
+*set var m=MatProp(Tensile_cracking_energy_multiplier_m,real)
+*set var gc=operation((fc/Ec)*(n-1)*fc/2)
+*set var gt=operation((fct/Ec)*(m-1)*fct/2)
+*# define CDPPlaneStressThermal for concrete
+#nDMaterial  CDPPlaneStressThermal matTag Ec  v  ft  fc  gt  gc
+*format "%6d%6g%6g%6g%6g%6g"
+nDMaterial CDPPlaneStressThermal   *PlaneStressUserMaterialTag *Ec 0.2 *fct *fc *gt *gc
 *# define PlateFromPlaneStress material
 *format "%6d%6d%6g"
 nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneStressUserMaterialTag *MatProp(Shear_modulus_of_out_plane,real)

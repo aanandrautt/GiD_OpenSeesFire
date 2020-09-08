@@ -51,11 +51,11 @@
 *endif
 *end materials
 
-# ShellMITC4GNLThermal Elements Definition: element ShellMITC4GNLThermal $eleTag $iNode $jNode $kNode $lNode $secTag
+# ShellMITC4NLThermal Elements Definition: element ShellMITC4GNLThermal $eleTag $iNode $jNode $kNode $lNode $secTag
 
 *endif
 *format "%6d%6d%6d%6d%6d   "
-element ShellMITC4GNLThermal *ElemsNum *ElemsConec *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
+element ShellMITC4NLThermal *ElemsNum *ElemsConec *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
 *set var VarCount=VarCount+1
 *endif
 *end elems

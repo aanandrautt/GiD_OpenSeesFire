@@ -1923,26 +1923,24 @@ QUESTION: Transverse_bar_area#UNITS#
 VALUE: 5.027e-005 m^2
 TITLE: Materials
 QUESTION: Concrete_compressive_strength#UNITS#
-VALUE: 20 MPa
+VALUE: 30 MPa
 HELP: positive value
 TKWIDGET: LayeredShell::CheckFieldValues
 QUESTION: Concrete_tensile_strength#UNITS#
-VALUE: 2.2 MPa
+VALUE: 3 MPa
 HELP: positive value
-QUESTION: Concrete_crushing_strength#UNITS#
-VALUE: -17.0 MPa
-HELP: negative value
 QUESTION: Concrete_strain_at_maximum_strength
-VALUE: -2.0e-3
-HELP: negative value
-QUESTION: Concrete_strain_at_crushing_strength
-VALUE: -3.5e-3
+VALUE: 2.0e-3
 HELP: negative value
 QUESTION: Ultimate_tensile_strain
 VALUE: 1.0e-3
 HELP: positive value
-QUESTION: Shear_retention_factor
-VALUE: 0.08
+QUESTION: Compressive_cracking_energy_multiplier_n
+VALUE: 10
+HELP: multiplier used for calculating gc
+QUESTION: Tensile_cracking_energy_multiplier_m
+VALUE: 10
+HELP: multiplier used for calculating gt
 QUESTION: Shear_modulus_of_out_plane#UNITS#
 VALUE: 12.5 GPa
 QUESTION: Longitudinal_bar_material#MAT#(Uniaxial_Steel_Materials)
@@ -2593,7 +2591,7 @@ QUESTION: Mass_density#UNITS#
 VALUE: 0.0 ton/m^3
 END MATERIAL
 
-MATERIAL: ShellMITC4GNLThermal
+MATERIAL: ShellMITC4NLThermal
 COMMENT: \n
 TITLE: General
 QUESTION: Element_type:#CB#(Shell)

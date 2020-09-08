@@ -141,6 +141,7 @@ section fiberSecThermal *FiberTag *\
 *format "%3d%6d%6d%10.6f%10.6f%10.6f%10.6f"
 patch rect *sectionmaterial *operation(2*ytfibers) *zfibers *operation(-ytcoordinate) 0 *ytcoordinate *zcoordinate
 
+
 #Flange Left
 *format "%3d%6d%6d%10.6f%10.6f%10.6f%10.6f"
 patch rect *sectionmaterial *yfibers *ztfibers *operation(-(ycoordinate+ytcoordinate)) *zcoordinate *operation(-ytcoordinate) *operation(zcoordinate+ztcoordinate)
@@ -459,11 +460,11 @@ patch rect *sectionmaterial *ytfibers *operation(2*zfibers) *ycoordinate *operat
 
 #Down Square of Box
 *format "%3d%6d%6d%10.6f%10.6f%10.6f%10.6f"
-patch rect *sectionmaterial *yfibers *ztfibers *operation(-ycoordinate)) *operation(-(zcoordinate+ztcoordinate)) *ycoordinate *operation(-zcoordinate)
+patch rect *sectionmaterial *yfibers *ztfibers *operation(-ycoordinate) *operation(-(zcoordinate+ztcoordinate)) *ycoordinate *operation(-zcoordinate)
 
 #Up Square of Box
 *format "%3d%6d%6d%10.6f%10.6f%10.6f%10.6f"
-patch rect *sectionmaterial *yfibers *ztfibers *operation(-ycoordinate)) *zcoordinate *ycoordinate *operation(zcoordinate+ztcoordinate)
+patch rect *sectionmaterial *yfibers *ztfibers *operation(-ycoordinate) *zcoordinate *ycoordinate *operation(zcoordinate+ztcoordinate)
 
 #Left Down Corner
 *format "%3d%6d%6d%10.6f%10.6f%10.6f%10.6f"

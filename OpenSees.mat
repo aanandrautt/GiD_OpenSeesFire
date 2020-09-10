@@ -1766,13 +1766,15 @@ VALUE: 0.0ton/m^3
 TKWIDGET: TK_SectionWikiInfo
 END MATERIAL
 
-MATERIAL: LayeredShell
+MATERIAL: LayeredShellThermal
 COMMENT: \n\tEnter the rectangular section properties to be modeled with shell elements\n\tusing a layered/composite formulation for each integration point.\n\n\tExample : 2 bars of 16 mm diameter with 100 mm spacing is 2[encoding convertfrom cp1252 \xD8]16/100.\n
 TITLE: General
 QUESTION: Section:#CB#(LayeredShell)
 VALUE: LayeredShell
 TKWIDGET: TK_SectionWikiInfo
 TITLE: Section_properties
+QUESTION: Offset#UNITS#
+VALUE: 0 m
 QUESTION: Wall_width#UNITS#
 VALUE: 0.25 m
 QUESTION: Reinforcement_cover#UNITS#

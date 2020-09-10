@@ -1,8 +1,4 @@
 *set var FiberTag=SectionID
-*set var dummy=tcl(Fire::ActivateThermalcheck Fiber *MatProp(Activate_Thermal,int) *ElemsMatProp(Element_type:) *ElemsNum)
-*if(dummy==1)
-*MessageBox
-*endif
 *if(ndime==3)
 *if(strcmp(Matprop(Cross_section),"Bridge_Deck")!=0)
 *# if it is a Fiber Section, We need to check which uniaxial materials we need to define
@@ -283,18 +279,13 @@
 *set var yhalf=operation(width/2.0)
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
 *format "%d"
 section Fiber *FiberTag *\
-*else
-*format "%d"
-section fiberSecThermal *FiberTag *\
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
+*else
+-GJ 1e10 *\
 *endif
  {
 *set var zdivision=MatProp(Fibers_in_local_z_direction,int)
@@ -407,15 +398,8 @@ layer straight *SelectedRBMaterial *operation(Howmanybars-2) *MatProp(Middle_Bar
 *set var yhalf=operation(width/2.0)
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
 *format "%d"
 section Fiber *FiberTag *\
-*else
-*format "%d"
-section fiberSecThermal *FiberTag *\
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -476,7 +460,7 @@ layer straight *SelectedRBMaterial *HowmanyBottombars *MatProp(Bottom_bar_area,r
 *set var SlabArea=operation(ts*(width-tw))
 *set var WebArea=operation(height*tw)
 *set var Area=operation((height-ts)*tw+ts*width)
-*set var Zcm=operation((WebArea*(height)/2+SlabArea*(height-ts/2))/Area)
+*set var Zcm=operation((WebArea*(height/2.0)+SlabArea*(height-ts/2.0))/Area)
 *set var zhalf=operation(height/2.0)
 *set var yhalf=operation(width/2.0)
 *set var cover=MatProp(Cover_depth_for_bars,real)
@@ -484,15 +468,8 @@ layer straight *SelectedRBMaterial *HowmanyBottombars *MatProp(Bottom_bar_area,r
 *MessageBox Error: Invalid geometric values in Fiber Tee Beam Section.
 *endif
 
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
 *format "%d"
 section Fiber *FiberTag *\
-*else
-*format "%d"
-section fiberSecThermal *FiberTag *\
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -580,15 +557,8 @@ fiber *operation(width/2-(width/2-tw/2)/2) *operation(height-Zcm-cover) *MatProp
 *set var CoreExternalRadius=operation(radius-cover)
 *set var coverFibers=tcl(NumofCoverFibers *cover *radius *raddivision)
 
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
 *format "%d"
 section Fiber *FiberTag *\
-*else
-*format "%d"
-section fiberSecThermal *FiberTag *\
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -694,13 +664,9 @@ layer circ *SelectedRBMaterial *MatProp(Bars_along_arc,int) *MatProp(Bar_Area,re
 *set var nfyintweb=MatProp(Fibers_along_internal_web_thickness,int)
 *set var nfybeam=MatProp(Fibers_along_beam_width,int)
 *set var nfzbeam=MatProp(Fibers_along_beam_height,int)
-*# DeckFiberSection3D { secID secName GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv zcoordTopIntTendon zcoordBotIntTendon zcoordTopExtTendon zcoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfyextweb nfzweb nfyintweb nfybeam nfzbeam} {
+*# DeckFiberSection3D { secID GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv zcoordTopIntTendon zcoordBotIntTendon zcoordTopExtTendon zcoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfyextweb nfzweb nfyintweb nfybeam nfzbeam} {
 *format "%d%g%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%g%g%g%g%g%g%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%d%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%d%d%d%d%d%d%d%d%d"
-*if(MatProp(Activate_Thermal,int)==0)
-DeckFiberSection3D *FiberTag Fiber *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID *steelbeamID *extTendonSteelID *intTendonSteelID *tendons *nsteeltop1 *nsteelbot1 *nsteeltop2 *nsteelbot2 *nsteeltop3 *nsteelbot3 *nbeamsteelfacey *nbeamsteelfacez *steelArea1 *steelArea2 *steelArea3 *beamSteelArea *intTendonArea *extTendonArea *wt *ts1 *wb *ts2 *ts3 *bsw *ts4 *b *h *cover *tw *nvoid *hv *dv *zcoordTopIntTendon *zcoordBotIntTendon *zcoordTopExtTendon *zcoordBotExtTendon *nfy1 *nfz1 *nfy2 *nfz2 *nfyextweb *nfzweb *nfyintweb *nfybeam *nfzbeam
-*else
-DeckFiberSection3D *FiberTag fiberSecThermal *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID *steelbeamID *extTendonSteelID *intTendonSteelID *tendons *nsteeltop1 *nsteelbot1 *nsteeltop2 *nsteelbot2 *nsteeltop3 *nsteelbot3 *nbeamsteelfacey *nbeamsteelfacez *steelArea1 *steelArea2 *steelArea3 *beamSteelArea *intTendonArea *extTendonArea *wt *ts1 *wb *ts2 *ts3 *bsw *ts4 *b *h *cover *tw *nvoid *hv *dv *zcoordTopIntTendon *zcoordBotIntTendon *zcoordTopExtTendon *zcoordBotExtTendon *nfy1 *nfz1 *nfy2 *nfz2 *nfyextweb *nfzweb *nfyintweb *nfybeam *nfzbeam
-*endif
+DeckFiberSection3D *FiberTag *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID *steelbeamID *extTendonSteelID *intTendonSteelID *tendons *nsteeltop1 *nsteelbot1 *nsteeltop2 *nsteelbot2 *nsteeltop3 *nsteelbot3 *nbeamsteelfacey *nbeamsteelfacez *steelArea1 *steelArea2 *steelArea3 *beamSteelArea *intTendonArea *extTendonArea *wt *ts1 *wb *ts2 *ts3 *bsw *ts4 *b *h *cover *tw *nvoid *hv *dv *zcoordTopIntTendon *zcoordBotIntTendon *zcoordTopExtTendon *zcoordBotExtTendon *nfy1 *nfz1 *nfy2 *nfz2 *nfyextweb *nfzweb *nfyintweb *nfybeam *nfzbeam
 *# endif section is rectangular or circular
 *endif
 *# --------------------------------------------- 2D ---------------------------------------------------
@@ -982,15 +948,8 @@ DeckFiberSection3D *FiberTag fiberSecThermal *GJ *conc1ID *conc2ID *steel1ID *st
 *set var zhalf=operation(width/2.0)
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
 *format "%d"
 section Fiber *FiberTag *\
-*else
-*format "%d"
-section fiberSecThermal *FiberTag *\
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -1096,15 +1055,7 @@ layer straight *SelectedRBMaterial *operation(Howmanybars-2) *MatProp(Middle_Bar
 *set var zhalf=operation(width/2.0)
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
-*format "%d"
 section Fiber *FiberTag {
-*else
-*format "%d"
-section fiberSecThermal *FiberTag {
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *set var ydivision=MatProp(Fibers_in_local_y_direction,int)
 *set var zdivision=MatProp(Fibers_in_local_z_direction,int)
 *set var ycoverFibers=tcl(NumofCoverFibers *cover *height *ydivision)
@@ -1158,21 +1109,12 @@ layer straight *SelectedRBMaterial *HowmanyBottombars *MatProp(Bottom_bar_area,r
 *set var SlabArea=operation(ts*(width-tw))
 *set var WebArea=operation(height*tw)
 *set var Area=operation((height-ts)*tw+ts*width)
-*set var Ycm=operation((WebArea*(height)/2+SlabArea*(height-ts/2))/Area)
+*set var Ycm=operation((WebArea*(height/2.0)+SlabArea*(height-ts/2.0))/Area)
 *set var cover=MatProp(Cover_depth_for_bars,real)
 *if(width<=tw || height<=ts || cover>tw)
 *MessageBox Error: Invalid geometric values in Fiber Tee Beam Section.
 *endif
-
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
-*format "%d"
 section Fiber *FiberTag {
-*else
-*format "%d"
-section fiberSecThermal *FiberTag {
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *set var zdivision=MatProp(Fibers_in_local_z_direction,int)
 *set var ydivision=MatProp(Fibers_in_local_y_direction,int)
 *set var ycoverFibers=tcl(NumofCoverFibers *cover *height *ydivision)
@@ -1254,15 +1196,8 @@ fiber *operation(height-Ycm-cover) *operation(+width/2-(width/2-tw/2)/2) *MatPro
 *set var CoreExternalRadius=operation(radius-cover)
 *set var coverFibers=tcl(NumofCoverFibers *cover *radius *raddivision)
 
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*if(Matprop(Activate_Thermal,int)==0)
-*format "%d"
 section Fiber *FiberTag {
-*else
-*format "%d"
-section fiberSecThermal *FiberTag {
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
+
 # Create the core fibers
 
 #patch circ $matTag $numSubdivCirc $numSubdivRad $yCenter $zCenter $intRad $extRad $startAng $endAng
@@ -1362,14 +1297,10 @@ layer circ *SelectedRBMaterial *MatProp(Bars_along_arc,int) *MatProp(Bar_Area,re
 *set var nfzintweb=MatProp(Fibers_along_internal_web_thickness,int)
 *set var nfybeam=MatProp(Fibers_along_beam_height,int)
 *set var nfzbeam=MatProp(Fibers_along_beam_width,int)
-*# DeckFiberSection3D { secID secName GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv zcoordTopIntTendon zcoordBotIntTendon zcoordTopExtTendon zcoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfzextweb nfyweb nfzintweb nfybeam nfzbeam} {
+*# DeckFiberSection3D { secID GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv zcoordTopIntTendon zcoordBotIntTendon zcoordTopExtTendon zcoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfzextweb nfyweb nfzintweb nfybeam nfzbeam} {
 *format "%d%g%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%g%g%g%g%g%g%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%d%0.3f%0.3f%0.3f%0.3f%0.3f%0.3f%d%d%d%d%d%d%d%d%d"
-*if(Matprop(Activate_Thermal,int)==0)
-DeckFiberSection2D *FiberTag Fiber *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID *steelbeamID *extTendonSteelID *intTendonSteelID *tendons *nsteeltop1 *nsteelbot1 *nsteeltop2 *nsteelbot2 *nsteeltop3 *nsteelbot3 *nbeamsteelfacey *nbeamsteelfacez *steelArea1 *steelArea2 *steelArea3 *beamSteelArea *intTendonArea *extTendonArea *wt *ts1 *wb *ts2 *ts3 *bsw *ts4 *b *h *cover *tw *nvoid *hv *dv *zcoordTopIntTendon *zcoordBotIntTendon *zcoordTopExtTendon *zcoordBotExtTendon *nfy1 *nfz1 *nfy2 *nfz2 *nfzextweb *nfyweb *nfzintweb *nfybeam *nfzbeam
-*else
-DeckFiberSection2D *FiberTag fiberSecThermal *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID *steelbeamID *extTendonSteelID *intTendonSteelID *tendons *nsteeltop1 *nsteelbot1 *nsteeltop2 *nsteelbot2 *nsteeltop3 *nsteelbot3 *nbeamsteelfacey *nbeamsteelfacez *steelArea1 *steelArea2 *steelArea3 *beamSteelArea *intTendonArea *extTendonArea *wt *ts1 *wb *ts2 *ts3 *bsw *ts4 *b *h *cover *tw *nvoid *hv *dv *zcoordTopIntTendon *zcoordBotIntTendon *zcoordTopExtTendon *zcoordBotExtTendon *nfy1 *nfz1 *nfy2 *nfz2 *nfzextweb *nfyweb *nfzintweb *nfybeam *nfzbeam
-*endif
+DeckFiberSection2D *FiberTag *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID *steelbeamID *extTendonSteelID *intTendonSteelID *tendons *nsteeltop1 *nsteelbot1 *nsteeltop2 *nsteelbot2 *nsteeltop3 *nsteelbot3 *nbeamsteelfacey *nbeamsteelfacez *steelArea1 *steelArea2 *steelArea3 *beamSteelArea *intTendonArea *extTendonArea *wt *ts1 *wb *ts2 *ts3 *bsw *ts4 *b *h *cover *tw *nvoid *hv *dv *zcoordTopIntTendon *zcoordBotIntTendon *zcoordTopExtTendon *zcoordBotExtTendon *nfy1 *nfz1 *nfy2 *nfz2 *nfzextweb *nfyweb *nfzintweb *nfybeam *nfzbeam
 *# endif section is rectangular or circular
 *endif
 *# end of 2D or 3D
-*endif
+*endif 

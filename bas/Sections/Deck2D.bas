@@ -1,4 +1,4 @@
-proc DeckFiberSection2D { secID secName GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv ycoordTopIntTendon ycoordBotIntTendon ycoordTopExtTendon ycoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfzextweb nfyweb nfzintweb nfybeam nfzbeam} {
+proc DeckFiberSection2D { secID GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv ycoordTopIntTendon ycoordBotIntTendon ycoordTopExtTendon ycoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfzextweb nfyweb nfzintweb nfybeam nfzbeam} {
 
     if {$nvoid!=0} {
         set nintwebs [expr $nvoid-1]; # number of internal webs
@@ -18,7 +18,7 @@ proc DeckFiberSection2D { secID secName GJ conc1ID conc2ID steel1ID steel2ID ste
         set nfz1 16
     }
 
-    set height [expr $thick1+$thick2+$hv]; # total external height of the main section, not including top slab and sidewalk
+    set height [expr $thick1+$thick2+$hv]; # total external height of the man section, not including top slab and sidewalk
 
     # Concrete Areas
     set Area1 [expr $thick1**$width1]; # Area of the middle slab
@@ -32,7 +32,7 @@ proc DeckFiberSection2D { secID secName GJ conc1ID conc2ID steel1ID steel2ID ste
 
     set ycm [expr ($Area1**($height-$thick1/2)+($Area2**$thick2/2)+($Area3**($height+$thick3/2))+2**($swslabArea**($height+$thick3+$swthick/2))+2**($beamArea**($height+$thick3+$swthick-$beamheight/2))+($nintwebs**$intWebArea)**($thick2+$hv/2)+(2**$extWebArea)**($thick2+$hv/2))/$totalArea]
 
-    section $secName $secID -GJ $GJ {
+    section Fiber $secID -GJ $GJ {
 
         ###################
         # CONCRETE FIBERS #

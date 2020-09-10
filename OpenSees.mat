@@ -1,18 +1,20 @@
 # GiD + OpenSees Interface - An Integrated FEA Platform
-# Copyright (C) 2016-2018
+# Copyright (C) 2016-2020
 #
 # Lab of R/C and Masonry Structures
 # School of Civil Engineering, AUTh
 #
-# Development team
-# T. Kartalis-Kaounis, Civil Engineer AUTh
-# V. Protopapadakis, Civil Engineer AUTh
-# T. Papadopoulos, Civil Engineer AUTh
+# Development Team
 #
-# Project coordinator
-# V.K. Papanikolaou, Assistant Professor AUTh
+# T. Kartalis-Kaounis, Dipl. Eng. AUTh, MSc
+# V.K. Papanikolaou, Dipl. Eng., MSc DIC, PhD, Asst. Prof. AUTh
 #
-# With contributions from Tejeswar Yarlagadda for Thermo-mechanical analysis
+# Project Contributors
+#
+# F. Derveni, Dipl. Eng. AUTh
+# V.K. Protopapadakis, Dipl. Eng. AUTh, MSc
+# T. Papadopoulos, Dipl. Eng. AUTh, MSc
+# T. Zachariadis, Dipl. Eng. AUTh, MSc
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,14 +29,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-
 #
 # Materials file
 #
 
 
 BOOK: Standard_Uniaxial_Materials
+
 
 MATERIAL: Elastic
 COMMENT: \n\tUpdate material window to assign selected Class/Type.\n\tSelect 'Custom' to enter user values.\n\tSelect Force-Deformation/Moment-Rotation formulation\n\tin order to use this material for zeroLength elements.\n
@@ -72,7 +73,7 @@ MATERIAL: Elastic_Perfectly_Plastic
 COMMENT: \n\tUpdate material window to assign selected Class/Type.\n\tSelect 'Custom' to enter user values.\n\tSelect Force-Deformation/Moment-Rotation formulation\n\tin order to use this material for zeroLength elements.\n
 QUESTION: Material:#CB#(ElasticPerfectlyPlastic)
 VALUE: ElasticPerfectlyPlastic
-HELP: elastic perfectly-plastic uniaxial material object.
+HELP: elastic perfectly-plastic uniaxial material object
 IMAGE: img/Materials/ElasticPP.png
 TKWIDGET: TK_UpdateInfoBar
 QUESTION: Formulation#CB#(Stress-Strain,Force-Deformation,Moment-Rotation)
@@ -126,7 +127,7 @@ MATERIAL: Elastic_Perfectly_Plastic_with_Gap
 COMMENT: \n\tUpdate material window to assign selected Class/Type.\n\tSelect 'Custom' to enter user values.\n\tSelect Force-Deformation/Moment-Rotation formulation\n\tin order to use this material for zeroLength elements.\n
 QUESTION: Material:#CB#(ElasticPerfectlyPlasticwithGap)
 VALUE: ElasticPerfectlyPlasticwithGap
-HELP: elastic perfectly-plastic gap uniaxial material object.
+HELP: elastic perfectly-plastic gap uniaxial material object
 IMAGE: img/Materials/ElasticPPGap.png
 TKWIDGET: TK_UpdateInfoBar
 QUESTION: Formulation#CB#(Stress-Strain,Force-Deformation,Moment-Rotation)
@@ -312,27 +313,9 @@ MATERIAL: Steel01
 COMMENT: \n\tUpdate material window to assign selected Grade.\n\tSelect 'Custom' to enter user values.\n\tSelect Force-Deformation/Moment-Rotation formulation\n\tin order to use this material for zeroLength elements.\n
 QUESTION: Material:#CB#(Steel01)
 VALUE: Steel01
-HELP: uniaxial bilinear steel material object with kinematic hardening and optional isotropic hardening described by a non-linear evolution equation.
+HELP: Uniaxial bilinear steel material object with kinematic hardening and optional isotropic hardening described by a non-linear evolution equation.
 IMAGE: img/Materials/Steel01.png
 TKWIDGET: TK_UpdateInfoBar
-QUESTION: Thermal_Material:#CB#(Steel01)
-VALUE: Steel01
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding section,RESTORE,_and, element in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding section,HIDE,_and, element in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: Compatible_Thermal_elements:#CB#(_)
-VALUE: dispBeamColumn
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 QUESTION: Formulation#CB#(Stress-Strain,Force-Deformation,Moment-Rotation)
 VALUE: Stress-Strain
 DEPENDENCIES: (Stress-Strain,RESTORE,Steel_grade,#CURRENT#,RESTORE,Yield_Stress_Fy,#CURRENT#,RESTORE,Initial_elastic_tangent_E0,#CURRENT#,HIDE,Force_Fy,#CURRENT#,HIDE,Initial_stiffness_K,#CURRENT#,HIDE,Moment_My,#CURRENT#,HIDE,Moment_per_rotation_unit,#CURRENT#)
@@ -375,25 +358,6 @@ QUESTION: Material:#CB#(Steel02)
 VALUE: Steel02
 HELP: uniaxial Giuffre-Menegotto-Pinto steel material object with isotropic strain hardening
 TKWIDGET: TK_UpdateInfoBar
-QUESTION: Thermal_Material:#CB#(Steel02)
-VALUE: Steel02
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding section,RESTORE,_and, element in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding section,HIDE,_and, element in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: Compatible_Thermal_elements:#CB#(_)
-VALUE: dispBeamColumn
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 QUESTION: Formulation#CB#(Stress-Strain,Force-Deformation,Moment-Rotation)
 VALUE: Stress-Strain
 DEPENDENCIES: (Stress-Strain,RESTORE,Steel_grade,#CURRENT#,RESTORE,Yield_Stress_Fy,#CURRENT#,RESTORE,Initial_elastic_tangent_E0,#CURRENT#,HIDE,Force_Fy,#CURRENT#,HIDE,Initial_stiffness_K,#CURRENT#,HIDE,Moment_My,#CURRENT#,HIDE,Moment_per_rotation_unit,#CURRENT#,RESTORE,Initial_stress,#CURRENT#,HIDE,Initial_force,#CURRENT#,HIDE,Initial_moment,#CURRENT#)
@@ -594,24 +558,6 @@ VALUE: Concrete01
 HELP: uniaxial Kent-Scott-Park concrete material object with degraded linear unloading/reloading stiffness according to the work of Karsan-Jirsa and no tensile strength
 IMAGE: img/Materials/Concrete01.png
 TKWIDGET: TK_UpdateInfoBar
-QUESTION: Thermal_Material:#CB#(Concrete01)
-VALUE: Concrete01
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding section,RESTORE,_and, element in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding section,HIDE,_and, element in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: Compatible_Thermal_elements:#CB#(_)
-VALUE: dispBeamColumn
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 QUESTION: Strength_class#CB#(C12/15,C16/20,C20/25,C25/30,C30/37,C35/45,C40/50,C45/55,C50/60,C55/67,C60/75,C70/85,C80/95,C90/105,Custom)
 VALUE: Custom
 TKWIDGET: ConcreteUniaxMaterial::GenerateValues
@@ -649,24 +595,6 @@ QUESTION: Material:#CB#(Concrete02)
 VALUE: Concrete02
 IMAGE: img/Materials/Concrete02.png
 TKWIDGET: TK_UpdateInfoBar
-QUESTION: Thermal_Material:#CB#(Concrete02)
-VALUE: Concrete02
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding section,RESTORE,_and, element in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding section,HIDE,_and, element in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: Compatible_Thermal_elements:#CB#(_)
-VALUE: dispBeamColumn
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 QUESTION: Strength_class#CB#(C12/15,C16/20,C20/25,C25/30,C30/37,C35/45,C40/50,C45/55,C50/60,C55/67,C60/75,C70/85,C80/95,C90/105,Custom)
 VALUE: Custom
 TKWIDGET: ConcreteUniaxMaterial::GenerateValues
@@ -1033,6 +961,20 @@ VALUE: 1.0e16 rad
 TKWIDGET: TK_MaterialWikiInfo
 END MATERIAL
 
+BOOK: User_Materials
+
+MATERIAL: User_Material
+COMMENT: \n
+QUESTION: Material:#CB#(UserMaterial)
+VALUE: UserMaterial
+QUESTION: Section:#CB#(UserMaterial)
+VALUE: UserMaterial
+QUESTION: Width#UNITS#
+VALUE: 0.1m
+HELP: Used to calculate self weight
+TKWIDGET: UserMaterial::Script
+END MATERIAL
+
 
 BOOK: Multidimensional_(nD)_Materials
 
@@ -1158,7 +1100,7 @@ QUESTION: Shear_strain_at_which_maximum_stress_is_reached
 VALUE: 0.1#WIDTH#(10)
 QUESTION: Friction_angle
 VALUE: 0.0#WIDTH#(10)
-HELP: Enter angle in degrees.
+HELP: Enter angle in degrees
 QUESTION: Reference_mean_effective_confining_pressure_pr#UNITS#
 VALUE: 100kPa
 QUESTION: Positive_constant_d
@@ -1199,14 +1141,14 @@ QUESTION: Shear_strain_at_which_maximum_stress_is_reached
 VALUE: 0.1#WIDTH#(10)
 QUESTION: Friction_angle
 VALUE: 29#WIDTH#(10)
-HELP: Enter angle in degrees.
+HELP: Enter angle in degrees
 QUESTION: Reference_mean_effective_confining_pressure_pr#UNITS#
 VALUE: 80kPa
 QUESTION: Positive_constant_d
 VALUE: 0.5#WIDTH#(10)
 QUESTION: Phase_transformation_angle
 VALUE: 29#WIDTH#(10)
-HELP: Enter angle in degrees.
+HELP: Enter angle in degrees
 QUESTION: Contraction_rate_constant
 VALUE: 0.21#WIDTH#(10)
 HELP: A non-negative constant defining the rate of shear-induced volume decrease (contraction) or pore pressure buildup. A larger value corresponds to faster contraction rate.
@@ -1248,6 +1190,95 @@ DEPENDENCIES: (0,RESTORE,Define_yield_surfaces_based_on_shear_modulus_reduction_
 QUESTION: Define_yield_surfaces_based_on_shear_modulus_reduction_curve(Shear_strain,Modulus_ratio)
 VALUE: #N# 2 0.005 0.1
 STATE: HIDDEN
+TKWIDGET: TK_MaterialWikiInfo
+END MATERIAL
+
+MATERIAL: PressureDependMultiYield02
+COMMENT: \n\tUpdate material window to assign selected soil type.\n\tSelect 'Custom' to enter user values.\n
+QUESTION: Material:#CB#(PressureDependMultiYield02)
+VALUE: PressureDependMultiYield02
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Soil_type#CB#(Dr=30%,Dr=40%,Dr=50%,Dr=60%,Dr=75%,Custom)
+VALUE: Custom
+TKWIDGET: PDMY02::GenerateRecommendedValues
+QUESTION: Saturated_soil_mass_density#UNITS#
+VALUE: 1.7ton/m^3
+QUESTION: Reference_shear_modulus_Gr#UNITS#
+VALUE: 55MPa
+QUESTION: Reference_bulk_modulus#UNITS#
+VALUE: 150MPa
+QUESTION: Shear_strain_at_which_maximum_stress_is_reached
+VALUE: 0.1#WIDTH#(10)
+QUESTION: Friction_angle
+VALUE: 29#WIDTH#(10)
+HELP: Enter angle in degrees
+QUESTION: Reference_mean_effective_confining_pressure_pr#UNITS#
+VALUE: 80kPa
+QUESTION: Positive_constant_d
+VALUE: 0.5#WIDTH#(10)
+QUESTION: Phase_transformation_angle
+VALUE: 29#WIDTH#(10)
+HELP: Enter angle in degrees
+QUESTION: Contraction_constant_1
+VALUE: 0.87#WIDTH#(10)
+QUESTION: Contraction_constant_2
+VALUE: 5#WIDTH#(10)
+QUESTION: Contraction_constant_3
+VALUE: 0.18#WIDTH#(10)
+HELP: A non-negative constant reflecting Ks effect
+QUESTION: Dilation_rate_constant_1
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Dilation_rate_constant_2
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Dilation_rate_constant_3
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Liquefaction_parameter_1#UNITS#
+VALUE: 10kPa
+QUESTION: Liquefaction_parameter_2
+VALUE: 0.02#WIDTH#(10)
+QUESTION: Initial_void_ratio
+VALUE: 0.85#WIDTH#(10)
+QUESTION: Critical_straight_line_parameter_cs1
+VALUE: 0.9#WIDTH#(10)
+QUESTION: Critical_straight_line_parameter_cs2
+VALUE: 0.02#WIDTH#(10)
+QUESTION: Critical_straight_line_parameter_cs3
+VALUE: 0.07#WIDTH#(10)
+QUESTION: Atmospheric_pressure_for_normalization#UNITS#
+VALUE: 101kPa
+QUESTION: Numerical_constant#UNITS#
+VALUE: 0.3kPa
+QUESTION: Yield_surfaces
+VALUE: 20#WIDTH#(10)
+HELP: Yield surfaces must be less than 40!
+QUESTION: Activate_plastic_response#CB#(1,0)
+VALUE: 0
+DEPENDENCIES: (0,HIDE,Activate_plastic_response_at_interval,#CURRENT#) (1,RESTORE,Activate_plastic_response_at_interval,#CURRENT#)
+QUESTION: Activate_plastic_response_at_interval
+VALUE: 2#WIDTH#(4)
+TKWIDGET: PDMY::CheckIntvNum
+QUESTION: Automatic_surface_generation#CB#(0,1)
+VALUE: 1
+DEPENDENCIES: (0,RESTORE,Define_yield_surfaces_based_on_shear_modulus_reduction_curve,#CURRENT#) (1,HIDE,Define_yield_surfaces_based_on_shear_modulus_reduction_curve,#CURRENT#)
+QUESTION: Define_yield_surfaces_based_on_shear_modulus_reduction_curve(Shear_strain,Modulus_ratio)
+VALUE: #N# 2 0.005 0.1
+STATE: HIDDEN
+TKWIDGET: TK_MaterialWikiInfo
+END MATERIAL
+
+MATERIAL: Contact
+COMMENT: \n\t
+QUESTION: Material:#CB#(Contact)
+VALUE: Contact
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Frictional_coefficient
+VALUE: 0.1#WIDTH#(10)
+QUESTION: Stiffness_parameter#UNITS#
+VALUE: 1000.0kN/m
+QUESTION: Cohesive_intercept
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Tensile_strength#UNITS#
+VALUE: 0.0kN
 TKWIDGET: TK_MaterialWikiInfo
 END MATERIAL
 
@@ -1339,25 +1370,6 @@ TKWIDGET: Fiber::CheckFieldValues
 QUESTION: Compatible_materials:#CB#(_)
 VALUE: Concrete uniaxial materials/InitStrain/InitStress/Steel uniaxial materials
 TKWIDGET: TK_SectionWikiInfo
-QUESTION: Thermal_Section:#CB#(Fiber)
-VALUE: Fiber
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding material,RESTORE,_and, element in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding material,HIDE,_and, element in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_materials:#CB#(_)
-VALUE: Concrete02/Steel01/Steel02
-QUESTION: Compatible_Thermal_elements:#CB#(_)
-VALUE: dispBeamColumn
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 TITLE: Section_properties
 QUESTION: _#CB#(_)
 VALUE:
@@ -1580,147 +1592,12 @@ VALUE: Steel01
 #VALUE: Steel01
 END MATERIAL
 
-#	Added By Tejeswar Yarlagadda------------Built Up Sections and Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-MATERIAL: Fiber_Built_Up_Sections
-COMMENT: \n
-TITLE: General
-QUESTION: Section:#CB#(FiberBuiltUpSections)
-VALUE: FiberBuiltUpSections
-TKWIDGET: Fiber::BuiltUpCheckFieldValues
-QUESTION: Compatible_materials:#CB#(_)
-VALUE: Steel uniaxial materials
-TKWIDGET: TK_SectionWikiInfo
-QUESTION: Thermal_Section:#CB#(FiberBuiltUpSections)
-VALUE: FiberBuiltUpSections
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding material,RESTORE,_and, element in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding material,HIDE,_and, element in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_materials:#CB#(_)
-VALUE: Steel01/Steel02
-QUESTION: Compatible_Thermal_elements:#CB#(_)
-VALUE: dispBeamColumn
-TITLE: Section_properties
-QUESTION: _#CB#(_)
-VALUE:
-STATE: HIDDEN
-TKWIDGET: TK_LocalAxesInfo
-QUESTION: Section_Type#CB#(Plate,Angle,Channel)
-VALUE: Plate
-DEPENDENCIES: (Plate,RESTORE,la,#CURRENT#,RESTORE,lb,#CURRENT#,RESTORE,Fibers_along_la,#CURRENT#,RESTORE,Fibers_along_lb,#CURRENT#,HIDE,ta,#CURRENT#,HIDE,tb,#CURRENT#,HIDE,Fibers_along_ta,#CURRENT#,HIDE,Fibers_along_tb,#CURRENT#,HIDE,Make_Section:,#CURRENT#,HIDE,Make_Section:_,#CURRENT#,HIDE,__,#CURRENT#,HIDE,___,#CURRENT#,HIDE,____,#CURRENT#,HIDE,_____,#CURRENT#,HIDE,______,#CURRENT#,HIDE,_______,#CURRENT#,HIDE,________,#CURRENT#,HIDE,_________,#CURRENT#,RESTORE,__________,#CURRENT#)
-DEPENDENCIES: (Angle,RESTORE,la,#CURRENT#,RESTORE,lb,#CURRENT#,RESTORE,Fibers_along_la,#CURRENT#,RESTORE,Fibers_along_lb,#CURRENT#,RESTORE,ta,#CURRENT#,RESTORE,tb,#CURRENT#,RESTORE,Fibers_along_ta,#CURRENT#,RESTORE,Fibers_along_tb,#CURRENT#,RESTORE,Make_Section:,L,HIDE,Make_Section:_,#CURRENT#,RESTORE,__,#CURRENT#,HIDE,___,#CURRENT#,HIDE,____,#CURRENT#,HIDE,_____,#CURRENT#,HIDE,______,#CURRENT#,HIDE,_______,#CURRENT#,HIDE,________,#CURRENT#,HIDE,_________,#CURRENT#,HIDE,__________,#CURRENT#)
-DEPENDENCIES: (Channel,RESTORE,la,#CURRENT#,RESTORE,lb,#CURRENT#,RESTORE,Fibers_along_la,#CURRENT#,RESTORE,Fibers_along_lb,#CURRENT#,RESTORE,ta,#CURRENT#,RESTORE,tb,#CURRENT#,RESTORE,Fibers_along_ta,#CURRENT#,RESTORE,Fibers_along_tb,#CURRENT#,HIDE,Make_Section:,#CURRENT#,RESTORE,Make_Section:_,C,HIDE,__,#CURRENT#,HIDE,___,#CURRENT#,HIDE,____,#CURRENT#,HIDE,_____,#CURRENT#,RESTORE,______,#CURRENT#,HIDE,_______,#CURRENT#,HIDE,________,#CURRENT#,HIDE,_________,#CURRENT#,HIDE,__________,#CURRENT#)
-QUESTION: __________#CB#(_)
-VALUE:
-STATE: HIDDEN
-IMAGE: img/Sections/sec_Plate.png
-QUESTION: Make_Section:#CB#(L,T,IT,Plus)
-VALUE: L
-DEPENDENCIES: (L,RESTORE,__,#CURRENT#,HIDE,___,#CURRENT#,HIDE,____,#CURRENT#,HIDE,_____,#CURRENT#)
-DEPENDENCIES: (T,HIDE,__,#CURRENT#,RESTORE,___,#CURRENT#,HIDE,____,#CURRENT#,HIDE,_____,#CURRENT#)
-DEPENDENCIES: (IT,HIDE,__,#CURRENT#,HIDE,___,#CURRENT#,RESTORE,____,#CURRENT#,HIDE,_____,#CURRENT#)
-DEPENDENCIES: (Plus,HIDE,__,#CURRENT#,HIDE,___,#CURRENT#,HIDE,____,#CURRENT#,RESTORE,_____,#CURRENT#)
-QUESTION: __#CB#(L-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_L.png
-QUESTION: ___#CB#(T-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_T.png
-QUESTION: ____#CB#(Inverted_T-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_IT.png
-QUESTION: _____#CB#(Plus-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_Plus.png
-QUESTION: Make_Section:_#CB#(C,I,H,Box)
-VALUE: C
-DEPENDENCIES: (C,RESTORE,______,#CURRENT#,HIDE,_______,#CURRENT#,HIDE,________,#CURRENT#,HIDE,_________,#CURRENT#)
-DEPENDENCIES: (I,HIDE,______,#CURRENT#,RESTORE,_______,#CURRENT#,HIDE,________,#CURRENT#,HIDE,_________,#CURRENT#)
-DEPENDENCIES: (H,HIDE,______,#CURRENT#,HIDE,_______,#CURRENT#,RESTORE,________,#CURRENT#,HIDE,_________,#CURRENT#)
-DEPENDENCIES: (Box,HIDE,______,#CURRENT#,HIDE,_______,#CURRENT#,HIDE,________,#CURRENT#,RESTORE,_________,#CURRENT#)
-QUESTION: ______#CB#(C-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_C.png
-QUESTION: _______#CB#(I-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_I.png
-QUESTION: ________#CB#(H-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_H.png
-QUESTION: _________#CB#(Box-Section)
-VALUE: 
-STATE: HIDDEN
-IMAGE: img/Sections/sec_Box.png
-QUESTION: la#UNITS#
-VALUE: 0.5 m
-QUESTION: lb#UNITS#
-VALUE: 0.5 m
-QUESTION: ta#UNITS#
-VALUE: 0.1 m
-QUESTION: tb#UNITS#
-VALUE: 0.1 m
-QUESTION: Activate_torsional_stiffness#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,Torsional_stiffness_GJ,#CURRENT#)
-DEPENDENCIES: (0,HIDE,Torsional_stiffness_GJ,#CURRENT#)
-QUESTION: Torsional_stiffness_GJ#UNITS#
-VALUE: 10000 kNm^2
-QUESTION: Number_of_fibers:#CB#(_)
-VALUE: 
-QUESTION: Fibers_along_la
-VALUE: 10#WIDTH#(10)
-QUESTION: Fibers_along_lb
-VALUE: 10#WIDTH#(10)
-QUESTION: Fibers_along_ta
-VALUE: 2#WIDTH#(10)
-QUESTION: Fibers_along_tb
-VALUE: 2#WIDTH#(10)
-TITLE: Materials
-QUESTION: Section_Type_Material:#MAT#(Uniaxial_Steel_Materials)
-VALUE: Steel02
-END MATERIAL
-#	Ended By Tejeswar Yarlagadda------------Built Up Sections and Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 MATERIAL: Fiber_Custom
 COMMENT: \n\tEach region consists of one material. Material Tags should be entered as \$MatTag at each TCL Code\n\tand are automatically handled by the Interface. Use TCL code only if project is already saved.\n\tArea is considered only for the mass per unit length of the non-linear fiber element and/or for dead loads if activated.\n
 TITLE: General
 QUESTION: Section:#CB#(FiberCustom)
 VALUE: FiberCustom
-TKWIDGET: Fiber::CustomCheckFieldValues
-QUESTION: _#CB#(_)
-VALUE:
-STATE: HIDDEN
 TKWIDGET: TK_SectionWikiInfo
-QUESTION: Thermal_Section:#CB#(FiberCustom)
-VALUE: FiberCustom
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding material,RESTORE,_and, element in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding material,HIDE,_and, element in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_materials:#CB#(_)
-VALUE: Concrete02/Steel01/Steel02
-QUESTION: Compatible_Thermal_elements:#CB#(_)
-VALUE: dispBeamColumn
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 TITLE: Section_properties
 QUESTION: Cross_section_area#UNITS#
 VALUE: 0.0 m^2
@@ -1867,7 +1744,7 @@ TKWIDGET: TK_SectionWikiInfo
 TITLE: Material
 QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
 VALUE: Elastic_Isotropic
-HELP: All nD materials are listed here.
+HELP: All nD materials are listed here
 TITLE: Thickness
 QUESTION: Plate_thickness_h#UNITS#
 VALUE: 0.25m
@@ -1889,64 +1766,92 @@ VALUE: 0.0ton/m^3
 TKWIDGET: TK_SectionWikiInfo
 END MATERIAL
 
-MATERIAL: LayeredShellThermal
-COMMENT: \n\tEnter the properties of the rectangular section to be modelled with Shell elements\n\tusing a layered/composite integrated section for each in-plane integration point.\n\tMaterial properties and thicknesses are assigned by 10 layers according to the\n\tsize of the wall and the reinforcement distribution.\n
+MATERIAL: LayeredShell
+COMMENT: \n\tEnter the rectangular section properties to be modeled with shell elements\n\tusing a layered/composite formulation for each integration point.\n\n\tExample : 2 bars of 16 mm diameter with 100 mm spacing is 2[encoding convertfrom cp1252 \xD8]16/100.\n
 TITLE: General
 QUESTION: Section:#CB#(LayeredShell)
 VALUE: LayeredShell
 TKWIDGET: TK_SectionWikiInfo
 TITLE: Section_properties
-QUESTION: Offset#UNITS#
-VALUE: 0 m
-QUESTION: Height#UNITS#
-VALUE: 3 m
-QUESTION: Thickness#UNITS#
-VALUE: 0.2 m
-QUESTION: Width#UNITS#
-VALUE: 0.5 m
-QUESTION: Cover_depth_for_bars#UNITS#
+QUESTION: Wall_width#UNITS#
+VALUE: 0.25 m
+QUESTION: Reinforcement_cover#UNITS#
 VALUE: 5 cm
 QUESTION: Longitudinal_bars
-VALUE: 8#WIDTH#(10)
-QUESTION: Transverse_reinforcement_space#UNITS#
-VALUE: 100 mm
-QUESTION: Longitudinal_bar_size#UNITS#
+VALUE: 2
+QUESTION: Longitudinal_bar_diameter#UNITS#
 VALUE: 16 mm
-QUESTION: Transverse_bar_size#UNITS#
+QUESTION: Longitudinal_reinforcement_spacing#UNITS#
+VALUE: 100 mm
+QUESTION: Transverse_bars
+VALUE: 2
+QUESTION: Transverse_bar_diameter#UNITS#
 VALUE: 8 mm
-QUESTION: Calculate_bar_areas_(update_to_apply)#CB#(0,1)
+QUESTION: Transverse_reinforcement_spacing#UNITS#
+VALUE: 100 mm
+QUESTION: Calculate_reinforcement_ratios_(update_to_apply)#CB#(0,1)
 VALUE: 1
 TKWIDGET: LayeredShell::CalcBarAreas
-QUESTION: Longitudinal_bar_area#UNITS#
-VALUE: 2.011e-004 m^2
-QUESTION: Transverse_bar_area#UNITS#
-VALUE: 5.027e-005 m^2
-TITLE: Materials
-QUESTION: Concrete_compressive_strength#UNITS#
-VALUE: 30 MPa
+QUESTION: Longitudinal_reinforcement_ratio
+VALUE: 1.608e-02
+QUESTION: Transverse_reinforcement_ratio
+VALUE: 4.021e-03
+QUESTION: Cover_layers
+VALUE: 1
+QUESTION: Core_layers
+VALUE: 4
+TITLE: Cover_concrete
+QUESTION: Cover_fc#UNITS#
+VALUE: 20 MPa
 HELP: positive value
-TKWIDGET: LayeredShell::CheckFieldValues
-QUESTION: Concrete_tensile_strength#UNITS#
-VALUE: 3 MPa
+QUESTION: Cover_ft#UNITS#
+VALUE: 2.2 MPa
 HELP: positive value
-QUESTION: Concrete_strain_at_maximum_strength
-VALUE: 2.0e-3
+QUESTION: Cover_fu#UNITS#
+VALUE: -17.0 MPa
 HELP: negative value
-QUESTION: Ultimate_tensile_strain
+QUESTION: Cover_ec
+VALUE: -2.0e-3
+HELP: negative value
+QUESTION: Cover_ecu
+VALUE: -3.5e-3
+HELP: negative value
+QUESTION: Cover_etu
 VALUE: 1.0e-3
 HELP: positive value
-QUESTION: Compressive_cracking_energy_multiplier_n
-VALUE: 10
-HELP: multiplier used for calculating gc
-QUESTION: Tensile_cracking_energy_multiplier_m
-VALUE: 10
-HELP: multiplier used for calculating gt
-QUESTION: Shear_modulus_of_out_plane#UNITS#
+QUESTION: Cover_shear_ret._factor
+VALUE: 0.1
+QUESTION: Cover_G#UNITS#
 VALUE: 12.5 GPa
-QUESTION: Longitudinal_bar_material#MAT#(Uniaxial_Steel_Materials)
+TITLE: Core_concrete
+QUESTION: Core_fc#UNITS#
+VALUE: 20 MPa
+HELP: positive value
+QUESTION: Core_ft#UNITS#
+VALUE: 2.2 MPa
+HELP: positive value
+QUESTION: Core_fu#UNITS#
+VALUE: -17.0 MPa
+HELP: negative value
+QUESTION: Core_ec
+VALUE: -2.0e-3
+HELP: negative value
+QUESTION: Core_ecu
+VALUE: -3.5e-3
+HELP: negative value
+QUESTION: Core_etu
+VALUE: 1.0e-3
+HELP: positive value
+QUESTION: Core_shear_ret._factor
+VALUE: 0.1
+QUESTION: Core_G#UNITS#
+VALUE: 12.5 GPa
+TITLE: Reinforcement
+QUESTION: Longitudinal_steel_material#MAT#(Uniaxial_Steel_Materials)
 VALUE: Steel02
-QUESTION: Transverse_bar_material#MAT#(Uniaxial_Steel_Materials)
+QUESTION: Transverse_steel_material#MAT#(Uniaxial_Steel_Materials)
 VALUE: Steel02
+TKWIDGET: LayeredShell::CheckFieldValues
 END MATERIAL
 
 
@@ -1983,179 +1888,9 @@ QUESTION: Record_viewer
 VALUE:
 STATE: HIDDEN
 TKWIDGET: Records::Display
+
 END MATERIAL
 
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-BOOK: Fire
-
-MATERIAL: Static_Temperature_Data_2
-COMMENT: \n\tPlease check with the consistency in data units while providing Temperature Data and Depth Points\n
-QUESTION: Data_Type:#CB#(Time_Independant)
-VALUE: Time_Independant
-QUESTION: Number_of_data_points:#CB#(2)
-VALUE: 2
-QUESTION: Custom_Depth_Points#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,__,#CURRENT#)
-DEPENDENCIES: (0,HIDE,__,#CURRENT#)
-QUESTION: Temperature_can_be_defined_at#CB#(_)
-VALUE: user defined points along the depth.
-QUESTION: Uncheck,_to_estimate_the_depth#CB#(_)
-VALUE: points automatically, at equal intervals.
-QUESTION: Depth_points_cannot_be_estimated#CB#(_)
-VALUE: for fibercustom and bridge sections, automatically.
-QUESTION: Compatible_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: _#CB#(_)
-VALUE:
-QUESTION: __(PT1,PT2)
-VALUE: #N# 2 0.0 0.0
-STATE: HIDDEN
-QUESTION: ___(TEMP1,TEMP2)
-VALUE: #N# 2 20.0 20.0
-IMAGE: img/Thermal/2.png
-END MATERIAL
-
-MATERIAL: Static_Temperature_Data_5
-COMMENT: \n\tPlease check with the consistency in data units while providing Temperature Data and Depth Points\n
-QUESTION: Data_Type:#CB#(Time_Independant)
-VALUE: Time_Independant
-QUESTION: Number_of_data_points:#CB#(5)
-VALUE: 5
-QUESTION: Custom_Depth_Points#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,__,#CURRENT#)
-DEPENDENCIES: (0,HIDE,__,#CURRENT#)
-QUESTION: Temperature_can_be_defined_at#CB#(_)
-VALUE: user defined points along the depth.
-QUESTION: Uncheck,_to_estimate_the_depth#CB#(_)
-VALUE: points automatically, at equal intervals.
-QUESTION: Depth_points_cannot_be_estimated#CB#(_)
-VALUE: for fibercustom and bridge sections, automatically.
-QUESTION: Compatible_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: _#CB#(_)
-VALUE:
-QUESTION: __(PT1,PT2,PT3,PT4,PT5)
-VALUE: #N# 5 0.0 0.0 0.0 0.0 0.0
-STATE: HIDDEN
-QUESTION: ___(TEMP1,TEMP2,TEMP3,TEMP4,TEMP5)
-VALUE: #N# 5 20.0 20.0 20.0 20.0 20.0
-IMAGE: img/Thermal/5.png
-END MATERIAL
-
-MATERIAL: Static_Temperature_Data_9
-COMMENT: \n\tPlease check with the consistency in data units while providing Temperature Data and Depth Points\n
-QUESTION: Data_Type:#CB#(Time_Independant)
-VALUE: Time_Independant
-QUESTION: Number_of_data_points:#CB#(9)
-VALUE: 9
-QUESTION: Custom_Depth_Points#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,__,#CURRENT#)
-DEPENDENCIES: (0,HIDE,__,#CURRENT#)
-QUESTION: Temperature_can_be_defined_at#CB#(_)
-VALUE: user defined points along the depth.
-QUESTION: Uncheck,_to_estimate_the_depth#CB#(_)
-VALUE: points automatically, at equal intervals.
-QUESTION: Depth_points_cannot_be_estimated#CB#(_)
-VALUE: for fibercustom and bridge sections, automatically.
-QUESTION: Compatible_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: _#CB#(_)
-VALUE:
-QUESTION: __(PT1,PT2,PT3,PT4,PT5,PT6,PT7,PT8,PT9)
-VALUE: #N# 9 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
-STATE: HIDDEN
-QUESTION: ___(TEMP1,TEMP2,TEMP3,TEMP4,TEMP5,TEMP6,TEMP7,TEMP8,TEMP9)
-VALUE: #N# 9 20.0 20.0 20.0 20.0 20.0 20.0 20.0 20.0 20.0
-IMAGE: img/Thermal/9.png
-END MATERIAL
-
-MATERIAL: Transient_Temperature_Data_2
-COMMENT: \n\tPlease check with the consistency in data units while providing Temperature Data, time and Depth Points\n\n\tAlso Please Provide at least 7 Time-Temperature Data points\n
-QUESTION: Data_Type:#CB#(Time_Dependant)
-VALUE: Time_Dependant
-QUESTION: Number_of_data_points:#CB#(2)
-VALUE: 2
-QUESTION: Custom_Depth_Points#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,__,#CURRENT#)
-DEPENDENCIES: (0,HIDE,__,#CURRENT#)
-QUESTION: Temperature_can_be_defined_at#CB#(_)
-VALUE: user defined points along the depth.
-QUESTION: Uncheck,_to_estimate_the_depth#CB#(_)
-VALUE: points automatically, at equal intervals.
-QUESTION: Depth_points_cannot_be_estimated#CB#(_)
-VALUE: for fibercustom and bridge sections, automatically.
-QUESTION: Compatible_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: _#CB#(_)
-VALUE:
-QUESTION: __(PT1,PT2)
-VALUE: #N# 2 0.0 0.0
-STATE: HIDDEN
-QUESTION: ___(TIME,TEMP1,TEMP2)
-VALUE: #N# 3 0.0 20.0 20.0
-IMAGE: img/Thermal/2.png
-END MATERIAL
-
-MATERIAL: Transient_Temperature_Data_5
-COMMENT: \n\tPlease check with the consistency in data units while providing Temperature Data, time and Depth Pointsn\n\tAlso Please Provide at least 7 Time-Temperature Data points\n
-QUESTION: Data_Type:#CB#(Time_Dependant)
-VALUE: Time_Dependant
-QUESTION: Number_of_data_points:#CB#(5)
-VALUE: 5
-QUESTION: Custom_Depth_Points#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,__,#CURRENT#)
-DEPENDENCIES: (0,HIDE,__,#CURRENT#)
-QUESTION: Temperature_can_be_defined_at#CB#(_)
-VALUE: user defined points along the depth.
-QUESTION: Uncheck,_to_estimate_the_depth#CB#(_)
-VALUE: points automatically, at equal intervals.
-QUESTION: Depth_points_cannot_be_estimated#CB#(_)
-VALUE: for fibercustom and bridge sections, automatically.
-QUESTION: Compatible_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: _#CB#(_)
-VALUE:
-QUESTION: __(PT1,PT2,PT3,PT4,PT5)
-VALUE: #N# 5 0.0 0.0 0.0 0.0 0.0
-STATE: HIDDEN
-QUESTION: ___(TIME,TEMP1,TEMP2,TEMP3,TEMP4,TEMP5)
-VALUE: #N# 6 0.0 20.0 20.0 20.0 20.0 20.0
-IMAGE: img/Thermal/5.png
-END MATERIAL
-
-MATERIAL: Transient_Temperature_Data_9
-COMMENT: \n\tPlease check with the consistency in data units while providing Temperature Data, time and Depth Pointsn\n\tAlso Please Provide at least 7 Time-Temperature Data points\n
-QUESTION: Data_Type:#CB#(Time_Dependant)
-VALUE: Time_Dependant
-QUESTION: Number_of_data_points:#CB#(9)
-VALUE: 9
-QUESTION: Custom_Depth_Points#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,__,#CURRENT#)
-DEPENDENCIES: (0,HIDE,__,#CURRENT#)
-QUESTION: Temperature_can_be_defined_at#CB#(_)
-VALUE: user defined points along the depth.
-QUESTION: Uncheck,_to_estimate_the_depth#CB#(_)
-VALUE: points automatically, at equal intervals.
-QUESTION: Depth_points_cannot_be_estimated#CB#(_)
-VALUE: for fibercustom and bridge sections, automatically.
-QUESTION: Compatible_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-QUESTION: _#CB#(_)
-VALUE:
-QUESTION: __(PT1,PT2,PT3,PT4,PT5,PT6,PT7,PT8,PT9)
-VALUE: #N# 9 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
-STATE: HIDDEN
-QUESTION: ___(TIME,TEMP1,TEMP2,TEMP3,TEMP4,TEMP5,TEMP6,TEMP7,TEMP8,TEMP9)
-VALUE: #N# 10 0.0 20.0 20.0 20.0 20.0 20.0 20.0 20.0 20.0 20.0
-IMAGE: img/Thermal/9.png
-END MATERIAL
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 
 BOOK: Beam-Column_Elements
 
@@ -2170,7 +1905,7 @@ QUESTION: Compatible_materials:#CB#(Elastic_Isotropic)
 VALUE: Elastic Isotropic
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
+QUESTION: Material#MAT#(Multidimensional_(nD)_Materials,User_Materials)
 VALUE: Elastic_Isotropic
 TKWIDGET: EBC::CheckMaterial
 TITLE: Section_properties
@@ -2239,7 +1974,7 @@ QUESTION: Compatible_materials:#CB#(Elastic_Isotropic)
 VALUE: Elastic Isotropic
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
+QUESTION: Material#MAT#(Multidimensional_(nD)_Materials,User_Materials)
 VALUE: Elastic_Isotropic
 TKWIDGET: EBC::CheckMaterial
 TITLE: Section_properties
@@ -2320,11 +2055,11 @@ VALUE: 3#WIDTH#(4)
 HELP: number of Gauss-Lobatto integration points along the element
 STATE: DISABLED
 QUESTION: The_number_of_integration#CB#(_)
-VALUE: points per element is currently fixed to three points per element.
+VALUE: Points per element is currently fixed to three points per element.
 QUESTION: To_increase_analysis_accuracy,#CB#(_)
 VALUE: a finer mesh is recommended for modeling structural members instead of one element per member
 TITLE: Section
-QUESTION: Section#MAT#(Section_Force-Deformation,Combined_Materials)
+QUESTION: Section#MAT#(Section_Force-Deformation,Combined_Materials,User_Materials)
 VALUE: Fiber
 TKWIDGET: FBC::CheckSection
 TITLE: Element_Geometry
@@ -2356,36 +2091,17 @@ TKWIDGET: TK_UpdateInfoBar
 QUESTION: Compatible_Sections:#CB#(_)
 VALUE: Elastic/Fiber/SectionAggregator
 TKWIDGET: TK_ElementWikiInfo
-QUESTION: Thermal_Element_Type:#CB#(dispBeamColumn)
-VALUE: dispBeamColumn
-STATE: HIDDEN
-TKWIDGET: Fire::SetActivateThermal
-
-#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-QUESTION: Activate_Thermal#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (1,RESTORE,NOTE:,Please activate thermal in corresponding section,RESTORE,_and, material in order to run thermal analysis) (0,HIDE,NOTE:,Please activate thermal in corresponding section,HIDE,_and, material in order to run thermal analysis)
-QUESTION: NOTE:#CB#(_)
-VALUE:
-QUESTION: _and#CB#(_)
-VALUE:
-QUESTION: Compatible_Thermal_materials:#CB#(_)
-VALUE: Concrete02/Steel01/Steel02
-QUESTION: Compatible_Thermal_sections:#CB#(_)
-VALUE: Fiber/Fiber Builtup/Fiber Custom
-#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-
 TITLE: Integration
 QUESTION: Number_of_integration_points
 VALUE: 3#WIDTH#(4)
 HELP: number of integration points along the element
 STATE: DISABLED
 QUESTION: The_number_of_integration#CB#(_)
-VALUE: points per element is currently fixed to three points per element.
+VALUE: Points per element is currently fixed to three points per element.
 QUESTION: To_increase_analysis_accuracy,#CB#(_)
 VALUE: a finer mesh is recommended for modeling structural members instead of one element per member
 TITLE: Section
-QUESTION: Section#MAT#(Section_Force-Deformation,Combined_Materials)
+QUESTION: Section#MAT#(Section_Force-Deformation,Combined_Materials,User_Materials)
 VALUE: Fiber
 TKWIDGET: DBC::CheckSection
 TITLE: Element_Geometry
@@ -2413,7 +2129,7 @@ VALUE: 3
 HELP: number of integration points along the element
 STATE: DISABLED
 QUESTION: The_number_of_integration#CB#(_)
-VALUE: points per element is currently fixed to three points per element.
+VALUE: Points per element is currently fixed to three points per element.
 QUESTION: To_increase_analysis_accuracy,#CB#(_)
 VALUE: a finer mesh is recommended for modeling structural members instead of one element per member
 TITLE: Section
@@ -2447,7 +2163,7 @@ QUESTION: Compatible_materials:#CB#(_)
 VALUE: Standard/Steel/Concrete Uniaxial Materials/Series/Parallel/InitStrain/InitStress
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Uniaxial_Concrete_Materials,Combined_Materials)
+QUESTION: Material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Uniaxial_Concrete_Materials,Combined_Materials,User_Materials)
 VALUE: Elastic
 HELP: Choose one existing material to use its parameters.
 TKWIDGET: Truss::CheckFieldValues
@@ -2502,7 +2218,7 @@ QUESTION: Compatible_materials:#CB#(_)
 VALUE: Standard/Steel/Concrete Uniaxial Materials/Series/Parallel/InitStrain/InitStress
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Uniaxial_Concrete_Materials,Combined_Materials)
+QUESTION: Material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Uniaxial_Concrete_Materials,Combined_Materials,User_Materials)
 VALUE: Elastic
 HELP: Choose one existing material to use its parameters.
 TKWIDGET: Truss::CheckFieldValues
@@ -2566,7 +2282,7 @@ VALUE: 0
 HELP: equalDOF commands are automatically printed for element nodes which share the same vertical (Y) location
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
+QUESTION: Material#MAT#(Multidimensional_(nD)_Materials,User_Materials)
 VALUE: Elastic_Isotropic
 QUESTION: Plane_behavior#CB#(PlaneStrain,PlaneStress)
 VALUE: PlaneStrain
@@ -2591,7 +2307,7 @@ QUESTION: Mass_density#UNITS#
 VALUE: 0.0 ton/m^3
 END MATERIAL
 
-MATERIAL: ShellMITC4NLThermal
+MATERIAL: Shell
 COMMENT: \n
 TITLE: General
 QUESTION: Element_type:#CB#(Shell)
@@ -2602,7 +2318,7 @@ QUESTION: Compatible_materials:#CB#(PlateFiber/ElasticMembranePlate)
 VALUE: PlateFiber/ElasticMembranePlate
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Section
-QUESTION: Type#MAT#(Section_Force-Deformation)
+QUESTION: Type#MAT#(Section_Force-Deformation,User_Materials)
 VALUE: Elastic_Membrane_Plate
 TKWIDGET: Shell::CheckFieldValues
 TITLE: Weight
@@ -2610,7 +2326,7 @@ QUESTION: Weight_density#UNITS#
 VALUE: 25 kN/m^3
 END MATERIAL
 
-MATERIAL: ShellNLDKGQThermal
+MATERIAL: ShellDKGQ
 COMMENT: \n
 TITLE: General
 QUESTION: Element_type:#CB#(ShellDKGQ)
@@ -2621,7 +2337,7 @@ QUESTION: Compatible_materials:#CB#(_)
 VALUE: PlateFiber/ElasticMembranePlate
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Section
-QUESTION: Type#MAT#(Section_Force-Deformation)
+QUESTION: Type#MAT#(Section_Force-Deformation,User_Materials)
 VALUE: Elastic_Membrane_Plate
 TKWIDGET: Shell::CheckFieldValues
 TITLE: Weight
@@ -2641,7 +2357,7 @@ QUESTION: Compatible_materials:#CB#(_)
 VALUE: nD Materials
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
+QUESTION: Material#MAT#(Multidimensional_(nD)_Materials,User_Materials)
 VALUE: Elastic_Isotropic
 QUESTION: Plane_behavior#CB#(PlaneStrain,PlaneStress)
 VALUE: PlaneStrain
@@ -2681,7 +2397,7 @@ VALUE: 0
 HELP: equalDOF commands are automatically printed for element nodes which share the same vertical (Y) location
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
+QUESTION: Material#MAT#(Multidimensional_(nD)_Materials,User_Materials)
 VALUE: PressureIndependMultiYield
 QUESTION: PMY_ID
 VALUE:
@@ -2731,7 +2447,7 @@ QUESTION: Compatible_materials:#CB#(nD_Materials)
 VALUE: nD Materials
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Material
-QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
+QUESTION: Material#MAT#(Multidimensional_(nD)_Materials,User_Materials)
 VALUE: Elastic_Isotropic
 TITLE: Body_Forces
 QUESTION: Applied_on_the_global_axes#CB#(_)
@@ -2742,4 +2458,200 @@ QUESTION: Y-Direction#UNITS#
 VALUE: 0.0kN/m^3
 QUESTION: Z-Direction#UNITS#
 VALUE: 0.0kN/m^3
+END MATERIAL
+
+
+BOOK: AutoZL
+
+
+MATERIAL: Auto_Zero_Length
+COMMENT: \n\tApply function creates extra points/nodes in Layer: AutoZL at the region\n\twhere existed points/nodes meet the topology criteria selected below.\n\tZero length elements will be then applied between existed model\n\tpoints/nodes and extra auto made points/nodes.\n\tClear function deletes every extra point from layer: AutoZL as well as\n\tzero length conditions applied by the Apply function.\n\n\tDO NOT FORGET TO UPDATE WINDOW FOR EVERY MODIFICATION.\n
+QUESTION: Element_type:#CB#(AutoZL)
+VALUE: AutoZL
+STATE: HIDDEN
+QUESTION: X-Criteria#CB#(Any,Fixed,GT,GET,LT,LET,Between)
+VALUE:
+HELP: GT: Greater than\nGET: Greater/Equal than\nLT: Less than\nLET: Less/Equal than\nBetween: inside (min,max) space including boundaries
+DEPENDENCIES: (Any,HIDE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (Fixed,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (GT,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (GET,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (LT,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (LET,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (Between,HIDE,X-Coordinate,#CURRENT#,RESTORE,Min_X-Coordinate,#CURRENT#,RESTORE,Max_X-Coordinate,#CURRENT#)
+QUESTION: X-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Min_X-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Max_X-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Y-Criteria#CB#(Any,Fixed,GT,GET,LT,LET,Between)
+VALUE:
+HELP: GT: Greater than\nGET: Greater/Equal than\nLT: Less than\nLET: Less/Equal than\nBetween: inside (min,max) space including boundaries
+DEPENDENCIES: (Any,HIDE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (Fixed,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (GT,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (GET,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (LT,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (LET,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (Between,HIDE,Y-Coordinate,#CURRENT#,RESTORE,Min_Y-Coordinate,#CURRENT#,RESTORE,Max_Y-Coordinate,#CURRENT#)
+QUESTION: Y-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Min_Y-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Max_Y-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Z-Criteria#CB#(Any,Fixed,GT,GET,LT,LET,Between)
+VALUE:
+HELP: GT: Greater than\nGET: Greater/Equal than\nLT: Less than\nLET: Less/Equal than\nBetween: inside (min,max) space including boundaries
+DEPENDENCIES: (Any,HIDE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (Fixed,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (GT,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (GET,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (LT,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (LET,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (Between,HIDE,Z-Coordinate,#CURRENT#,RESTORE,Min_Z-Coordinate,#CURRENT#,RESTORE,Max_Z-Coordinate,#CURRENT#)
+QUESTION: Z-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Min_Z-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Max_Z-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Extra_point/node_offset#CB#(_)
+VALUE:
+QUESTION: X-Offset
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Y-Offset
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Z-Offset
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Activate_Ux#CB#(0,1)
+VALUE: 1
+DEPENDENCIES: (0,SET,Ux_material,#CURRENT#) (1,RESTORE,Ux_material,#CURRENT#)
+QUESTION: Ux_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials)
+VALUE: Elastic
+QUESTION: Activate_Uy#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Uy_material,#CURRENT#) (1,RESTORE,Uy_material,#CURRENT#)
+QUESTION: Uy_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Uz#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Uz_material,#CURRENT#) (1,RESTORE,Uz_material,#CURRENT#)
+QUESTION: Uz_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Rx#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Rx_material,#CURRENT#) (1,RESTORE,Rx_material,#CURRENT#)
+QUESTION: Rx_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Ry#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Ry_material,#CURRENT#) (1,RESTORE,Ry_material,#CURRENT#)
+QUESTION: Ry_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Rz#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Rz_material,#CURRENT#) (1,RESTORE,Rz_material,#CURRENT#)
+QUESTION: Rz_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials)
+VALUE: Elastic
+STATE: DISABLED
+TKWIDGET: TK_ZeroLengthWikiInfo
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: ZeroLength::AutoCreate
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: ZeroLength::AutoClear
+END MATERIAL
+
+BOOK: AutoEDOF
+
+MATERIAL: Auto_equal_constraint
+COMMENT: \n\t
+QUESTION: Determine_master_node#CB#(Existed,Extra)
+VALUE: Existed
+QUESTION: X-Criteria#CB#(Any,Fixed,GT,GET,LT,LET,Between)
+VALUE:
+HELP: GT: Greater than\nGET: Greater/Equal than\nLT: Less than\nLET: Less/Equal than\nBetween: inside (min,max) space including boundaries
+DEPENDENCIES: (Any,HIDE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (Fixed,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (GT,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (GET,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (LT,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (LET,RESTORE,X-Coordinate,#CURRENT#,HIDE,Min_X-Coordinate,#CURRENT#,HIDE,Max_X-Coordinate,#CURRENT#)
+DEPENDENCIES: (Between,HIDE,X-Coordinate,#CURRENT#,RESTORE,Min_X-Coordinate,#CURRENT#,RESTORE,Max_X-Coordinate,#CURRENT#)
+QUESTION: X-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Min_X-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Max_X-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Y-Criteria#CB#(Any,Fixed,GT,GET,LT,LET,Between)
+VALUE:
+HELP: GT: Greater than\nGET: Greater/Equal than\nLT: Less than\nLET: Less/Equal than\nBetween: inside (min,max) space including boundaries
+DEPENDENCIES: (Any,HIDE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (Fixed,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (GT,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (GET,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (LT,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (LET,RESTORE,Y-Coordinate,#CURRENT#,HIDE,Min_Y-Coordinate,#CURRENT#,HIDE,Max_Y-Coordinate,#CURRENT#)
+DEPENDENCIES: (Between,HIDE,Y-Coordinate,#CURRENT#,RESTORE,Min_Y-Coordinate,#CURRENT#,RESTORE,Max_Y-Coordinate,#CURRENT#)
+QUESTION: Y-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Min_Y-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Max_Y-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Z-Criteria#CB#(Any,Fixed,GT,GET,LT,LET,Between)
+VALUE:
+HELP: GT: Greater than\nGET: Greater/Equal than\nLT: Less than\nLET: Less/Equal than\nBetween: inside (min,max) space including boundaries
+DEPENDENCIES: (Any,HIDE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (Fixed,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (GT,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (GET,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (LT,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (LET,RESTORE,Z-Coordinate,#CURRENT#,HIDE,Min_Z-Coordinate,#CURRENT#,HIDE,Max_Z-Coordinate,#CURRENT#)
+DEPENDENCIES: (Between,HIDE,Z-Coordinate,#CURRENT#,RESTORE,Min_Z-Coordinate,#CURRENT#,RESTORE,Max_Z-Coordinate,#CURRENT#)
+QUESTION: Z-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Min_Z-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Max_Z-Coordinate
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Extra_point/node_offset#CB#(_)
+VALUE:
+QUESTION: X-Offset
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Y-Offset
+VALUE: 0.0#WIDTH#(10)
+QUESTION: Z-Offset
+VALUE: 0.0#WIDTH#(10)
+QUESTION: X-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: Y-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: X-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Y-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Rotation#CB#(1,0)
+VALUE: 1
+TKWIDGET: TK_EqualDOFWikiInfo
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: EqualDOF::AutoCreate
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: EqualDOF::AutoClear
 END MATERIAL

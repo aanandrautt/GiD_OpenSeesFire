@@ -1,26 +1,28 @@
 # GiD + OpenSees Interface
 
-*(c) 2016-2018*
+*(c) 2016-2020*
 
 *Lab of R/C and Masonry Structures, School of Civil Engineering, Aristotle University of Thessaloniki, Greece*
 
 **Development team**
 
-- T. Kartalis-Kaounis, Civil Engineer AUTh
-- V.K. Protopapadakis, Civil Engineer AUTh
-- T. Papadopoulos, Civil Engineer AUTh
+- T. Kartalis-Kaounis, Dipl. Eng. AUTh, MSc
+- V.K. Papanikolaou, Dipl. Eng., MSc DIC, PhD, Asst. Prof. AUTh
 
-**Project coordinator**
+**Project contributors**
 
-V.K. Papanikolaou, Assistant Professor AUTh
+- F. Derveni, Dipl. Eng. AUTh
+- V.K. Protopapadakis, Dipl. Eng. AUTh, MSc
+- T. Papadopoulos, Dipl. Eng. AUTh, MSc
+- T. Zachariadis, Dipl. Eng. AUTh, MSc
 
 ---
 
 ### KNOWN ISSUES
 
 ---
+- GiD+OpenSees Interface **requires the full tcl/tk framework to run properly**. If you are using the latest version of OpenSees, please install **ActiveTcl 8.6** first, delete any tcl/tk files in the OpenSees folder and keep **only the OpenSees executable**.
 - In order to view the generated .tcl file ('Create and view .tcl only' menu option), first associate the .tcl extension with your favorite text editor (e.g. Notepad, Notepad++ etc.).
-- GiD may occasionally crash when spaces are used in new material/element names. Please do not use spaces in names until this issue is resolved in GiD.
 - OpenSees does not combine constraints (multiple 'fix' commands on the same node). As a result:
    - Intersection joints that belong to two lines with different constraints should be handled separately.
    - Intersection lines that belong to two surfaces with different constraints should be handled separately.
@@ -29,6 +31,35 @@ V.K. Papanikolaou, Assistant Professor AUTh
 ---
 
 ### VERSION HISTORY
+
+---
+
+**Version 2.8.0 (03/07/2020)**
+
+- Added : **User Material** for user material scripts (Data Menu -> Materials/Elements Definition)
+- Added : **User Recorder** for user recorder scripts (Options)
+- Added : **Layer Recorders** for individual LayeredShell layers (Options)
+- Added : **Cracking output** in LayeredShell layers (available in OpenSees source after 30/6/2020)
+- Improved : results postprocessor rewritten, supports results on individual LayeredShell layers
+- Improved : .tcl import feature
+- Improved : LayeredShell element definition
+- Improved : option to enable 6DOFs for truss elements
+- Various fixes and improvements
+
+---
+
+**Version 2.7.0 (17/01/2020)**
+
+- Improved : .tcl import feature
+- New feature : Auto ZeroLength options in ZeroLength condition window
+- New feature : Auto EqualDOF options in EqualDOF condition window
+- Added : Node displacements can be assigned on lines or surfaces
+- Added : **PressureDependMultiYield02** nD Material
+- Added : **Contact** nD Material
+- Added : **BeamContact** element
+- Improved : More options added on GiD+OpenSees menu
+- Various improvements and GitHub issue fixes
+- Updated User Manual
 
 ---
 

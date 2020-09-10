@@ -1,19 +1,9 @@
 *set var FiberCustomTag=SectionID
-*set var dummy=tcl(Fire::ActivateThermalcheck FiberCustom *MatProp(Activate_Thermal,int) *ElemsMatProp(Element_type:) *ElemsNum)
-*if(dummy==1)
-*MessageBox
+*if(MatProp(Activate_torsional_stiffness,int)==1 && MatProp(Torsional_stiffness_GJ,real)!=0)
+section Fiber *FiberCustomTag -GJ *MatProp(Torsional_stiffness_GJ,real) {
+*else
+section Fiber *FiberCustomTag -GJ 1e10 {
 *endif
-*format "%d"
-*if(Matprop(Activate_Thermal,int)==0)
-section Fiber *FiberCustomTag *\
-*elseif(Matprop(Activate_Thermal,int)==1)
-section fiberSecThermal *FiberCustomTag *\
-*endif
-*if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
-*format "%g"
--GJ *MatProp(Torsional_stiffness_GJ,real) *\
-*endif
- {
 *set var FileExists=tcl(Fiber::FiberCustomFileExists *MatProp(0) 1)
 *if(FileExists==1)
 *set var SelectedMaterial=tcl(FindMaterialNumber *MatProp(Region_1_material) *DomainNum)

@@ -7,20 +7,22 @@
 #                           |_|                                                                                
 #
 # GiD + OpenSees Interface - An Integrated FEA Platform
-# Copyright (C) 2016-2018
+# Copyright (C) 2016-2020
 #
 # Lab of R/C and Masonry Structures
 # School of Civil Engineering, AUTh
 #
-# Development team
+# Development Team
 #
-# T. Kartalis-Kaounis, Civil Engineer AUTh
-# V. Protopapadakis, Civil Engineer AUTh
-# T. Papadopoulos, Civil Engineer AUTh
+# T. Kartalis-Kaounis, Dipl. Eng. AUTh, MSc
+# V.K. Papanikolaou, Dipl. Eng., MSc DIC, PhD, Asst. Prof. AUTh
 #
-# Project coordinator
+# Project Contributors
 #
-# V.K. Papanikolaou, Assistant Professor AUTh
+# F. Derveni, Dipl. Eng. AUTh
+# V.K. Protopapadakis, Dipl. Eng. AUTh, MSc
+# T. Papadopoulos, Dipl. Eng. AUTh, MSc
+# T. Zachariadis, Dipl. Eng. AUTh, MSc
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +36,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 
 # --------------------------------------------------------------------------------------------------------------
 # U N I T S
@@ -47,13 +48,14 @@
 # Mass   : *Units(MASS)
 
 # --------------------------------------------------------------------------------------------------------------
-# E L E M E N T S  U S E D
+# M A T E R I A L S / S E C T I O N S ( E L E M E N T S )
 # --------------------------------------------------------------------------------------------------------------
 
 *loop materials
 *set var ElementCounter=0
 # *MatProp(0) *\
 *loop elems
+*# *ElemsNum
 *if(strcmp(MatProp(0),ElemsMatProp(0))==0)
 *set var ElementCounter=operation(ElementCounter+1)
 *endif
@@ -164,7 +166,7 @@
 *set var PlaneStressUserMaterialTag=200
 *set var PlateFromPlaneStressMaterialTag=300
 *set var PlateRebarLongTag=400
-*set var PlateRebarTransvTag=500
+*set var PlateRebarTransTag=500
 *# Clear the lists of nodeTags for each Group (each domain)
 *set var dummy=tcl(ClearGroupNodes )
 *# Clear the list of Quad/QuadUP Nodes, used for automatic equalDOF commands (if chosen)
@@ -173,8 +175,16 @@
 *#
 *set var DomainNum=0
 *loop groups
-*if(strcmp(GroupName,"2DOF")==0 || strcmp(GroupName,"3DOF")==0 || strcmp(GroupName,"6DOF")==0 || strcmp(GroupName,"3PDOF")==0)
-*set var DomainNum=operation(DomainNum+1)
+*if(strcmp(GroupName,"2DOF")==0)
+*set var DomainNum=2
+*elseif(strcmp(GroupName,"3DOF")==0)
+*set var DomainNum=3
+*elseif(strcmp(GroupName,"6DOF")==0)
+*set var DomainNum=6
+*elseif(strcmp(GroupName,"3PDOF")==0)
+*set var DomainNum=30
+*endif
+*if(DomainNum != 0)
 *#
 *# Specify the current ndf
 *#
@@ -186,7 +196,7 @@
 
 # --------------------------------------------------------------------------------------------------------------
 #
-# M O D E L  D O M A I N  *DomainNum  (*GroupName)
+# M O D E L  D O M A I N  *GroupName  (*DomainNum)
 #
 # --------------------------------------------------------------------------------------------------------------
 
@@ -207,7 +217,6 @@ model BasicBuilder -ndm *ndime -ndf *currentDOF
 *# procedure to clear list of used materials, because in case of recalculation, the list keeps its elements from previous calculation
 *#
 *set var dummy=tcl(ClearUsedMaterials)
-*set var dummy=tcl(ThermalClearUsedMaterials)
 *set var MaterialExists=-1
 *set var procReadPeerFilePrinted=0
 *set var procLoadRecValuesPrinted=0
@@ -303,6 +312,10 @@ model BasicBuilder -ndm *ndime -ndf *currentDOF
 *#
 *include bas\Boundary\equalDOF.bas
 *#
+*# Beam Contact Elements
+*#
+*include bas\Elements\BeamContact\BeamContact.bas
+*#
 *# Recorders
 *#
 *include bas\Model\Recorders.bas
@@ -324,13 +337,28 @@ puts ""
 *format "%d"
 puts "Interval *IntvNum : *IntvData(Analysis_type) - *\
 *if(strcmp(IntvData(Analysis_type),"Static")==0)
+*# Static Monotonic
 *if(strcmp(IntvData(Loading_path),"Monotonic")==0)
 *format "%d%g"
 [expr int(1+*IntvData(Analysis_steps,int))] steps"
+*# Static Cyclic
 *else
-*set var index=operation(IntvNum*2)
-*set var cycles=IntvData(Displacement_peaks-cycles,*index,real)
-[expr int(1+*operation(4*cycles*IntvData(Analysis_steps,int)))] steps"
+*set var npeaks=IntvData(Displacement_peaks-cycles,int)
+*set var totalCyclicSteps=0
+*for(index=1;index<=npeaks;index=index+2)
+*set var dispRatio=IntvData(Displacement_peaks-cycles,*index,real)
+*if(IntvData(Adjust_number_of_steps_according_to_displacement_ratio,int)==1)
+*set var adjustedSteps=operation(dispRatio*IntvData(Analysis_steps,int))
+*set var adjustedSteps=tcl(Bas_Int *adjustedSteps)
+*set var totalCyclicSteps=operation(totalCyclicSteps+IntvData(Displacement_peaks-cycles,*operation(index+1),int)*adjustedSteps)
+*else
+*set var totalCyclicSteps=operation(totalCyclicSteps+IntvData(Displacement_peaks-cycles,*operation(index+1),int)*IntvData(Analysis_steps,int))
+*endif
+*endfor
+*#set var index=operation(IntvNum*2)
+*#set var cycles=IntvData(Displacement_peaks-cycles,*index,real)
+*#[expr int(1+*operation(4*cycles*IntvData(Analysis_steps,int)))] steps"
+[expr int(1+*operation(4*totalCyclicSteps))] steps"
 *endif
 *elseif(strcmp(IntvData(Analysis_type),"Transient")==0)
 *format "%g%g%g"
@@ -358,6 +386,7 @@ puts "Running interval *IntvNum\n"
 *include bas\Actions\Loads.bas
 *include bas\Analysis\UpdateMaterialStage.bas
 *include bas\Analysis\UpdateParameters.bas
+*include bas\Analysis\setParameter.bas
 
 # recording the initial status
 

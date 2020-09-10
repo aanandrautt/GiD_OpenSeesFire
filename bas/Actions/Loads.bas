@@ -1,7 +1,9 @@
 *set var PrintPlainPattern=0
 *set var PrintMultiSupportPattern=0
 *set var PrintPlainPatternPathTimeseries=0
+*#
 *# Check if there are any loads applied
+*#
 *set cond Point_Forces *nodes *CanRepeat
 *add cond Line_Forces *nodes *CanRepeat
 *add cond Surface_Forces *nodes *CanRepeat
@@ -14,6 +16,8 @@
 *add cond Line_Forces *nodes *CanRepeat
 *add cond Surface_Forces *nodes *CanRepeat
 *add cond Point_Displacements *nodes *CanRepeat
+*add cond Line_Displacements *nodes *CanRepeat
+*add cond Surface_Displacements *nodes *CanRepeat
 *loop nodes *OnlyInCond
 *set var PrintPlainPattern=1
 *break
@@ -33,22 +37,19 @@
 *set var PrintMultiSupportPattern=1
 *break
 *end nodes
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*set var PrintPlainPatternThermal=0
-*set cond Line_Thermal *elems *CanRepeat
-*loop elems *OnlyInCond
-*set var PrintPlainPatternThermal=1
-*break
-*end elems
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
 *if(strcmp(IntvData(Loading_type),"Constant")==0 || strcmp(IntvData(Loading_type),"Linear")==0)
+*#
 *# if there are loads applied, Create the pattern
+*#
 *if(PrintPlainPattern==1)
 
 # Loads - Plain Pattern
 
 *set var PatternTag=operation(IntvNum*100)
 pattern Plain *PatternTag *IntvData(Loading_type) {
+*#
+*# Point / line / surface forces
+*#
 *set cond Point_Forces *nodes *CanRepeat
 *add cond Line_Forces *nodes *CanRepeat
 *add cond Surface_Forces *nodes *CanRepeat
@@ -56,25 +57,25 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *set var nodeDOF=tcl(ReturnNodeGroupDOF *NodesNum)
 *if(nodeDOF==6)
 *format "%6d"
-  load *NodesNum *\
+    load *NodesNum *\
 *format "%8g%8g%8g%8g%8g%8g"
 *cond(1,real) *cond(2,real) *cond(3,real) *cond(4,real) *cond(5,real) *cond(6,real)
 *elseif(nodeDOF==3)
 *if(ndime==3)
 *format "%6d"
-  load *NodesNum *\
+    load *NodesNum *\
 *format "%8g%8g%8g"
 *cond(1,real) *cond(2,real) *cond(3,real)
 *# 2D with 3DOF : Ux Uy Rz --> Fx Fy Mz
 *else
 *format "%6d"
-  load *NodesNum *\
+    load *NodesNum *\
 *format "%8g%8g%8g"
 *cond(1,real) *cond(2,real) *cond(6,real)
 *endif
 *elseif(nodeDOF==2)
 *format "%6d"
-  load *NodesNum *\
+    load *NodesNum *\
 *format "%8g%8g"
 *cond(1,real) *cond(2,real)
 *endif
@@ -83,17 +84,19 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *set cond Line_Uniform_Forces *elems
 *loop elems *OnlyInCond
 *format "%6d%8g%8g%8g"
-  eleLoad -ele *ElemsNum -type -beamUniform *cond(2,real) *cond(3,real) *cond(1,real)
+    eleLoad -ele *ElemsNum -type -beamUniform *cond(2,real) *cond(3,real) *cond(1,real)
 *end elems
-*# if it is 2D..
+*# if it is 2D
 *else
 *set cond Line_Uniform_Forces *elems
 *loop elems *OnlyInCond
 *format "%6d%8g%8g"
-  eleLoad -ele *ElemsNum -type -beamUniform *cond(2,real) *cond(1,real)
+    eleLoad -ele *ElemsNum -type -beamUniform *cond(2,real) *cond(1,real)
 *end elems
 *endif
 *set cond Point_Displacements *nodes
+*add cond Line_Displacements *nodes
+*add cond Surface_Displacements *nodes
 *loop nodes *OnlyInCond
 *set var nodeDOF=tcl(ReturnNodeGroupDOF *NodesNum)
 *if(nodeDOF==6)
@@ -157,7 +160,9 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *endif
 *end nodes
 *if(IntvData(Activate_dead_load,int)==1 && strcmp(IntvData(Analysis_type),"Static")==0 && strcmp(IntvData(Integrator_type),"Load_control")==0)
+
 # Dead Loads
+
 *include DeadLoad.bas
 *endif
 }
@@ -177,16 +182,4 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *set var PatternTag=operation(IntvNum*1000)
 *include MultipleSupportExcitationPattern.bas
 *endif
-*#	Added By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////
-*elseif(strcmp(IntvData(Loading_type),"Thermal")==0)
-*if(PrintPlainPatternThermal==1)
-
-#Loads - Thermal Loading
-
-*set var PatternTag=operation(IntvNum*10000)
-pattern Plain *PatternTag Linear {
-*include Thermal.bas
-}
 *endif
-*endif
-*#	Ended By Tejeswar Yarlagadda------------Add Thermal Analysis----------------------------------------------------------------------------------/////////////////////////////////////////////////

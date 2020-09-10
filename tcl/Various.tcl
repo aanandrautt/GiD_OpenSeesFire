@@ -69,6 +69,7 @@ global SelectedVerticalAxis
 proc TK_EditModelDim { event args } {
 
 	global SelectedVerticalAxis
+	global VerticalAxisChanged
 	set PARENT [lindex $args 0]
 	upvar [lindex $args 1] ROW
 	set GDN [lindex $args 2]
@@ -84,9 +85,14 @@ proc TK_EditModelDim { event args } {
 			set dummy [DWLocalSetValue $GDN $STRUCT $QUESTION $dim]
 
 			if {$dim == 2} {
-					set dummy [DWLocalSetValue $GDN $STRUCT Vertical_axis "Y"]
+				set dummy [DWLocalSetValue $GDN $STRUCT Vertical_axis "Y"]
 			} else {
+				if {$VerticalAxisChanged == 0} {
+					set dummy [DWLocalSetValue $GDN $STRUCT Vertical_axis "Z"]
+					set VerticalAxisChanged 1
+				} else {
 					set dummy [DWLocalSetValue $GDN $STRUCT Vertical_axis $SelectedVerticalAxis]
+				}
 			}
 
 			return ""
@@ -150,7 +156,6 @@ proc TK_ElementWikiInfo { event args } {
 				"dispBeamColumnInt" {
 						set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/Flexure-Shear_Interaction_Displacement-Based_Beam-Column_Element"
 				}
-
 			}
 
 			image create photo wiki -format PNG -file [file join [OpenSees::GetProblemTypePath] img/Menu/mnu_Wiki.png]
@@ -236,6 +241,9 @@ proc TK_MaterialWikiInfo { event args } {
 				"PressureDependMultiYield" {
 						set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/PressureDependMultiYield_Material"
 				}
+				"PressureDependMultiYield02" {
+						set cmd "VisitWeb https://opensees.berkeley.edu/wiki/index.php/PressureDependMultiYield02_Material"
+				}
 				"Series" {
 						set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/Series_Material"
 				}
@@ -271,6 +279,9 @@ proc TK_MaterialWikiInfo { event args } {
 				}
 				"BondSP01" {
 						set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/Bond_SP01_-_-_Strain_Penetration_Model_for_Fully_Anchored_Steel_Reinforcing_Bars"
+				}
+				"Contact" {
+						set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/ContactMaterial3D"
 				}
 			}
 
@@ -319,12 +330,9 @@ proc TK_SectionWikiInfo { event args } {
 							set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/Section_Aggregator"
 					}
 					"LayeredShell" {
-							set cmd "VisitWeb http://www.luxinzheng.net/publication6/Shell_wall_element_OpenSees_FEAD_2015.htm"
+							set cmd "VisitWeb http://www.luxinzheng.net/download/OpenSEES/En_THUShell_OpenSEES.htm"
 					}
 					"FiberCustom" {
-							set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/Fiber_Section"
-					}
-					"FiberBuiltUpSections" {
 							set cmd "VisitWeb http://opensees.berkeley.edu/wiki/index.php/Fiber_Section"
 					}
 			}
@@ -569,25 +577,6 @@ proc TK_OpenRecordsWindow { event args } {
 	return ""
 }
 
-proc TK_OpenFireWindow { event args } {
-
-	switch $event {
-
-		INIT {
-
-			set PARENT [lindex $args 0]
-			upvar [lindex $args 1] ROW
-			set cmd "GidOpenMaterials Fire"
-
-			set b [Button $PARENT.buttonFirewindow -text [= " Open Fire window "] -helptext [= "Open the Fire dialog"] -command $cmd -state normal]
-			grid $b -column 1 -row [expr $ROW+1] -sticky nw -pady 5
-
-		}
-	}
-
-	return ""
-}
-
 proc TK_RayleighLabel { event args } {
 
 	switch $event {
@@ -634,15 +623,22 @@ proc TK_DWSet { GDN STRUCT QUESTION VALUE {STATE ""}} {
 proc Bas_round { x y } {
 
 	set ans [expr int($x/$y)]
-	return $ans
 
+	return $ans
 }
 
 proc Bas_mod { x y } {
 
 	set ans [expr fmod ($x,$y)]
 
-return $ans
+	return $ans
+}
+
+proc Bas_Int { x } {
+
+	set result [expr int($x)]
+
+	return $result
 }
 
 proc TK_PMY-ID { event args } {

@@ -1307,6 +1307,8 @@ proc Fire::CompatibleThermalElements { Element } {
 
 	set CompatibleThermalElements " \
 	dispBeamColumn \
+	ShellDKGQ \
+	Shell \
 	"
 
 	set ElementCompatibility [lsearch $CompatibleThermalElements $Element]

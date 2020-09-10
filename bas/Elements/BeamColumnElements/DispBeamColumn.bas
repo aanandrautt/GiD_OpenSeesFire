@@ -32,32 +32,25 @@
 *# Corotational geomTransf tags
 *set var TransfTag5=5
 *set var TransfTag6=6
-*#------------------------------------------------
-*#-----------Geometric Transformation-------------
-*#------------------------------------------------
 # Geometric Transformation
 
-*#-------------------- Z AXIS AS VERTICAL AXIS-------------------------
+*# Z AXIS AS VERTICAL AXIS
 *if(strcmp(GenData(Vertical_axis),"Z")==0)
-*# Vertical elements
-geomTransf Linear *TransfTag1 -1 0 0
-geomTransf PDelta *TransfTag3 -1 0 0
-geomTransf Corotational *TransfTag5 -1 0 0
-*# Not vertical elements
-geomTransf Linear *TransfTag2  0 0 1
-geomTransf PDelta *TransfTag4  0 0 1
-geomTransf Corotational *TransfTag6 0 0 1
+geomTransf Linear       *TransfTag1 -1 0 0; # vertical
+geomTransf Linear       *TransfTag2  0 0 1; # non-vertical
+geomTransf PDelta       *TransfTag3 -1 0 0; # vertical
+geomTransf PDelta       *TransfTag4  0 0 1; # non-vertical
+geomTransf Corotational *TransfTag5 -1 0 0; # vertical
+geomTransf Corotational *TransfTag6  0 0 1; # non-vertical
 
-*#-------------------- Y AXIS AS VERTICAL AXIS-------------------------
+*# Y AXIS AS VERTICAL AXIS
 *elseif(strcmp(GenData(Vertical_axis),"Y")==0)
-*# Vertical elements
-geomTransf Linear *TransfTag1 -1 0 0
-geomTransf PDelta *TransfTag3 -1 0 0
-geomTransf Corotational *TransfTag5 -1 0 0
-*# Not vertical elements
-geomTransf Linear *TransfTag2  0 1 0
-geomTransf PDelta *TransfTag4  0 1 0
-geomTransf Corotational *TransfTag6 0 1 0
+geomTransf Linear       *TransfTag1 -1 0 0; # vertical
+geomTransf Linear       *TransfTag2  0 1 0; # non-vertical
+geomTransf PDelta       *TransfTag3 -1 0 0; # vertical
+geomTransf PDelta       *TransfTag4  0 1 0; # non-vertical
+geomTransf Corotational *TransfTag5 -1 0 0; # vertical
+geomTransf Corotational *TransfTag6  0 1 0; # non-vertical
 
 *endif
 *set var GeomTransfPrinted=1
@@ -80,8 +73,6 @@ geomTransf Corotational *TransfTag6 0 1 0
 *set var dummy=tcl(AddUsedMaterials *SelectedSection)
 *if(strcmp(MatProp(Section:),"Fiber")==0)
 *include ..\..\Sections\Fiber.bas
-*elseif(strcmp(MatProp(Section:),"FiberBuiltUpSections")==0)
-*include ..\..\Sections\FiberBuiltUpSections.bas
 *elseif(strcmp(MatProp(Section:),"SectionAggregator")==0)
 *include ..\..\Sections\SectionAggregator.bas
 *elseif(strcmp(MatProp(Section:),"ElasticSection")==0)
@@ -147,22 +138,15 @@ geomTransf Corotational *TransfTag6 0 1 0
 *endif
 *endif
 *endif
-*Set var SecTag=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
-*if(ElemsMatProp(Activate_Thermal,int)==0)
+*set var SecTag=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
 *format "%6d%6d%7d%2d%6d%2d"
-element dispBeamColumn *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,Int) *SecTag *TransfTag *\
-*else
-*format "%6d%6d%7d%2d%6d%2d"
-element dispBeamColumnThermal *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,Int) *SecTag *TransfTag *\
-*endif
+element dispBeamColumn *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,int) *SecTag *TransfTag *\
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
 *loop materials *NotUsed
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
 *if(SelectedSection==SectionID)
 *if(strcmp(MatProp(Section:),"Fiber")==0)
 *set var FiberArea=MatProp(Cross_section_area,real)
-*elseif(strcmp(MatProp(Section:),"FiberBuiltUpSections")==0)
-*set var FiberArea=0
 *elseif(strcmp(MatProp(Section:),"SectionAggregator")==0)
 *if(MatProp(Select_section,int)==1)
 *set var SelectedSectionTobeAggregated=tcl(FindMaterialNumber *MatProp(Section_to_be_aggregated) *DomainNum)
@@ -235,14 +219,15 @@ geomTransf Corotational *TransfTag3
 *set var dummy=tcl(AddUsedMaterials *SelectedSection)
 *if(strcmp(MatProp(Section:),"Fiber")==0)
 *include ..\..\Sections\Fiber.bas
-*elseif(strcmp(MatProp(Section:),"FiberBuiltUpSections")==0)
-*include ..\..\Sections\FiberBuiltUpSections.bas
 *elseif(strcmp(MatProp(Section:),"SectionAggregator")==0)
 *include ..\..\Sections\SectionAggregator.bas
 *elseif(strcmp(MatProp(Section:),"ElasticSection")==0)
 *include ..\..\Sections\ElasticSection.bas
 *elseif(strcmp(MatProp(Section:),"FiberCustom")==0)
 *include ..\..\Sections\FiberCustom.bas
+*elseif(strcmp(MatProp(Material:),"UserMaterial")==0)
+set MatTag *SectionID; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
+*include ..\..\Materials\User\UserMaterial.bas
 *endif
 *break
 *endif
@@ -269,13 +254,8 @@ geomTransf Corotational *TransfTag3
 *set var TransfTag=TransfTag3
 *endif
 *set var SecTag=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
-*if(ElemsMatProp(Activate_Thermal,int)==0)
 *format "%6d%6d%7d%2d%6d%2d"
 element dispBeamColumn *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,int) *SecTag *TransfTag *\
-*else
-*format "%6d%6d%7d%2d%6d%2d"
-element dispBeamColumnThermal *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,int) *SecTag *TransfTag *\
-*endif
 *# Mass is calculated for Displacement Beam Column.
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
 *loop materials *NotUsed
@@ -283,8 +263,6 @@ element dispBeamColumnThermal *ElemsNum *ElemsConec *ElemsMatProp(Number_of_inte
 *if(SelectedSection==SectionID)
 *if(strcmp(MatProp(Section:),"Fiber")==0)
 *set var FiberArea=MatProp(Cross_section_area,real)
-*elseif(strcmp(MatProp(Section:),"FiberBuiltUpSections")==0)
-*set var FiberArea=0
 *elseif(strcmp(MatProp(Section:),"SectionAggregator")==0)
 *if(MatProp(Select_section,int)==1)
 *set var SelectedSectionTobeAggregated=tcl(FindMaterialNumber *MatProp(Section_to_be_aggregated) *DomainNum)
@@ -318,6 +296,6 @@ element dispBeamColumnThermal *ElemsNum *ElemsConec *ElemsMatProp(Number_of_inte
 *# end if it is DBC
 *endif
 *end elems
-*# endif counter!=0
 *endif
+*# endif counter!=0
 *endif

@@ -1,4 +1,4 @@
-proc DeckFiberSection3D { secID secName GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv zcoordTopIntTendon zcoordBotIntTendon zcoordTopExtTendon zcoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfyextweb nfzweb nfyintweb nfybeam nfzbeam} {
+proc DeckFiberSection3D { secID GJ conc1ID conc2ID steel1ID steel2ID steel3ID steelbeamID extTendonSteelID intTendonSteelID tendons nsteeltop1 nsteelbot1 nsteeltop2 nsteelbot2 nsteeltop3 nsteelbot3 nbeamsteelfacey nbeamsteelfacez steelArea1 steelArea2 steelArea3 beamSteelArea intTendonArea extTendonArea width1 thick1 width2 thick2 thick3 swwidth swthick beamwidth beamheight cover extWebThick nvoid hv dv zcoordTopIntTendon zcoordBotIntTendon zcoordTopExtTendon zcoordBotExtTendon nfy1 nfz1 nfy2 nfz2 nfyextweb nfzweb nfyintweb nfybeam nfzbeam} {
 
     if {$nvoid!=0} {
         set nintwebs [expr $nvoid-1]; #number of internal webs
@@ -34,7 +34,7 @@ proc DeckFiberSection3D { secID secName GJ conc1ID conc2ID steel1ID steel2ID ste
 
     if {$GJ} {
 
-    section $secName $secID -GJ $GJ {
+    section Fiber $secID -GJ $GJ {
 
         ###################
         # CONCRETE FIBERS #
@@ -197,7 +197,7 @@ proc DeckFiberSection3D { secID secName GJ conc1ID conc2ID steel1ID steel2ID ste
 
     } else {
 
-    section $secName $secID {
+    section Fiber $secID -GJ 1e10 {
 
         ###################
         # CONCRETE FIBERS #

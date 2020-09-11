@@ -29,7 +29,7 @@
 *endif
 *end materials
 *endif
-*format "%6d%4d%4d"
+*format "%6d%6d%6d"
 nDMaterial PlateRebarThermal *PlateRebarLongTag *SelectedLongRBMaterial  90
 *#
 *# define PlateRebar for transverse reinforcement
@@ -63,43 +63,6 @@ nDMaterial PlateRebarThermal *PlateRebarLongTag *SelectedLongRBMaterial  90
 nDMaterial PlateRebarThermal *PlateRebarTransTag *SelectedTransverseRBMaterial  0
 *#
 *#
-*# define decking steel
-*#
-*#
-*set var PlateRebarDeckingTag=PlateRebarTransTag+1
-*set var SelectedTransverseRBMaterial=tcl(FindMaterialNumber *MatProp(Transverse_steel_material) *DomainNum)
-*set var MaterialExists=tcl(CheckUsedMaterials *SelectedTransverseRBMaterial )
-*if(MaterialExists==-1)
-*loop materials *NotUsed
-*set var MaterialID=tcl(FindMaterialNumber *Matprop(0) *DomainNum)
-*if(SelectedTransverseRBMaterial==MaterialID)
-*if(strcmp(MatProp(Material:),"Steel01")==0)
-*include ..\Materials\Uniaxial\Steel01.bas
-*elseif(strcmp(MatProp(Material:),"Steel02")==0)
-*include ..\Materials\Uniaxial\Steel02.bas
-*elseif(strcmp(MatProp(Material:),"Hysteretic")==0)
-*include ..\Materials\Uniaxial\Hysteretic.bas
-*elseif(strcmp(MatProp(Material:),"ReinforcingSteel")==0)
-*include ..\Materials\Uniaxial\ReinforcingSteel.bas
-*elseif(strcmp(MatProp(Material:),"RambergOsgoodSteel")==0)
-*include ..\Materials\Uniaxial\RambergOsgoodSteel.bas
-*else
-*MessageBox Error: Unsupported steel material for LayeredShell Section
-*endif
-*set var dummy=tcl(AddUsedMaterials *SelectedTransverseRBMaterial)
-*break
-*endif
-*end materials
-*endif
-*set var angle=MatProp(Angle,real)
-*if(strcmp(MatProp(Material:),"UserMaterial")==0)
-*format "%6d%4d%4d"
-nDMaterial   PlateFromPlaneStressThermal    *PlateRebarDeckingTag   *SelectedTransverseRBMaterial   20e5;
-*else
-*format "%6d%4d%4d%4d"
-nDMaterial PlateRebarThermal *PlateRebarDeckingTag *SelectedTransverseRBMaterial  *angle
-*#
-*#
 *# define CDPMaterial for concrete
 *#
 *set var PlaneStressUserMaterialTag=PlaneStressUserMaterialTag+1
@@ -117,8 +80,8 @@ nDMaterial PlateRebarThermal *PlateRebarDeckingTag *SelectedTransverseRBMaterial
 nDMaterial CDPPlaneStressThermal   *PlaneStressUserMaterialTag *Ec 0.2 *fct *fc *gt *gc
 *# define PlateFromPlaneStress material
 *set var PlateFromPlaneStressMaterialTag=PlateFromPlaneStressMaterialTag+1
-*format "%6d%6d%6g"
-nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneStressUserMaterialTag *MatProp(Shear_modulus_of_out_plane,real)
+*format "%6d%6d%10g"
+nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneStressUserMaterialTag *MatProp(Cover_G,real)
 *#
 *#
 *#
@@ -126,21 +89,21 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *set var thickness=MatProp(Slab_thickness,real)
 *set var topCover=MatProp(Top_reinforcement_cover,real)
 *set var botCover=MatProp(Bot_reinforcement_cover,real)
-*set var topLongBarDiameter=MatProp(Top_longitudinal_bar_diameter, real)
-*set var botLongBarDiameter=MatProp(Bot_longitudinal_bar_diameter, real)
-*set var topTransBarDiameter=MatProp(Top_transverse_bar_diameter, real)
-*set var botTransBarDiameter=MatProp(Bot_transverse_bar_diameter, real)
-*set var topLongBarSpacing=MatProp(Top_longitudinal_bar_spacing, real)
-*set var botLongBarSpacing=MatProp(Bot_longitudinal_bar_spacing, real)
-*set var topTransBarSpacing=MatProp(Top_transverse_bar_spacing, real)
-*set var botTransBarSpacing=MatProp(Bot_transverse_bar_spacing, real)
+*set var topLongBarDiameter=MatProp(Top_longitudinal_bar_diameter,real)
+*set var botLongBarDiameter=MatProp(Bot_longitudinal_bar_diameter,real)
+*set var topTransBarDiameter=MatProp(Top_transverse_bar_diameter,real)
+*set var botTransBarDiameter=MatProp(Bot_transverse_bar_diameter,real)
+*set var topLongBarSpacing=MatProp(Top_longitudinal_bar_spacing,real)
+*set var botLongBarSpacing=MatProp(Bot_longitudinal_bar_spacing,real)
+*set var topTransBarSpacing=MatProp(Top_transverse_bar_spacing,real)
+*set var botTransBarSpacing=MatProp(Bot_transverse_bar_spacing,real)
 *#
 *# Values to use for the layers
 *set var topLongThick=operation((topLongBarDiameter*topLongBarDiameter*3.1415926/4)*(1/topLongBarSpacing))
 *set var topTransThick=operation((topTransBarDiameter*topTransBarDiameter*3.1415926/4)*(1/topTransBarSpacing))
 *set var botLongThick=operation((botLongBarDiameter*botLongBarDiameter*3.1415926/4)*(1/botLongBarSpacing))
 *set var botTransThick=operation((botTransBarDiameter*botTransBarDiameter*3.1415926/4)*(1/botTransBarSpacing))
-*set var deckingThick=MatProp(Decking_thickness, real)
+*set var deckingThick=MatProp(Decking_thickness,real)
 *#
 *#
 *set var nlayersTopCover=MatProp(Top_cover_layers,int)
@@ -164,6 +127,7 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *set var nlayersSteel=operation(nlayersSteel-1)
 *endif
 *set var nlayers=operation(nlayersTopCover+nlayersBotCover+nlayersCore+nlayersSteel)
+*nlayers
 *#
 *#
 *#
@@ -175,7 +139,6 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *#
 *format "%d%d"
 section LayeredShellThermal *LayeredShellTag *nlayers *\
-*set var PlateFromPlaneStressMaterialTag=PlateFromPlaneStressMaterialTag-1
 *if(deckingThick!=0)
 *format "%d%g"
 *PlateRebarDeckingTag *deckingThick *\
@@ -201,7 +164,6 @@ section LayeredShellThermal *LayeredShellTag *nlayers *\
 *endif
 *#
 *#
-*set var PlateFromPlaneStressMaterialTag=PlateFromPlaneStressMaterialTag+1
 *for(i=1;i<=nlayersCore;i=i+1)
 *format "%d%g"
 *PlateFromPlaneStressMaterialTag *coreThick *\

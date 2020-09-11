@@ -96,7 +96,7 @@ proc OpenSees::InitGIDProject { dir } {
 	UpdateInfoBar
 
 	cd "$OpenSeesProblemTypePath/exe"
-	after idle exec {*}[auto_execok start] "CheckForUpdate.exe" "/q" &
+	# after idle exec {*}[auto_execok start] "CheckForUpdate.exe" "/q" &
 }
 
 proc OpenSees::ChangeData {} {

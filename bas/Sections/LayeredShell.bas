@@ -89,8 +89,9 @@ nDMaterial PlateRebarThermal *PlateRebarTransTag *SelectedTransverseRBMaterial  
 *endif
 *end materials
 *endif
-*format "%6d%6d"
-nDMaterial PlateRebarThermal *PlateRebarDeckingTag *SelectedDeckingRBMaterial  90
+*set var angle=MatProp(Angle,real)
+*format "%6d%6d%6g"
+nDMaterial PlateRebarThermal *PlateRebarDeckingTag *SelectedDeckingRBMaterial *angle
 *#
 *# define CDPMaterial for concrete
 *#

@@ -116,7 +116,7 @@ set MatTag *SelectedSection; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
 *# ------------------------------------
 *#
 *format "%6d%6d%6d%6d%6d%6d"
-element ShellMITC4 *ElemsNum *n1 *n2 *n3 *n4 *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum); # *ElemsMatProp(Type)
+element ShellMITC4Thermal *ElemsNum *n1 *n2 *n3 *n4 *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum); # *ElemsMatProp(Type)
 *set var VarCount=VarCount+1
 *endif
 *end elems

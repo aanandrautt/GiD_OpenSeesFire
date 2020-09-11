@@ -116,7 +116,7 @@ set MatTag *SelectedSection; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
 *# ------------------------------------
 *#
 *format "%6d%6d%6d%6d%6d%6d"
-element ShellDKGQ *ElemsNum *n1 *n2 *n3 *n4 *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum); # *ElemsMatProp(Type)
+element ShellNLDKGQThermal *ElemsNum *n1 *n2 *n3 *n4 *tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum); # *ElemsMatProp(Type)
 *set var VarCount=VarCount+1
 *endif
 *end elems

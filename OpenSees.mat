@@ -309,7 +309,7 @@ END MATERIAL
 BOOK: Uniaxial_Steel_Materials
 
 
-MATERIAL: Steel01
+MATERIAL: Steel01Thermal
 COMMENT: \n\tUpdate material window to assign selected Grade.\n\tSelect 'Custom' to enter user values.\n\tSelect Force-Deformation/Moment-Rotation formulation\n\tin order to use this material for zeroLength elements.\n
 QUESTION: Material:#CB#(Steel01)
 VALUE: Steel01
@@ -2287,7 +2287,7 @@ QUESTION: Mass_density#UNITS#
 VALUE: 0.0 ton/m^3
 END MATERIAL
 
-MATERIAL: Shell
+MATERIAL: ShellMITC4Thermal
 COMMENT: \n
 TITLE: General
 QUESTION: Element_type:#CB#(Shell)
@@ -2306,7 +2306,7 @@ QUESTION: Weight_density#UNITS#
 VALUE: 25 kN/m^3
 END MATERIAL
 
-MATERIAL: ShellDKGQ
+MATERIAL: ShellNLDKGQThermal
 COMMENT: \n
 TITLE: General
 QUESTION: Element_type:#CB#(ShellDKGQ)

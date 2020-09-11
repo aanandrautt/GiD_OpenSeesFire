@@ -285,7 +285,7 @@
 *elseif(strcmp(MatProp(Section:),"ElasticMembranePlate")==0)
 *set var thickness=MatProp(Section_depth_h,real)
 *elseif(strcmp(MatProp(Section:),"LayeredShell")==0)
-*set var thickness=MatProp(Wall_width,real)
+*set var thickness=MatProp(Slab_thickness,real)
 *elseif(strcmp(MatProp(Section:),"UserMaterial")==0)
 *set var thickness=MatProp(Width,real)
 *else

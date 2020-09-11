@@ -167,6 +167,7 @@
 *set var PlateFromPlaneStressMaterialTag=300
 *set var PlateRebarLongTag=400
 *set var PlateRebarTransTag=500
+*set var PlateRebarDeckingTag=550
 *# Clear the lists of nodeTags for each Group (each domain)
 *set var dummy=tcl(ClearGroupNodes )
 *# Clear the list of Quad/QuadUP Nodes, used for automatic equalDOF commands (if chosen)

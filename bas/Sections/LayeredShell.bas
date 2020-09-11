@@ -62,6 +62,35 @@ nDMaterial PlateRebarThermal *PlateRebarLongTag *SelectedLongRBMaterial  90
 *format "%6d%4d%4d"
 nDMaterial PlateRebarThermal *PlateRebarTransTag *SelectedTransverseRBMaterial  0
 *#
+*# define PlateRebar for steel decking
+*#
+*set var PlateRebarDeckingTag=PlateRebarDeckingTag+1
+*set var SelectedDeckingRBMaterial=tcl(FindMaterialNumber *MatProp(Decking_steel_material) *DomainNum)
+*set var MaterialExists=tcl(CheckUsedMaterials *SelectedDeckingRBMaterial )
+*if(MaterialExists==-1)
+*loop materials *NotUsed
+*set var MaterialID=tcl(FindMaterialNumber *Matprop(0) *DomainNum)
+*if(SelectedDeckingRBMaterial==MaterialID)
+*if(strcmp(MatProp(Material:),"Steel01")==0)
+*include ..\Materials\Uniaxial\Steel01.bas
+*elseif(strcmp(MatProp(Material:),"Steel02")==0)
+*include ..\Materials\Uniaxial\Steel02.bas
+*elseif(strcmp(MatProp(Material:),"Hysteretic")==0)
+*include ..\Materials\Uniaxial\Hysteretic.bas
+*elseif(strcmp(MatProp(Material:),"ReinforcingSteel")==0)
+*include ..\Materials\Uniaxial\ReinforcingSteel.bas
+*elseif(strcmp(MatProp(Material:),"RambergOsgoodSteel")==0)
+*include ..\Materials\Uniaxial\RambergOsgoodSteel.bas
+*else
+*MessageBox Error: Unsupported steel material for LayeredShell Section
+*endif
+*set var dummy=tcl(AddUsedMaterials *SelectedDeckingRBMaterial)
+*break
+*endif
+*end materials
+*endif
+*format "%6d%6d"
+nDMaterial PlateRebarThermal *PlateRebarDeckingTag *SelectedDeckingRBMaterial  90
 *#
 *# define CDPMaterial for concrete
 *#
@@ -127,7 +156,6 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *set var nlayersSteel=operation(nlayersSteel-1)
 *endif
 *set var nlayers=operation(nlayersTopCover+nlayersBotCover+nlayersCore+nlayersSteel)
-*nlayers
 *#
 *#
 *#
@@ -137,8 +165,15 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *set var LayeredShellTag=SectionID
 *#
 *#
+*if(offset==0)
 *format "%d%d"
 section LayeredShellThermal *LayeredShellTag *nlayers *\
+*else
+*format "%d%d"
+section LayeredShellThermal *LayeredShellTag *nlayers *\
+*format "%g"
+-offset *offset *\
+*endif
 *if(deckingThick!=0)
 *format "%d%g"
 *PlateRebarDeckingTag *deckingThick *\

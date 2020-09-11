@@ -21,9 +21,6 @@
 *include ..\Materials\Uniaxial\ReinforcingSteel.bas
 *elseif(strcmp(MatProp(Material:),"RambergOsgoodSteel")==0)
 *include ..\Materials\Uniaxial\RambergOsgoodSteel.bas
-*elseif(strcmp(MatProp(Material:),"UserMaterial")==0)
-set MatTag *SelectedSection; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
-*include ..\..\Materials\User\UserMaterial.bas
 *else
 *MessageBox Error: Unsupported steel material for LayeredShell Section
 *endif
@@ -54,9 +51,6 @@ nDMaterial PlateRebarThermal *PlateRebarLongTag *SelectedLongRBMaterial  90
 *include ..\Materials\Uniaxial\ReinforcingSteel.bas
 *elseif(strcmp(MatProp(Material:),"RambergOsgoodSteel")==0)
 *include ..\Materials\Uniaxial\RambergOsgoodSteel.bas
-*elseif(strcmp(MatProp(Material:),"UserMaterial")==0)
-set MatTag *SelectedSection; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
-*include ..\..\Materials\User\UserMaterial.bas
 *else
 *MessageBox Error: Unsupported steel material for LayeredShell Section
 *endif
@@ -89,9 +83,6 @@ nDMaterial PlateRebarThermal *PlateRebarTransTag *SelectedTransverseRBMaterial  
 *include ..\Materials\Uniaxial\ReinforcingSteel.bas
 *elseif(strcmp(MatProp(Material:),"RambergOsgoodSteel")==0)
 *include ..\Materials\Uniaxial\RambergOsgoodSteel.bas
-*elseif(strcmp(MatProp(Material:),"UserMaterial")==0)
-set MatTag *SelectedSection; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
-*include ..\..\Materials\User\UserMaterial.bas
 *else
 *MessageBox Error: Unsupported steel material for LayeredShell Section
 *endif

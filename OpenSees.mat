@@ -1822,12 +1822,12 @@ VALUE: 0.1
 QUESTION: Cover_G#UNITS#
 VALUE: 12.5 GPa
 TITLE: Reinforcement
-QUESTION: Longitudinal_steel_material#MAT#(Uniaxial_Steel_Materials, User_Materials)
+QUESTION: Longitudinal_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
 VALUE: Steel01
 HELP: oriented at 90 degrees with local x axis, so in global x axis
-QUESTION: Transverse_steel_material#MAT#(Uniaxial_Steel_Materials, User_Materials)
+QUESTION: Transverse_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
 VALUE: Steel01
-QUESTION: Decking_steel_material#MAT#(Uniaxial_Steel_Materials, User_Materials)
+QUESTION: Decking_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
 VALUE: Steel01
 HELP: oriented at 0 degrees with local x axis, so in global y axis
 QUESTION: Angle

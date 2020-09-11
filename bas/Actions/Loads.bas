@@ -28,6 +28,12 @@
 *set var PrintPlainPatternPathTimeseries=1
 *break
 *end elems
+*set cond Line_Linear_Temperatures *elems *CanRepeat
+*loop elems *OnlyInCond
+*set var PrintPlainPattern=1
+*set var PrintPlainPatternPathTimeseries=1
+*break
+*end elems
 *if(IntvData(Activate_dead_load,int)==1)
 *set var PrintPlainPattern=1
 *endif
@@ -42,9 +48,7 @@
 *# if there are loads applied, Create the pattern
 *#
 *if(PrintPlainPattern==1)
-
 # Loads - Plain Pattern
-
 *set var PatternTag=operation(IntvNum*100)
 pattern Plain *PatternTag *IntvData(Loading_type) {
 *#
@@ -92,6 +96,20 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *loop elems *OnlyInCond
 *format "%6d%8g%8g"
     eleLoad -ele *ElemsNum -type -beamUniform *cond(2,real) *cond(1,real)
+*end elems
+*endif
+*if(ndime==3)
+*set cond Line_Linear_Temperatures *elems
+*loop elems *OnlyInCond
+*format "%6d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal *cond(4,real) *cond(3,real) *cond(2,real) *cond(1,real)
+*end elems
+*# if it is 2D
+*else
+*set cond Line_Uniform_Forces *elems
+*loop elems *OnlyInCond
+*format "%6d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal *cond(1,real) *cond(2,real) *cond(3,real) *cond(4,real)
 *end elems
 *endif
 *set cond Point_Displacements *nodes

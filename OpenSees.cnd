@@ -241,6 +241,29 @@ STATE: HIDDEN
 TKWIDGET: TK_LineLoadsWikiInfo
 END CONDITION
 
+CONDITION: Line_Linear_Temperatures
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+COMMENT: \n\tThis condition is assigned on lines and is transferred on linear elements.\n\tLoads are always applied in the ACTIVE interval.\n\tAfter assigning new loads DO NOT FORGET to regenerate the mesh.\n
+QUESTION: Top_temperature#UNITS#
+VALUE: 20.0 C
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Top_fiber#UNITS#
+VALUE: 0.1 m
+QUESTION: Bottom_temperature#UNITS#
+VALUE: 20.0 C
+QUESTION: Bottom_fiber#UNITS#
+VALUE: -0.1 m
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_LocalAxesInfo
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
 CONDITION: Point_Displacements
 CONDTYPE: over points
 CONDMESHTYPE: over nodes

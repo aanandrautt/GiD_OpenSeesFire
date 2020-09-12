@@ -40,6 +40,12 @@
 *set var PrintPlainPatternPathTimeseries=1
 *break
 *end elems
+*set cond Surface_Temperature_History *elems *CanRepeat
+*loop elems *OnlyInCond
+*set var PrintPlainPattern=1
+*set var PrintPlainPatternPathTimeseries=1
+*break
+*end elems
 *if(IntvData(Activate_dead_load,int)==1)
 *set var PrintPlainPattern=1
 *endif
@@ -125,6 +131,14 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
     eleLoad -ele *ElemsNum -type -shellThermal *cond(4,real) *cond(3,real) *cond(2,real) *cond(1,real)
 *end elems
 *endif
+*if(ndime==3)
+*set cond Surface_Temperature_History *elems
+*loop elems *OnlyInCond
+*format "%6d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -shellThermal "../Records/*cond(1)" *cond(2,real) *cond(3,real)
+*end elems
+*endif
+
 *set cond Point_Displacements *nodes
 *add cond Line_Displacements *nodes
 *add cond Surface_Displacements *nodes

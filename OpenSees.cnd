@@ -287,6 +287,26 @@ STATE: HIDDEN
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
+CONDITION: Surface_Temperature_History
+CONDTYPE: over surfaces
+CONDMESHTYPE: over body elements
+COMMENT: \n\tThis condition is assigned on surfaces and is transferred on shell elements.\n\tYou must add the temperature files to the folder "Records" which you placed manually in the project OpenSees folder.
+QUESTION: Record_file_name
+VALUE: temp.dat
+QUESTION: Top_fiber#UNITS#
+VALUE: 0.1 m
+QUESTION: Bottom_fiber#UNITS#
+VALUE: -0.1 m
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_LocalAxesInfo
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
 CONDITION: Point_Displacements
 CONDTYPE: over points
 CONDMESHTYPE: over nodes

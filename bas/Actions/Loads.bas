@@ -134,10 +134,8 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(ndime==3)
 *set cond Surface_Temperature_History *elems
 *loop elems *OnlyInCond
-*loop materials
-*set var SelectedSection=tcl(FindMaterialNumber *MatProp(Type) *DomainNum)
-*set var MaterialExists=tcl(CheckUsedMaterials *SelectedSection)
-*if(MaterialExists==-1)
+*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0 || strcmp(ElemsMatProp(Element_type:),"Shell")==0)
+*set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
 *loop materials *NotUsed
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
 *if(SelectedSection==SectionID)
@@ -154,17 +152,21 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *set var thickness=MatProp(Slab_thickness,real)
 *set var deckingThickness=MatProp(Decking_thickness,real)
 *set var offset=MatProp(Offset,real)
+*elseif(strcmp(MatProp(Section:),"UserMaterial")==0)
+*set var thickness=MatProp(Width,real)
+*set var offset=0.0
+*set var deckingThick=0.0
 *else
-*MessageBox Error: Unsupported section for Surface Temperature History action
+*MessageBox Error: Invalid Section selected for Shell/ShellDKGQ element
 *endif
+*break
 *endif
 *end materials
-*endif
 *set var topFiber=operation(1.001*(thickness+deckingThick)/2.0+offset)
 *set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0+offset)
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -shellThermal -source *cond(1) *botFiber *topFiber
-*end materials	
+    eleLoad -ele *ElemsNum -type -shellThermal -source *cond(1) *botFiber *topFiber	
+*endif
 *end elems
 *endif
 *set cond Point_Displacements *nodes

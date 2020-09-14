@@ -292,7 +292,7 @@ CONDTYPE: over surfaces
 CONDMESHTYPE: over body elements
 COMMENT: \n\tThis condition is assigned on surfaces and is transferred on shell elements.\n\tYou must add the temperature files to the folder "Records" which you placed manually in the project OpenSees folder.
 QUESTION: Record_file_name
-VALUE: temp.dat
+VALUE: "\Records\.dat"
 QUESTION: Top_fiber#UNITS#
 VALUE: 0.1 m
 QUESTION: Bottom_fiber#UNITS#

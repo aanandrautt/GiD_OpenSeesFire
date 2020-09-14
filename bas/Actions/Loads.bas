@@ -134,11 +134,39 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(ndime==3)
 *set cond Surface_Temperature_History *elems
 *loop elems *OnlyInCond
+*loop materials
+*set var SelectedSection=tcl(FindMaterialNumber *MatProp(Type) *DomainNum)
+*set var MaterialExists=tcl(CheckUsedMaterials *SelectedSection)
+*if(MaterialExists==-1)
+*loop materials *NotUsed
+*set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
+*if(SelectedSection==SectionID)
+*set var dummy=tcl(AddUsedMaterials *SelectedSection)
+*if(strcmp(MatProp(Section:),"PlateFiber")==0)
+*set var thickness=MatProp(Plate_thickness_h,real)
+*set var offset=0.0
+*set var deckingThick=0.0
+*elseif(strcmp(MatProp(Section:),"ElasticMembranePlate")==0)
+*set var thickness=MatProp(Section_depth_h,real)
+*set var offset=0.0
+*set var deckingThick=0.0
+*elseif(strcmp(MatProp(Section:),"LayeredShell")==0)
+*set var thickness=MatProp(Slab_thickness,real)
+*set var deckingThickness=MatProp(Decking_thickness,real)
+*set var offset=MatProp(Offset,real)
+*else
+*MessageBox Error: Unsupported section for Surface Temperature History action
+*endif
+*endif
+*end materials
+*endif
+*set var topFiber=operation(1.001*(thickness+deckingThick)/2.0+offset)
+*set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0+offset)
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -shellThermal "../Records/*cond(1)" *cond(2,real) *cond(3,real)
+    eleLoad -ele *ElemsNum -type -shellThermal -source *cond(1) *botFiber *topFiber
+*end materials	
 *end elems
 *endif
-
 *set cond Point_Displacements *nodes
 *add cond Line_Displacements *nodes
 *add cond Surface_Displacements *nodes

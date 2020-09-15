@@ -423,6 +423,37 @@ proc Fiber::CalcArea { event args } {
 								}
 						}
 
+				} elseif {$CrossSectionType == "I_Section"} {
+						set heightUnit [DWLocalGetValue $GDN $STRUCT Height_h]
+						set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
+						set TopFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Top_flange_width_b1]
+						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf1]
+						set TopFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Top_flange_width_b2]
+						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf2]
+						
+						
+
+						
+						set temp [GidConvertValueUnit $heightUnit]
+						set temp [ParserNumberUnit $temp h HUnit]
+						set temp [GidConvertValueUnit $WebThickUnit]
+						set temp [ParserNumberUnit $temp tw twUnit]
+						set temp [GidConvertValueUnit $TopFlangeWidthUnit]
+						set temp [ParserNumberUnit $temp b1 b1Unit]
+						set temp [GidConvertValueUnit $TopFlangeThickUnit]
+						set temp [ParserNumberUnit $temp tf1 tf1Unit]
+						set temp [GidConvertValueUnit $BotFlangeWidthUnit]
+						set temp [ParserNumberUnit $temp b2 b2Unit]
+						set temp [GidConvertValueUnit $BotFlangeThickUnit]
+						set temp [ParserNumberUnit $temp tf2 tf2Unit]
+						
+						
+
+						set Areaunit $HUnit^2
+
+						set AreaSize [expr ($h - $tf1 - $tf2)*$tw + $b1*$tf1 + $b2*$tf2]
+						set Area $AreaSize$Areaunit
+						set ok [DWLocalSetValue $GDN $STRUCT "Cross_section_area" $Area]
 				} else {
 
 						return ""

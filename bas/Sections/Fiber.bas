@@ -1,6 +1,10 @@
 *set var FiberTag=SectionID
 *if(ndime==3)
-*if(strcmp(Matprop(Cross_section),"Bridge_Deck")!=0)
+*# ANWAR ORABI: For some reason I cannot seem to get both the bridge deck and I sections to work. Need to use !=0 for I_section, in stead of for bridge deck.
+*if(strcmp(Matprop(Cross_section),"I_Section")!=0)
+*include PredefinedFiber.bas
+*endif 
+*if(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)
 *# if it is a Fiber Section, We need to check which uniaxial materials we need to define
 *set var SelectedCoreMaterial=tcl(FindMaterialNumber *MatProp(Core_material) *DomainNum)
 *set var SelectedCoverMaterial=tcl(FindMaterialNumber *MatProp(Cover_material) *DomainNum)
@@ -93,7 +97,7 @@
 *# endif material has been already defined
 *endif
 *# bridge deck
-*else
+*elseif(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)
 *set var SelectedMainMaterial=tcl(FindMaterialNumber *MatProp(Main_section_material) *DomainNum)
 *set var SelectedTopRBMaterial=tcl(FindMaterialNumber *MatProp(Top_slab_reinforcing_bar_material) *DomainNum)
 *set var SelectedBottomRBMaterial=tcl(FindMaterialNumber *MatProp(Bottom_slab_reinforcing_bar_material) *DomainNum)
@@ -280,7 +284,7 @@
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
 *format "%d"
-section Fiber *FiberTag *\
+section fiberSecThermal *FiberTag *\
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -763,7 +767,7 @@ DeckFiberSection3D *FiberTag *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID
 *# endif material has not been already defined
 *endif
 *# bridge deck
-*else
+*elseif(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)
 *set var SelectedMainMaterial=tcl(FindMaterialNumber *MatProp(Main_section_material) *DomainNum)
 *set var SelectedTopRBMaterial=tcl(FindMaterialNumber *MatProp(Top_slab_reinforcing_bar_material) *DomainNum)
 *set var SelectedBottomRBMaterial=tcl(FindMaterialNumber *MatProp(Bottom_slab_reinforcing_bar_material) *DomainNum)

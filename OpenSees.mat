@@ -1361,6 +1361,58 @@ QUESTION: mod._Iyz
 VALUE: 1
 END MATERIAL
 
+MATERIAL: Predefined Fiber Section
+COMMENT: \n
+TITLE: Section properties
+QUESTION: Cross_section
+VALUE: I_Section
+STATE: HIDDEN
+QUESTION: Section:#CB#(Fiber)
+VALUE: Fiber
+STATE: HIDDEN
+QUESTION: Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
+VALUE: Steel01
+QUESTION: Web_Y_fibers
+VALUE: 1
+QUESTION: Web_Z_fibers
+VALUE: 6
+QUESTION: Height_h#UNITS#
+VALUE: 250 mm
+QUESTION: Web_thickness_tw#UNITS#
+VALUE: 8 mm
+QUESTION: Top_flange_Y_fibers
+VALUE: 5
+QUESTION: Top_flange_Z_fibers
+VALUE: 3
+QUESTION: Top_flange_width_b1#UNITS#
+VALUE: 200 mm
+QUESTION: Top_flange_thickness_tf1#UNITS#
+VALUE: 10 mm
+QUESTION: Bot_flange_Y_fibers
+VALUE: 5
+QUESTION: Bot_flange_Z_fibers
+VALUE: 3
+QUESTION: Bot_flange_width_b2#UNITS#
+VALUE: 200 mm
+QUESTION: Bot_flange_thickness_tf2#UNITS#
+VALUE: 10 mm
+QUESTION: Rotation_angle
+VALUE: 0
+HELP: Enter angle in degrees
+QUESTION: Young_modulus#UNITS#
+VALUE: 206 GPa
+HELP: For finding torsional stiffness JG
+QUESTION: I_section_picture
+VALUE: 2#WIDTH#(10)
+IMAGE: img/Sections/I-section.jpg
+QUESTION: Cross_section_area#UNITS#
+VALUE: 0.25m^2
+STATE: HIDDEN
+TKWIDGET: Fiber::CalcArea
+TKWIDGET: TK_SectionWikiInfo
+TKWIDGET: TK_LocalAxesInfo
+END MATERIAL
+
 MATERIAL: Fiber
 COMMENT: \n
 TITLE: General

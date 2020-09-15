@@ -137,8 +137,10 @@
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
 *if(SelectedSection==SectionID)
 *if(ThermalSectionMaterialExists==-1)
+
 *set var dummy=tcl(ThermalAddUsedMaterials *SelectedSection)
 *endif
+
 *if(strcmp(MatProp(Section:),"Fiber")==0)
 *if(MatProp(Activate_Thermal,int)!=0)
 *if(strcmp(Matprop(Cross_section),"Rectangular_Column")==0)

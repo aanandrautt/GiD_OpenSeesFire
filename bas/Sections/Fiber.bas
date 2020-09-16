@@ -1,7 +1,7 @@
 *set var FiberTag=SectionID
 *if(ndime==3)
 *# ANWAR ORABI: For some reason I cannot seem to get both the bridge deck and I sections to work. Need to use !=0 for I_section, in stead of for bridge deck.
-*if(strcmp(Matprop(Cross_section),"I_Section")!=0)
+*if(strcmp(Matprop(Cross_section),"I_Section")==0)
 *include PredefinedFiber.bas
 *endif 
 *if(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)
@@ -675,7 +675,7 @@ DeckFiberSection3D *FiberTag *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID
 *endif
 *# --------------------------------------------- 2D ---------------------------------------------------
 *elseif(ndime==2)
-*if(strcmp(Matprop(Cross_section),"Bridge_Deck")!=0)
+*if(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)
 *set var SelectedCoreMaterial=tcl(FindMaterialNumber *MatProp(Core_material) *DomainNum)
 *set var SelectedCoverMaterial=tcl(FindMaterialNumber *MatProp(Cover_material) *DomainNum)
 *set var SelectedRBMaterial=tcl(FindMaterialNumber *MatProp(Reinforcing_Bar_material) *DomainNum)

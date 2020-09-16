@@ -120,8 +120,8 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(SelectedSection==SectionID)
 *set var dummy=tcl(AddUsedMaterials *SelectedSection)
 *if(strcmp(MatProp(Section:),"Fiber")==0)
-*set var topFiber=MatProp(Z2,real)
 *set var botFiber=MatProp(Z1,real)
+*set var topFiber=MatProp(Z2,real)
 *set var area=MatProp(Cross_section_area,real)
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
@@ -133,6 +133,8 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 # CANNOT APPLY THE REGULAR THERMAL LINE LOAD TO ANYTHING OTHER THAN A REGULARLY ORIENTED SECTION
 *endif
 *area
+bottom fiber is *botFiber
+top fiber is *topFiber
 *format "%6d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -beamThermal *cond(2,real) *botFiber *cond(1,real) *topFiber	
 *endif

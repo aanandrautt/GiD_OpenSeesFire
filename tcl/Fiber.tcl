@@ -470,7 +470,7 @@ proc Fiber::CalcCorners { event args } {
 	switch $event {
 
 		SYNC {
-
+				set pi 3.14159265359
 				set GDN [lindex $args 0]
 				set STRUCT [lindex $args 1]
 				set QUESTION [lindex $args 2]
@@ -501,13 +501,13 @@ proc Fiber::CalcCorners { event args } {
 						set temp [ParserNumberUnit $temp b2 b2Unit]
 						set temp [GidConvertValueUnit $BotFlangeThickUnit]
 						set temp [ParserNumberUnit $temp tf2 tf2Unit]
-						set temp [GidConvertValueUnit $rotationAngle]
-						set temp [ParserNumberUnit $temp angle angleUnit]
+						# set temp [GidConvertValueUnit $rotationAngle]
+						# set temp [ParserNumberUnit $temp angle angleUnit]
 						
 
 						set locationUnit $HUnit
-						set sine [expr sin($angle)]
-						set cosine [expr cos($angle)]
+						set sine [expr sin($rotationAngle*$pi/180)]
+						set cosine [expr cos($rotationAngle*$pi/180)]
 						
 						#Based on top flange point K
 						set H [expr $h*0.5 - $tf1*0.5]

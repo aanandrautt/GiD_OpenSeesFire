@@ -428,8 +428,8 @@ proc Fiber::CalcArea { event args } {
 						set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
 						set TopFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Top_flange_width_b1]
 						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf1]
-						set TopFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Top_flange_width_b2]
-						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf2]
+						set BotFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_width_b2]
+						set BotFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_thickness_tf2]
 						
 						
 
@@ -466,6 +466,95 @@ proc Fiber::CalcArea { event args } {
 	return ""
 }
 
+proc Fiber::CalcCorners { event args } {
+	switch $event {
+
+		SYNC {
+
+				set GDN [lindex $args 0]
+				set STRUCT [lindex $args 1]
+				set QUESTION [lindex $args 2]
+
+				set CrossSectionType [DWLocalGetValue $GDN $STRUCT Cross_section]
+
+				if {$CrossSectionType == "I_Section"} {
+						set heightUnit [DWLocalGetValue $GDN $STRUCT Height_h]
+						set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
+						set TopFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Top_flange_width_b1]
+						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf1]
+						set BotFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_width_b2]
+						set BotFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_thickness_tf2]
+						set rotationAngle [DWLocalGetValue $GDN $STRUCT Rotation_angle]
+						
+						
+
+						
+						set temp [GidConvertValueUnit $heightUnit]
+						set temp [ParserNumberUnit $temp h HUnit]
+						set temp [GidConvertValueUnit $WebThickUnit]
+						set temp [ParserNumberUnit $temp tw twUnit]
+						set temp [GidConvertValueUnit $TopFlangeWidthUnit]
+						set temp [ParserNumberUnit $temp b1 b1Unit]
+						set temp [GidConvertValueUnit $TopFlangeThickUnit]
+						set temp [ParserNumberUnit $temp tf1 tf1Unit]
+						set temp [GidConvertValueUnit $BotFlangeWidthUnit]
+						set temp [ParserNumberUnit $temp b2 b2Unit]
+						set temp [GidConvertValueUnit $BotFlangeThickUnit]
+						set temp [ParserNumberUnit $temp tf2 tf2Unit]
+						set temp [GidConvertValueUnit $rotationAngle]
+						set temp [ParserNumberUnit $temp angle angleUnit]
+						
+
+						set locationUnit $HUnit
+						set sine [expr sin($angle)]
+						set cosine [expr cos($angle)]
+						
+						#Based on top flange point K
+						set H [expr $h*0.5 - $tf1*0.5]
+						set y1 [expr $H*$sine]
+						set y2 [expr 0.5*$b1*$cosine]
+						set y3 [expr 0.5*$tf1*$sine]
+						set Ky [expr -$y1 + $y2 - $y3]
+						set Y2 $Ky$locationUnit
+						
+						set z1 [expr $H*$cosine]
+						set z2 [expr 0.5*$b1*$sine]
+						set z3 [expr 0.5*$tf1*$cosine]
+						set Kz [expr $z1 + $z2 + $z3]
+						set Z2 $Kz$locationUnit
+						
+						#Based on bottom flange point I
+						set H [expr $h*0.5 - $tf2*0.5]
+						set y1 [expr $H*$sine]
+						set y2 [expr 0.5*$b2*$cosine]
+						set y3 [expr 0.5*$tf2*$sine]
+						set Iy [expr $y1 - $y2 + $y3]
+						set Y1 $Iy$locationUnit
+						
+						set z1 [expr $H*$cosine]
+						set z2 [expr 0.5*$b2*$sine]
+						set z3 [expr 0.5*$tf2*$cosine]
+						set Iz [expr -$z1 - $z2 - $z3]
+						set Z1 $Iz$locationUnit
+						
+						set ok [DWLocalSetValue $GDN $STRUCT "Y1" $Y1]
+						set ok [DWLocalSetValue $GDN $STRUCT "Y2" $Y2]
+						set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
+						set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
+				} else {
+
+						return ""
+				}
+
+						return ""
+		}
+	}
+
+	return ""
+}
+				
+				
+				
 proc Fiber::SuggestFibers { event args } {
 
 	switch $event {

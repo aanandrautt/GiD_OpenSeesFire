@@ -1396,19 +1396,31 @@ QUESTION: Bot_flange_width_b2#UNITS#
 VALUE: 200 mm
 QUESTION: Bot_flange_thickness_tf2#UNITS#
 VALUE: 10 mm
-QUESTION: Rotation_angle
-VALUE: 0
+QUESTION: Rotation_angle#UNITS#
+VALUE: 0 degree
 HELP: Enter angle in degrees
 QUESTION: Young_modulus#UNITS#
 VALUE: 206 GPa
 HELP: For finding torsional stiffness JG
-QUESTION: I_section_picture
 VALUE: 2#WIDTH#(10)
 IMAGE: img/Sections/I-section.jpg
-QUESTION: Cross_section_area#UNITS#
-VALUE: 0.25m^2
-STATE: HIDDEN
 TKWIDGET: Fiber::CalcArea
+QUESTION: Cross_section_area#UNITS#
+VALUE: 0.25 m^2
+STATE: HIDDEN
+TKWIDGET: Fiber::CalcCorners
+QUESTION: Y1#UNITS#
+VALUE: -0.1 m
+STATE: HIDDEN
+QUESTION: Y2#UNITS#
+VALUE: 0.1 m
+STATE: HIDDEN
+QUESTION: Z1#UNITS#
+VALUE: -0.125 m
+STATE: HIDDEN
+QUESTION: Z2#UNITS#
+VALUE: 0.125 m
+STATE: HIDDEN
 TKWIDGET: TK_SectionWikiInfo
 TKWIDGET: TK_LocalAxesInfo
 END MATERIAL

@@ -113,15 +113,30 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(ndime==3)
 *set cond Line_Linear_Temperatures *elems
 *loop elems *OnlyInCond
-*format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal *cond(4,real) *cond(3,real) *cond(2,real) *cond(1,real)
-*end elems
-*# if it is 2D
+*if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
+*set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
+*loop materials *NotUsed
+*set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
+*if(SelectedSection==SectionID)
+*set var dummy=tcl(AddUsedMaterials *SelectedSection)
+*if(strcmp(MatProp(Section:),"Fiber")==0)
+*set var sectionDepth=MatProp(Height_h,real)
+*set var angle=MatProp(Rotation_angle,real)
+*set var offset=0.0
 *else
-*set cond Line_Uniform_Forces *elems
-*loop elems *OnlyInCond
+*MessageBox Error: Cannot grab section properties from anything other than a Fiber section
+*endif
+*break
+*endif
+*end materials
+*if(angle!=0)
+# CANNOT APPLY THE REGULAR THERMAL LINE LOAD TO ANYTHING OTHER THAN A REGULARLY ORIENTED SECTION
+*endif
+*set var topFiber=operation(1.001*(sectionDepth)/2.0+offset)
+*set var botFiber=operation(-1.001*(sectionDepth)/2.0+offset)
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal *cond(1,real) *cond(2,real) *cond(3,real) *cond(4,real)
+    eleLoad -ele *ElemsNum -type -beamThermal *cond(2,real) *botFiber *cond(1,real) *topFiber	
+*endif
 *end elems
 *endif
 *if(ndime==3)

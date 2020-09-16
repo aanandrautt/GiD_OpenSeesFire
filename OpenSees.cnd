@@ -248,12 +248,8 @@ COMMENT: \n\tThis condition is assigned on lines and is transferred on linear el
 QUESTION: Top_temperature#UNITS#
 VALUE: 20.0 C
 TKWIDGET: TK_UpdateInfoBar
-QUESTION: Top_fiber#UNITS#
-VALUE: 0.1 m
 QUESTION: Bottom_temperature#UNITS#
 VALUE: 20.0 C
-QUESTION: Bottom_fiber#UNITS#
-VALUE: -0.1 m
 QUESTION: _#CB#(_)
 VALUE:
 STATE: HIDDEN

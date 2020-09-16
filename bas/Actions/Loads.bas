@@ -128,7 +128,7 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *set cond Surface_Linear_Temperatures *elems
 *loop elems *OnlyInCond
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -shellThermal *cond(4,real) *cond(3,real) *cond(2,real) *cond(1,real)
+    eleLoad -ele *ElemsNum -type -shellThermal *cond(3,real) *cond(4,real) *cond(1,real) *cond(2,real)
 *end elems
 *endif
 *if(ndime==3)

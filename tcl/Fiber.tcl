@@ -431,7 +431,6 @@ proc Fiber::CalcArea { event args } {
 						set BotFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_width_b2]
 						set BotFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_thickness_tf2]
 						
-						
 
 						
 						set temp [GidConvertValueUnit $heightUnit]
@@ -447,13 +446,28 @@ proc Fiber::CalcArea { event args } {
 						set temp [GidConvertValueUnit $BotFlangeThickUnit]
 						set temp [ParserNumberUnit $temp tf2 tf2Unit]
 						
+						set H [expr $h*0.5 - $tf2*0.5]
+						set z1 [expr $H*1]
+						set z2 [expr 0.5*$b1*0]
+						set z3 [expr 0.5*$tf1*1]
+						set Kz [expr $z1 + $z2 + $z3]
+						set Z2 $Kz$HUnit
+						set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
 						
-
+						set H [expr $h*0.5 - $tf2*0.5]
+						set z1 [expr $H*1]
+						set z2 [expr 0.5*$b2*0]
+						set z3 [expr 0.5*$tf2*1]
+						set Iz [expr -$z1 - $z2 - $z3]
+						set Z1 $Iz$HUnit
+						set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
+						
 						set Areaunit $HUnit^2
 
 						set AreaSize [expr ($h - $tf1 - $tf2)*$tw + $b1*$tf1 + $b2*$tf2]
 						set Area $AreaSize$Areaunit
 						set ok [DWLocalSetValue $GDN $STRUCT "Cross_section_area" $Area]
+						
 				} else {
 
 						return ""
@@ -484,7 +498,7 @@ proc Fiber::CalcCorners { event args } {
 						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf1]
 						set BotFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_width_b2]
 						set BotFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_thickness_tf2]
-						set rotationAngle [DWLocalGetValue $GDN $STRUCT Rotation_angle]
+						# set rotationAngle [DWLocalGetValue $GDN $STRUCT Rotation_angle]
 						
 						
 
@@ -506,8 +520,8 @@ proc Fiber::CalcCorners { event args } {
 						
 
 						set locationUnit $HUnit
-						set sine [expr sin($rotationAngle*$pi/180)]
-						set cosine [expr cos($rotationAngle*$pi/180)]
+						set sine [expr sin(0*$pi/180)]
+						set cosine [expr cos(0*$pi/180)]
 						
 						#Based on top flange point K
 						set H [expr $h*0.5 - $tf1*0.5]
@@ -537,9 +551,9 @@ proc Fiber::CalcCorners { event args } {
 						set Iz [expr -$z1 - $z2 - $z3]
 						set Z1 $Iz$locationUnit
 						
-						set ok [DWLocalSetValue $GDN $STRUCT "Y1" $Y1]
-						set ok [DWLocalSetValue $GDN $STRUCT "Y2" $Y2]
-						set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
+						# set ok [DWLocalSetValue $GDN $STRUCT "Y1" $Y1]
+						# set ok [DWLocalSetValue $GDN $STRUCT "Y2" $Y2]
+						# set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
 						set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
 				} else {
 

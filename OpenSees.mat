@@ -1402,7 +1402,6 @@ HELP: Enter angle in degrees
 QUESTION: Young_modulus#UNITS#
 VALUE: 206 GPa
 HELP: For finding torsional stiffness JG
-VALUE: 2#WIDTH#(10)
 IMAGE: img/Sections/I-section.jpg
 QUESTION: Cross_section_area#UNITS#
 VALUE: 0.25 m^2

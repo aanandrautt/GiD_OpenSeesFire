@@ -1,5 +1,5 @@
 
-*format "%f"
+*format "%g"
 set Lincr *LoadIncr
 *format "%d"
 set Nsteps *steps

@@ -127,8 +127,39 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(ndime==3)
 *set cond Surface_Linear_Temperatures *elems
 *loop elems *OnlyInCond
+*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0 || strcmp(ElemsMatProp(Element_type:),"Shell")==0)
+*set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
+*loop materials *NotUsed
+*set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
+*if(SelectedSection==SectionID)
+*set var dummy=tcl(AddUsedMaterials *SelectedSection)
+*if(strcmp(MatProp(Section:),"PlateFiber")==0)
+*set var thickness=MatProp(Plate_thickness_h,real)
+*set var offset=0.0
+*set var deckingThick=0.0
+*elseif(strcmp(MatProp(Section:),"ElasticMembranePlate")==0)
+*set var thickness=MatProp(Section_depth_h,real)
+*set var offset=0.0
+*set var deckingThick=0.0
+*elseif(strcmp(MatProp(Section:),"LayeredShell")==0)
+*set var thickness=MatProp(Slab_thickness,real)
+*set var deckingThickness=MatProp(Decking_thickness,real)
+*set var offset=MatProp(Offset,real)
+*elseif(strcmp(MatProp(Section:),"UserMaterial")==0)
+*set var thickness=MatProp(Width,real)
+*set var offset=0.0
+*set var deckingThick=0.0
+*else
+*MessageBox Error: Invalid Section selected for Shell/ShellDKGQ element
+*endif
+*break
+*endif
+*end materials
+*set var topFiber=operation(1.001*(thickness+deckingThick)/2.0+offset)
+*set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0+offset)
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -shellThermal *cond(3,real) *cond(4,real) *cond(1,real) *cond(2,real)
+    eleLoad -ele *ElemsNum -type -shellThermal *cond(3,real) *botFiber *cond(1,real) *topFiber	
+*endif
 *end elems
 *endif
 *if(ndime==3)

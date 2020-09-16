@@ -86,7 +86,8 @@ constraints *IntvData(Constraint_handler)
 *# Integrator for Static Monotonic Analysis
 *if(strcmp(IntvData(Integrator_type),"Load_control")==0)
 *set var steps=IntvData(Analysis_steps,int)
-*set var LoadIncr=operation(1.0/steps)
+*set var totTime=IntvData(Total_analysis_time,real)
+*set var LoadIncr=operation(totTime/steps)
 *format "%g"
 integrator LoadControl *LoadIncr
 *elseif(strcmp(IntvData(Integrator_type),"Displacement_control")==0)

@@ -314,14 +314,14 @@ QUESTION: Iterations_for_new_tangent
 VALUE: 10
 QUESTION: Analysis_type#CB#(Static,Transient)
 VALUE: Static
-DEPENDENCIES: (Static,RESTORE,Analysis_steps,#CURRENT#,HIDE,Analysis_duration,#CURRENT#,HIDE,Analysis_time_step,#CURRENT#,RESTORE,Integrator_type,#CURRENT#)
-DEPENDENCIES: (Transient,HIDE,Analysis_steps,#CURRENT#,RESTORE,Analysis_duration,#CURRENT#,RESTORE,Analysis_time_step,#CURRENT#,HIDE,Displacement_peaks-cycles,#CURRENT#,RESTORE,Integrator_type,#CURRENT#)
+DEPENDENCIES: (Static,RESTORE,Analysis_steps,#CURRENT#,RESTORE,Total_analysis_time,#CURRENT#,HIDE,Analysis_duration,#CURRENT#,HIDE,Analysis_time_step,#CURRENT#,RESTORE,Integrator_type,#CURRENT#)
+DEPENDENCIES: (Transient,HIDE,Analysis_steps,#CURRENT#,HIDE,Total_analysis_time,#CURRENT#,RESTORE,Analysis_duration,#CURRENT#,RESTORE,Analysis_time_step,#CURRENT#,HIDE,Displacement_peaks-cycles,#CURRENT#,RESTORE,Integrator_type,#CURRENT#)
 QUESTION: Integrator_type#CB#(Load_control,Displacement_control,Newmark,Hilber-Hughes-Taylor)
 VALUE: Load_control
-DEPENDENCIES: (Load_control,RESTORE,Analysis_steps,#CURRENT#,HIDE,Total_displacement,#CURRENT#,HIDE,Total_rotation,#CURRENT#,HIDE,Control_node,#CURRENT#,HIDE,Control_node_direction,#CURRENT#,HIDE,alpha,#CURRENT#,HIDE,gamma,#CURRENT#,HIDE,beta,#CURRENT#,HIDE,Analysis_duration,#CURRENT#,HIDE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Static,RESTORE,Loading_type,#CURRENT#,RESTORE,Activate_dead_load,#CURRENT#)
-DEPENDENCIES: (Displacement_control,RESTORE,Analysis_steps,#CURRENT#,RESTORE,Control_node,#CURRENT#,RESTORE,Control_node_direction,#CURRENT#,HIDE,alpha,#CURRENT#,HIDE,gamma,#CURRENT#,HIDE,beta,#CURRENT#,HIDE,Analysis_duration,#CURRENT#,HIDE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Static,RESTORE,Loading_type,#CURRENT#,HIDE,Activate_dead_load,#CURRENT#)
-DEPENDENCIES: (Newmark,RESTORE,gamma,#CURRENT#,RESTORE,beta,#CURRENT#,HIDE,Analysis_steps,#CURRENT#,HIDE,Total_displacement,#CURRENT#,HIDE,Total_rotation,#CURRENT#,HIDE,Control_node,#CURRENT#,HIDE,Control_node_direction,#CURRENT#,HIDE,alpha,#CURRENT#,RESTORE,Analysis_duration,#CURRENT#,RESTORE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Transient,RESTORE,Loading_type,#CURRENT#,HIDE,Activate_dead_load,#CURRENT#)
-DEPENDENCIES: (Hilber-Hughes-Taylor,RESTORE,alpha,#CURRENT#,RESTORE,gamma,#CURRENT#,RESTORE,beta,#CURRENT#,HIDE,Analysis_steps,#CURRENT#,HIDE,Total_displacement,#CURRENT#,HIDE,Total_rotation,#CURRENT#,HIDE,Control_node,#CURRENT#,HIDE,Control_node_direction,#CURRENT#,RESTORE,Analysis_duration,#CURRENT#,RESTORE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Transient,RESTORE,Loading_type,#CURRENT#,HIDE,Activate_dead_load,#CURRENT#)
+DEPENDENCIES: (Load_control,RESTORE,Analysis_steps,#CURRENT#,RESTORE,Total_analysis_time,#CURRENT#,HIDE,Total_displacement,#CURRENT#,HIDE,Total_rotation,#CURRENT#,HIDE,Control_node,#CURRENT#,HIDE,Control_node_direction,#CURRENT#,HIDE,alpha,#CURRENT#,HIDE,gamma,#CURRENT#,HIDE,beta,#CURRENT#,HIDE,Analysis_duration,#CURRENT#,HIDE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Static,RESTORE,Loading_type,#CURRENT#,RESTORE,Activate_dead_load,#CURRENT#)
+DEPENDENCIES: (Displacement_control,RESTORE,Analysis_steps,#CURRENT#,HIDE,Total_analysis_time,#CURRENT#,RESTORE,Control_node,#CURRENT#,RESTORE,Control_node_direction,#CURRENT#,HIDE,alpha,#CURRENT#,HIDE,gamma,#CURRENT#,HIDE,beta,#CURRENT#,HIDE,Analysis_duration,#CURRENT#,HIDE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Static,RESTORE,Loading_type,#CURRENT#,HIDE,Activate_dead_load,#CURRENT#)
+DEPENDENCIES: (Newmark,RESTORE,gamma,#CURRENT#,RESTORE,beta,#CURRENT#,HIDE,Analysis_steps,#CURRENT#,HIDE,Total_analysis_time,#CURRENT#,HIDE,Total_displacement,#CURRENT#,HIDE,Total_rotation,#CURRENT#,HIDE,Control_node,#CURRENT#,HIDE,Control_node_direction,#CURRENT#,HIDE,alpha,#CURRENT#,RESTORE,Analysis_duration,#CURRENT#,RESTORE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Transient,RESTORE,Loading_type,#CURRENT#,HIDE,Activate_dead_load,#CURRENT#)
+DEPENDENCIES: (Hilber-Hughes-Taylor,RESTORE,alpha,#CURRENT#,RESTORE,gamma,#CURRENT#,RESTORE,beta,#CURRENT#,HIDE,Analysis_steps,#CURRENT#,HIDE,Total_analysis_time,#CURRENT#,HIDE,Total_displacement,#CURRENT#,HIDE,Total_rotation,#CURRENT#,HIDE,Control_node,#CURRENT#,HIDE,Control_node_direction,#CURRENT#,RESTORE,Analysis_duration,#CURRENT#,RESTORE,Analysis_time_step,#CURRENT#,RESTORE,Analysis_type,Transient,RESTORE,Loading_type,#CURRENT#,HIDE,Activate_dead_load,#CURRENT#)
 TKWIDGET: IntvData::Integrator
 QUESTION: Control_node
 VALUE:
@@ -338,6 +338,8 @@ DEPENDENCIES: (RY,HIDE,Total_displacement,#CURRENT#,RESTORE,Total_rotation,#CURR
 DEPENDENCIES: (RZ,HIDE,Total_displacement,#CURRENT#,RESTORE,Total_rotation,#CURRENT#)
 TKWIDGET: IntvData::CtrlNodeDirection
 QUESTION: Analysis_steps
+VALUE: 10
+QUESTION: Total_analysis_time
 VALUE: 1
 QUESTION: Total_displacement#UNITS#
 VALUE: 0.1 m

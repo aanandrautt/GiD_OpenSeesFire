@@ -452,7 +452,7 @@ proc Fiber::CalcArea { event args } {
 						set z3 [expr 0.5*$tf1*1]
 						set Kz [expr $z1 + $z2 + $z3]
 						set Z2 $Kz$HUnit
-						set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
+						# set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
 						
 						set H [expr $h*0.5 - $tf2*0.5]
 						set z1 [expr $H*1]
@@ -460,7 +460,7 @@ proc Fiber::CalcArea { event args } {
 						set z3 [expr 0.5*$tf2*1]
 						set Iz [expr -$z1 - $z2 - $z3]
 						set Z1 $Iz$HUnit
-						set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
+						# set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
 						
 						set Areaunit $HUnit^2
 
@@ -484,7 +484,6 @@ proc Fiber::CalcCorners { event args } {
 	switch $event {
 
 		SYNC {
-				set pi 3.14159265359
 				set GDN [lindex $args 0]
 				set STRUCT [lindex $args 1]
 				set QUESTION [lindex $args 2]
@@ -498,9 +497,7 @@ proc Fiber::CalcCorners { event args } {
 						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf1]
 						set BotFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_width_b2]
 						set BotFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_thickness_tf2]
-						# set rotationAngle [DWLocalGetValue $GDN $STRUCT Rotation_angle]
-						
-						
+						set Angle [DWLocalGetValue $GDN $STRUCT Rotation_angle]
 
 						
 						set temp [GidConvertValueUnit $heightUnit]
@@ -515,52 +512,47 @@ proc Fiber::CalcCorners { event args } {
 						set temp [ParserNumberUnit $temp b2 b2Unit]
 						set temp [GidConvertValueUnit $BotFlangeThickUnit]
 						set temp [ParserNumberUnit $temp tf2 tf2Unit]
-						# set temp [GidConvertValueUnit $rotationAngle]
-						# set temp [ParserNumberUnit $temp angle angleUnit]
 						
-
-						set locationUnit $HUnit
-						set sine [expr sin(0*$pi/180)]
-						set cosine [expr cos(0*$pi/180)]
+						set pi 3.14159265359
+						set sine [expr sin($Angle*$pi/180)]
+						set cosine [expr cos($Angle*$pi/180)]
 						
 						#Based on top flange point K
 						set H [expr $h*0.5 - $tf1*0.5]
-						set y1 [expr $H*$sine]
-						set y2 [expr 0.5*$b1*$cosine]
-						set y3 [expr 0.5*$tf1*$sine]
-						set Ky [expr -$y1 + $y2 - $y3]
-						set Y2 $Ky$locationUnit
-						
 						set z1 [expr $H*$cosine]
 						set z2 [expr 0.5*$b1*$sine]
 						set z3 [expr 0.5*$tf1*$cosine]
 						set Kz [expr $z1 + $z2 + $z3]
-						set Z2 $Kz$locationUnit
+						set Z2 $Kz$HUnit
+						set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
+						set y1 [expr $H*$sine]
+						set y2 [expr 0.5*$b1*$cosine]
+						set y3 [expr 0.5*$tf1*$sine]
+						set Ky [expr -$y1 + $y2 - $y3]
+						set Y2 $Ky$HUnit
+						set ok [DWLocalSetValue $GDN $STRUCT "Y2" $Y2]
 						
 						#Based on bottom flange point I
 						set H [expr $h*0.5 - $tf2*0.5]
-						set y1 [expr $H*$sine]
-						set y2 [expr 0.5*$b2*$cosine]
-						set y3 [expr 0.5*$tf2*$sine]
-						set Iy [expr $y1 - $y2 + $y3]
-						set Y1 $Iy$locationUnit
-						
 						set z1 [expr $H*$cosine]
 						set z2 [expr 0.5*$b2*$sine]
 						set z3 [expr 0.5*$tf2*$cosine]
 						set Iz [expr -$z1 - $z2 - $z3]
-						set Z1 $Iz$locationUnit
+						set Z1 $Iz$HUnit
+						set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
+						set y1 [expr $H*$sine]
+						set y2 [expr 0.5*$b2*$cosine]
+						set y3 [expr 0.5*$tf2*$sine]
+						set Iy [expr $y1 - $y2 + $y3]
+						set Y1 $Iy$HUnit
+						set ok [DWLocalSetValue $GDN $STRUCT "Y1" $Y1]
 						
-						# set ok [DWLocalSetValue $GDN $STRUCT "Y1" $Y1]
-						# set ok [DWLocalSetValue $GDN $STRUCT "Y2" $Y2]
-						# set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
-						set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
 				} else {
 
-						return ""
+					return ""
 				}
 
-						return ""
+				return ""
 		}
 	}
 

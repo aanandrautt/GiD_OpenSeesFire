@@ -132,9 +132,6 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(angle!=0)
 # CANNOT APPLY THE REGULAR THERMAL LINE LOAD TO ANYTHING OTHER THAN A REGULARLY ORIENTED SECTION
 *endif
-*area
-bottom fiber is *botFiber
-top fiber is *topFiber
 *format "%6d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -beamThermal *cond(2,real) *botFiber *cond(1,real) *topFiber	
 *endif

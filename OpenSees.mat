@@ -1285,6 +1285,137 @@ END MATERIAL
 
 BOOK: Section_Force-Deformation
 
+MATERIAL: Predefined Fiber Section
+COMMENT: \n
+TITLE: Section properties
+QUESTION: Cross_section
+VALUE: I_Section
+STATE: HIDDEN
+QUESTION: Section:#CB#(Fiber)
+VALUE: Fiber
+STATE: HIDDEN
+QUESTION: Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
+VALUE: Steel01
+QUESTION: Web_Y_fibers
+VALUE: 1
+QUESTION: Web_Z_fibers
+VALUE: 6
+QUESTION: Height_h#UNITS#
+VALUE: 250 mm
+QUESTION: Web_thickness_tw#UNITS#
+VALUE: 8 mm
+QUESTION: Top_flange_Y_fibers
+VALUE: 5
+QUESTION: Top_flange_Z_fibers
+VALUE: 3
+QUESTION: Top_flange_width_b1#UNITS#
+VALUE: 200 mm
+QUESTION: Top_flange_thickness_tf1#UNITS#
+VALUE: 10 mm
+QUESTION: Bot_flange_Y_fibers
+VALUE: 5
+QUESTION: Bot_flange_Z_fibers
+VALUE: 3
+QUESTION: Bot_flange_width_b2#UNITS#
+VALUE: 200 mm
+QUESTION: Bot_flange_thickness_tf2#UNITS#
+VALUE: 10 mm
+QUESTION: Rotation_angle
+VALUE: 0
+HELP: Enter angle in degrees
+QUESTION: Young_modulus#UNITS#
+VALUE: 206 GPa
+HELP: For finding torsional stiffness JG
+IMAGE: img/Sections/I-section.jpg
+QUESTION: Cross_section_area#UNITS#
+VALUE: 0.25 m^2
+STATE: HIDDEN
+TKWIDGET: Fiber::CalcArea
+QUESTION: Y1#UNITS#
+VALUE: -0.1 m
+STATE: HIDDEN
+TKWIDGET: Fiber::CalcCorners
+QUESTION: Y2#UNITS#
+VALUE: 0.1 m
+STATE: HIDDEN
+QUESTION: Z1#UNITS#
+VALUE: -0.125 m
+STATE: HIDDEN
+QUESTION: Z2#UNITS#
+VALUE: 0.125 m
+STATE: HIDDEN
+TKWIDGET: TK_SectionWikiInfo
+TKWIDGET: TK_LocalAxesInfo
+END MATERIAL
+
+MATERIAL: LayeredShellThermal
+COMMENT: \n\tThere is no check on this material. Make sure tcl is written correctly.\n
+TITLE: General
+QUESTION: Section:#CB#(LayeredShell)
+VALUE: LayeredShell
+TKWIDGET: TK_SectionWikiInfo
+TITLE: Section_properties
+QUESTION: Slab_thickness#UNITS#
+VALUE: 0.25 m
+QUESTION: Offset#UNITS#
+VALUE: 0 m
+QUESTION: Decking_thickness#UNITS#
+VALUE: 9 mm
+QUESTION: Top_reinforcement_cover#UNITS#
+VALUE: 20 mm
+QUESTION: Bot_reinforcement_cover#UNITS#
+VALUE: 20 mm
+QUESTION: Top_longitudinal_bar_diameter#UNITS#
+VALUE: 12 mm
+QUESTION: Top_longitudinal_bar_spacing#UNITS#
+VALUE: 100 mm
+QUESTION: Bot_longitudinal_bar_diameter#UNITS#
+VALUE: 12 mm
+QUESTION: Bot_longitudinal_bar_spacing#UNITS#
+VALUE: 100 mm
+QUESTION: Top_transverse_bar_diameter#UNITS#
+VALUE: 12 mm
+QUESTION: Top_transverse_bar_spacing#UNITS#
+VALUE: 100 mm
+QUESTION: Bot_transverse_bar_diameter#UNITS#
+VALUE: 12 mm
+QUESTION: Bot_transverse_bar_spacing#UNITS#
+VALUE: 100 mm
+QUESTION: Top_cover_layers
+VALUE: 1
+QUESTION: Core_layers
+VALUE: 4
+QUESTION: Bot_cover_layers
+VALUE: 1
+TITLE: Concrete
+QUESTION: Concrete_compressive_strength#UNITS#
+VALUE: 20 MPa
+HELP: positive value
+QUESTION: Concrete_tensile_strength#UNITS#
+VALUE: 2.2 MPa
+QUESTION: Concrete_strain_at_compr_strength
+VALUE: 2.0e-3
+QUESTION: Compressive_cracking_energy_multiplier_n
+VALUE: 10
+QUESTION: Tensile_cracking_energy_multiplier_m
+VALUE: 10
+QUESTION: Shear_ret._factor
+VALUE: 0.1
+QUESTION: Cover_G#UNITS#
+VALUE: 12.5 GPa
+TITLE: Reinforcement
+QUESTION: Longitudinal_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
+VALUE: Steel01
+HELP: oriented at 90 degrees with local x axis, so in global x axis
+QUESTION: Transverse_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
+VALUE: Steel01
+QUESTION: Decking_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
+VALUE: Steel01
+HELP: oriented at 0 degrees with local x axis, so in global y axis
+QUESTION: Angle
+VALUE: 0
+END MATERIAL
+
 
 MATERIAL: Elastic_Section
 COMMENT: \n
@@ -1359,69 +1490,6 @@ QUESTION: mod._Izz
 VALUE: 1
 QUESTION: mod._Iyz
 VALUE: 1
-END MATERIAL
-
-MATERIAL: Predefined Fiber Section
-COMMENT: \n
-TITLE: Section properties
-QUESTION: Cross_section
-VALUE: I_Section
-STATE: HIDDEN
-QUESTION: Section:#CB#(Fiber)
-VALUE: Fiber
-STATE: HIDDEN
-QUESTION: Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
-VALUE: Steel01
-QUESTION: Web_Y_fibers
-VALUE: 1
-QUESTION: Web_Z_fibers
-VALUE: 6
-QUESTION: Height_h#UNITS#
-VALUE: 250 mm
-QUESTION: Web_thickness_tw#UNITS#
-VALUE: 8 mm
-QUESTION: Top_flange_Y_fibers
-VALUE: 5
-QUESTION: Top_flange_Z_fibers
-VALUE: 3
-QUESTION: Top_flange_width_b1#UNITS#
-VALUE: 200 mm
-QUESTION: Top_flange_thickness_tf1#UNITS#
-VALUE: 10 mm
-QUESTION: Bot_flange_Y_fibers
-VALUE: 5
-QUESTION: Bot_flange_Z_fibers
-VALUE: 3
-QUESTION: Bot_flange_width_b2#UNITS#
-VALUE: 200 mm
-QUESTION: Bot_flange_thickness_tf2#UNITS#
-VALUE: 10 mm
-QUESTION: Rotation_angle
-VALUE: 0
-HELP: Enter angle in degrees
-QUESTION: Young_modulus#UNITS#
-VALUE: 206 GPa
-HELP: For finding torsional stiffness JG
-IMAGE: img/Sections/I-section.jpg
-QUESTION: Cross_section_area#UNITS#
-VALUE: 0.25 m^2
-STATE: HIDDEN
-TKWIDGET: Fiber::CalcArea
-QUESTION: Y1#UNITS#
-VALUE: -0.1 m
-STATE: HIDDEN
-TKWIDGET: Fiber::CalcCorners
-QUESTION: Y2#UNITS#
-VALUE: 0.1 m
-STATE: HIDDEN
-QUESTION: Z1#UNITS#
-VALUE: -0.125 m
-STATE: HIDDEN
-QUESTION: Z2#UNITS#
-VALUE: 0.125 m
-STATE: HIDDEN
-TKWIDGET: TK_SectionWikiInfo
-TKWIDGET: TK_LocalAxesInfo
 END MATERIAL
 
 MATERIAL: Fiber
@@ -1829,74 +1897,6 @@ VALUE: 0.0ton/m^3
 TKWIDGET: TK_SectionWikiInfo
 END MATERIAL
 
-MATERIAL: LayeredShellThermal
-COMMENT: \n\tThere is no check on this material. Make sure tcl is written correctly.\n
-TITLE: General
-QUESTION: Section:#CB#(LayeredShell)
-VALUE: LayeredShell
-TKWIDGET: TK_SectionWikiInfo
-TITLE: Section_properties
-QUESTION: Slab_thickness#UNITS#
-VALUE: 0.25 m
-QUESTION: Offset#UNITS#
-VALUE: 0 m
-QUESTION: Decking_thickness#UNITS#
-VALUE: 9 mm
-QUESTION: Top_reinforcement_cover#UNITS#
-VALUE: 20 mm
-QUESTION: Bot_reinforcement_cover#UNITS#
-VALUE: 20 mm
-QUESTION: Top_longitudinal_bar_diameter#UNITS#
-VALUE: 12 mm
-QUESTION: Top_longitudinal_bar_spacing#UNITS#
-VALUE: 100 mm
-QUESTION: Bot_longitudinal_bar_diameter#UNITS#
-VALUE: 12 mm
-QUESTION: Bot_longitudinal_bar_spacing#UNITS#
-VALUE: 100 mm
-QUESTION: Top_transverse_bar_diameter#UNITS#
-VALUE: 12 mm
-QUESTION: Top_transverse_bar_spacing#UNITS#
-VALUE: 100 mm
-QUESTION: Bot_transverse_bar_diameter#UNITS#
-VALUE: 12 mm
-QUESTION: Bot_transverse_bar_spacing#UNITS#
-VALUE: 100 mm
-QUESTION: Top_cover_layers
-VALUE: 1
-QUESTION: Core_layers
-VALUE: 4
-QUESTION: Bot_cover_layers
-VALUE: 1
-TITLE: Concrete
-QUESTION: Concrete_compressive_strength#UNITS#
-VALUE: 20 MPa
-HELP: positive value
-QUESTION: Concrete_tensile_strength#UNITS#
-VALUE: 2.2 MPa
-QUESTION: Concrete_strain_at_compr_strength
-VALUE: 2.0e-3
-QUESTION: Compressive_cracking_energy_multiplier_n
-VALUE: 10
-QUESTION: Tensile_cracking_energy_multiplier_m
-VALUE: 10
-QUESTION: Shear_ret._factor
-VALUE: 0.1
-QUESTION: Cover_G#UNITS#
-VALUE: 12.5 GPa
-TITLE: Reinforcement
-QUESTION: Longitudinal_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
-VALUE: Steel01
-HELP: oriented at 90 degrees with local x axis, so in global x axis
-QUESTION: Transverse_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
-VALUE: Steel01
-QUESTION: Decking_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
-VALUE: Steel01
-HELP: oriented at 0 degrees with local x axis, so in global y axis
-QUESTION: Angle
-VALUE: 0
-END MATERIAL
-
 
 BOOK: Records
 
@@ -1937,6 +1937,37 @@ END MATERIAL
 
 BOOK: Beam-Column_Elements
 
+MATERIAL: Thermal_Displacement-Based_Beam-Column
+COMMENT: \n
+TITLE: General
+QUESTION: Element_type:#CB#(dispBeamColumn)
+VALUE: dispBeamColumn
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Compatible_Sections:#CB#(_)
+VALUE: Elastic/Fiber/SectionAggregator
+TKWIDGET: TK_ElementWikiInfo
+TITLE: Integration
+QUESTION: Number_of_integration_points
+VALUE: 3#WIDTH#(4)
+HELP: number of integration points along the element
+STATE: DISABLED
+QUESTION: The_number_of_integration#CB#(_)
+VALUE: Points per element is currently fixed to three points per element.
+QUESTION: To_increase_analysis_accuracy,#CB#(_)
+VALUE: a finer mesh is recommended for modeling structural members instead of one element per member
+TITLE: Section
+QUESTION: Section#MAT#(Section_Force-Deformation,Combined_Materials,User_Materials)
+VALUE: Predefined Fiber Section
+TKWIDGET: DBC::CheckSection
+TITLE: Element_Geometry
+QUESTION: Geometric_transformation#CB#(Linear,P-Delta,Corotational)
+VALUE: Corotational
+TITLE: Mass-Weight
+QUESTION: Mass_density#UNITS#
+VALUE: 7850 kg/m^3
+QUESTION: Weight_density#UNITS#
+VALUE: 77 kN/m^3
+END MATERIAL
 
 MATERIAL: Elastic_Beam-Column
 COMMENT: \n
@@ -2118,38 +2149,6 @@ HELP: maximum number of iterations to undertake to satisfy element compatibility
 QUESTION: Tolerance
 VALUE: 1.0e-6#WIDTH#(10)
 HELP: tolerance for satisfaction of element compatibility
-TITLE: Mass-Weight
-QUESTION: Mass_density#UNITS#
-VALUE: 0.0ton/m^3
-QUESTION: Weight_density#UNITS#
-VALUE: 25 kN/m^3
-END MATERIAL
-
-MATERIAL: Displacement-Based_Beam-Column
-COMMENT: \n
-TITLE: General
-QUESTION: Element_type:#CB#(dispBeamColumn)
-VALUE: dispBeamColumn
-TKWIDGET: TK_UpdateInfoBar
-QUESTION: Compatible_Sections:#CB#(_)
-VALUE: Elastic/Fiber/SectionAggregator
-TKWIDGET: TK_ElementWikiInfo
-TITLE: Integration
-QUESTION: Number_of_integration_points
-VALUE: 3#WIDTH#(4)
-HELP: number of integration points along the element
-STATE: DISABLED
-QUESTION: The_number_of_integration#CB#(_)
-VALUE: Points per element is currently fixed to three points per element.
-QUESTION: To_increase_analysis_accuracy,#CB#(_)
-VALUE: a finer mesh is recommended for modeling structural members instead of one element per member
-TITLE: Section
-QUESTION: Section#MAT#(Section_Force-Deformation,Combined_Materials,User_Materials)
-VALUE: Fiber
-TKWIDGET: DBC::CheckSection
-TITLE: Element_Geometry
-QUESTION: Geometric_transformation#CB#(Linear,P-Delta,Corotational)
-VALUE: Linear
 TITLE: Mass-Weight
 QUESTION: Mass_density#UNITS#
 VALUE: 0.0ton/m^3
@@ -2362,11 +2361,11 @@ VALUE: PlateFiber/ElasticMembranePlate
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Section
 QUESTION: Type#MAT#(Section_Force-Deformation,User_Materials)
-VALUE: Elastic_Membrane_Plate
+VALUE: LayeredShellThermal
 TKWIDGET: Shell::CheckFieldValues
 TITLE: Weight
 QUESTION: Weight_density#UNITS#
-VALUE: 25 kN/m^3
+VALUE: 23.55 kN/m^3
 END MATERIAL
 
 MATERIAL: ShellNLDKGQThermal
@@ -2381,11 +2380,11 @@ VALUE: PlateFiber/ElasticMembranePlate
 TKWIDGET: TK_ElementWikiInfo
 TITLE: Section
 QUESTION: Type#MAT#(Section_Force-Deformation,User_Materials)
-VALUE: Elastic_Membrane_Plate
+VALUE: LayeredShellThermal
 TKWIDGET: Shell::CheckFieldValues
 TITLE: Weight
 QUESTION: Weight_density#UNITS#
-VALUE: 25 kN/m^3
+VALUE: 23.55 kN/m^3
 END MATERIAL
 
 MATERIAL: Tri31

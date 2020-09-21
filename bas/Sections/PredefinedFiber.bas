@@ -37,6 +37,7 @@
 *set var G=operation(E/2.6)
 *set var J=tcl(GetTorsionalConstant *h *tw *b1 *tf1 *b2 *tf2)
 *set var JG=operation(J*G)
+*# Area of the section is *MatProp(Cross_section_area,real)
 *format "%d"
 section fiberSecThermal *FiberTag *\
 *format "%g"

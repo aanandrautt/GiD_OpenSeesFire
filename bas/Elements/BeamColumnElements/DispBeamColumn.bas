@@ -93,7 +93,7 @@ geomTransf Corotational *TransfTag6  0 1 0; # non-vertical
 
 # Displacement-Based Beam Column Element Definition
 
-# element dispBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag <-mass $massDens>
+# element dispBeamColumnThermal $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag <-mass $massDens>
 
 *set var VarCount=VarCount+1
 *endif
@@ -140,7 +140,7 @@ geomTransf Corotational *TransfTag6  0 1 0; # non-vertical
 *endif
 *set var SecTag=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
 *format "%6d%6d%7d%2d%6d%2d"
-element dispBeamColumn *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,int) *SecTag *TransfTag *\
+element dispBeamColumnThermal *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,int) *SecTag *TransfTag *\
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
 *loop materials *NotUsed
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
@@ -242,7 +242,7 @@ set MatTag *SectionID; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
 
 # Displacement-Based Beam-Column Element definition
 
-# element dispBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
+# element dispBeamColumnThermal $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
 
 *set var VarCount=VarCount+1
 *endif
@@ -255,7 +255,7 @@ set MatTag *SectionID; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
 *endif
 *set var SecTag=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
 *format "%6d%6d%7d%2d%6d%2d"
-element dispBeamColumn *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,int) *SecTag *TransfTag *\
+element dispBeamColumnThermal *ElemsNum *ElemsConec *ElemsMatProp(Number_of_integration_points,int) *SecTag *TransfTag *\
 *# Mass is calculated for Displacement Beam Column.
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
 *loop materials *NotUsed

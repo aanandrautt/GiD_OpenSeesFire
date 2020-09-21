@@ -1,10 +1,1 @@
-general way to set shell loads
-
-*set cond Shell_Thermal *elems *CanRepeat
-*loop elems *OnlyInCond
-
-*set var FileName=Matprop(filename,str)
-*set var TopFiber=Matprop(tobFiber,str)
-*set var BotFiber=Matprop(botFiber,str)
-%format%%%%%
-eleLoad -ele *ElemsNum -type -shellThermal -file *FileName *BotFiber *TopFiber
+Dead load is not very good and sometimes applies load in the wrong direction (Y in stead of z). Need to be careful with it. 

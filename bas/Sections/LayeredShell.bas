@@ -1,6 +1,4 @@
-# section LayeredShell $sectionTag $nLayers $matTag1 $thickness_1 ... $matTagn $thickness_n
 # *tcl(UserMaterial::GetMaterialName *MatProp(0))
-
 *#
 *# define PlateRebar for top longitudinal reinforcement
 *#
@@ -167,9 +165,11 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *#
 *#
 *if(offset==0)
+# section LayeredShellThermal $sectionTag $nLayers $matTag1 $thickness_1 ... $matTagn $thickness_n
 *format "%d%d"
 section LayeredShellThermal *LayeredShellTag *nlayers *\
 *else
+# section LayeredShellThermal $sectionTag $nLayers -offset $offset $matTag1 $thickness_1 ... $matTagn $thickness_n
 *format "%d%d"
 section LayeredShellThermal *LayeredShellTag *nlayers *\
 *format "%g"
@@ -223,3 +223,4 @@ section LayeredShellThermal *LayeredShellTag *nlayers *\
 *endfor
 *endif
 *set var PlateFromPlaneStressMaterialTag=PlateFromPlaneStressMaterialTag+1
+

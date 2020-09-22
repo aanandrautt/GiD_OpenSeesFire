@@ -276,6 +276,23 @@ STATE: HIDDEN
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
+CONDITION: Surface_Uniform_Load
+CONDTYPE: over surfaces
+CONDMESHTYPE: over body elements
+COMMENT: \n\tThis condition is assigned on surfaces and is transferred on shell elements.\n\tLoads are always applied in the ACTIVE interval.\n\tAfter assigning new loads DO NOT FORGET to regenerate the mesh.\n
+QUESTION: Z_Load#UNITS#
+VALUE: 5.0 kN/m^2
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_LocalAxesInfo
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
 CONDITION: Surface_Linear_Temperatures
 CONDTYPE: over surfaces
 CONDMESHTYPE: over body elements

@@ -40,6 +40,12 @@
 *set var PrintPlainPatternPathTimeseries=1
 *break
 *end elems
+*set cond Surface_Uniform_Load *elems *CanRepeat
+*loop elems *OnlyInCond
+*set var PrintPlainPattern=1
+*set var PrintPlainPatternPathTimeseries=1
+*break
+*end elems
 *set cond Surface_Linear_Temperatures *elems *CanRepeat
 *loop elems *OnlyInCond
 *set var PrintPlainPattern=1
@@ -168,6 +174,70 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *endif
 *end elems
 *endif
+*set cond Surface_Uniform_Load *elems
+*loop elems *OnlyInCond
+*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0 || strcmp(ElemsMatProp(Element_type:),"Shell")==0)
+*# end coordinates
+*set var x1=NodesCoord(1,1)
+*set var y1=NodesCoord(1,2)
+*set var z1=NodesCoord(1,3)
+*set var x2=NodesCoord(2,1)
+*set var y2=NodesCoord(2,2)
+*set var z2=NodesCoord(2,3)
+*set var x3=NodesCoord(3,1)
+*set var y3=NodesCoord(3,2)
+*set var z3=NodesCoord(3,3)
+*set var x4=NodesCoord(4,1)
+*set var y4=NodesCoord(4,2)
+*set var z4=NodesCoord(4,3)
+*set var vecx1=operation(x2-x1)
+*set var vecx2=operation(x3-x2)
+*set var vecy1=operation(y2-y1)
+*set var vecy2=operation(y3-y2)
+*set var vecz1=operation(z2-z1)
+*set var vecz2=operation(z3-z2)
+*set var vecx3=operation(x4-x1)
+*set var vecx4=operation(x4-x3)
+*set var vecy3=operation(y4-y1)
+*set var vecy4=operation(y4-y3)
+*set var vecz3=operation(z4-z1)
+*set var vecz4=operation(z4-z3)
+*set var dotproduct1=operation(vecx1*vecx2+vecy1*vecy2+vecz1*vecz2)
+*set var dotproduct2=operation(vecx3*vecx4+vecy3*vecy4+vecz3*vecz4)
+*set var magn1=operation(sqrt(vecx1*vecx1+vecy1*vecy1+vecz1*vecz1))
+*set var magn2=operation(sqrt(vecx2*vecx2+vecy2*vecy2+vecz2*vecz2))
+*set var magn3=operation(sqrt(vecx3*vecx3+vecy3*vecy3+vecz3*vecz3))
+*set var magn4=operation(sqrt(vecx4*vecx4+vecy4*vecy4+vecz4*vecz4))
+*set var theta1=operation(acos(dotproduct1/(magn1*magn2)))
+*set var theta2=operation(acos(dotproduct2/(magn3*magn4)))
+*set var A=operation((magn1*magn2*sin(theta1))/2+(magn3*magn4*sin(theta2))/2)
+*set var AppliedLoad=operation(cond(1,real)*A/4)
+*if((AppliedLoad<1e-6) && (AppliedLoad>-1e-6))
+*set var AppliedLoad=0
+*endif
+*if(ndime==3)
+*if(strcmp(GenData(Vertical_axis),"Z")==0)
+*format "%6d%8.6g"
+    load *ElemsConec(1) 0.0 0.0 *AppliedLoad 0.0 0.0 0.0
+*format "%6d%8.6g"
+    load *ElemsConec(2) 0.0 0.0 *AppliedLoad 0.0 0.0 0.0
+*format "%6d%8.6g"
+    load *ElemsConec(3) 0.0 0.0 *AppliedLoad 0.0 0.0 0.0
+*format "%6d%8.6g"
+    load *ElemsConec(4) 0.0 0.0 *AppliedLoad 0.0 0.0 0.0
+*elseif(strcmp(GenData(Vertical_axis),"Y")==0)
+*format "%6d%8.6g"
+    load *ElemsConec(1) 0.0 *AppliedLoad 0.0 0.0 0.0 0.0
+*format "%6d%8.6g"
+    load *ElemsConec(2) 0.0 *AppliedLoad 0.0 0.0 0.0 0.0
+*format "%6d%8.6g"
+    load *ElemsConec(3) 0.0 *AppliedLoad 0.0 0.0 0.0 0.0
+*format "%6d%8.6g"
+    load *ElemsConec(4) 0.0 *AppliedLoad 0.0 0.0 0.0 0.0
+*endif
+*endif
+*endif
+*end elems
 *if(ndime==3)
 *set cond Surface_Linear_Temperatures *elems
 *loop elems *OnlyInCond

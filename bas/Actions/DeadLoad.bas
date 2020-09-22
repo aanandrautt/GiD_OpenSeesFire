@@ -343,7 +343,7 @@
     load *ElemsConec(3) 0.0 *operation(-DeadLoad) 0.0 0.0 0.0 0.0
 *format "%6d%8.4g"
   load *ElemsConec(4) 0.0 *operation(-DeadLoad) 0.0 0.0 0.0 0.0
-*else
+*elseif(strcmp(GenData(Vertical_axis),"Z")==0)
 *format "%6d%8.4g"
     load *ElemsConec(1) 0.0 0.0 *operation(-DeadLoad) 0.0 0.0 0.0
 *format "%6d%8.4g"

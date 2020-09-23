@@ -269,8 +269,8 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *break
 *endif
 *end materials
-*set var topFiber=operation(1.001*(thickness+deckingThick)/2.0+offset)
-*set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0+offset)
+*set var topFiber=operation(1.001*(thickness+deckingThick)/2.0-offset)
+*set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0-offset)
 *format "%6d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -shellThermal *cond(2,real) *botFiber *cond(1,real) *topFiber	
 *endif
@@ -307,8 +307,8 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *break
 *endif
 *end materials
-*set var topFiber=operation(1.001*(thickness+deckingThick)/2.0+offset)
-*set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0+offset)
+*set var topFiber=operation(1.001*(thickness+deckingThick)/2.0-offset)
+*set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0-offset)
 *format "%6d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -shellThermal -source *cond(1) *botFiber *topFiber	
 *endif

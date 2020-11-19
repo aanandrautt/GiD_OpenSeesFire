@@ -526,43 +526,43 @@ recorder Element -file ShellMITC4_strain_Layer*layer_GP*i.out -time -ele *\
 material *i fiber *layer strains
 *endfor
 *endif
-*if(GenData(Cracking_in_layer_A,int)==1)
+*if(GenData(Temp_and_KtKc_in_layer_A,int)==1)
 
-*set var layer = GenData(Cracking_layer_A,int)
+*set var layer = GenData(Temp_KtKc_layer_A,int)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_crack_Layer*layer_GP*i.out -time -ele *\
+recorder Element -file ShellMITC4_TempKtKc_Layer*layer_GP*i.out -time -ele *\
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
 *ElemsNum *\
 *endif
 *end elems
-material *i fiber *layer damage
+material *i fiber *layer TempAndElong
 *endfor
 *endif
-*if(GenData(Cracking_in_layer_B,int)==1)
+*if(GenData(Temp_and_KtKc_in_layer_B,int)==1)
 
-*set var layer = GenData(Cracking_layer_B,int)
+*set var layer = GenData(Temp_KtKc_layer_B,int)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_crack_Layer*layer_GP*i.out -time -ele *\
+recorder Element -file ShellMITC4_TempKtKc_Layer*layer_GP*i.out -time -ele *\
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
 *ElemsNum *\
 *endif
 *end elems
-material *i fiber *layer damage
+material *i fiber *layer TempAndElong
 *endfor
 *endif
-*if(GenData(Cracking_in_layer_C,int)==1)
+*if(GenData(Temp_and_KtKc_in_layer_C,int)==1)
 
-*set var layer = GenData(Cracking_layer_C,int)
+*set var layer = GenData(Temp_KtKc_layer_C,int)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_crack_Layer*layer_GP*i.out -time -ele *\
+recorder Element -file ShellMITC4_TempKtKc_Layer*layer_GP*i.out -time -ele *\
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
 *ElemsNum *\
 *endif
 *end elems
-material *i fiber *layer damage
+material *i fiber *layer TempAndElong
 *endfor
 *endif
 *endif
@@ -648,43 +648,43 @@ recorder Element -file ShellDKGQ_strain_Layer*layer_GP*i.out -time -ele *\
 material *i fiber *layer strains
 *endfor
 *endif
-*if(GenData(Cracking_in_layer_A,int)==1)
+*if(GenData(Temp_and_KtKc_in_layer_A,int)==1)
 
-*set var layer = GenData(Cracking_layer_A,int)
+*set var layer = GenData(Temp_KtKc_layer_A,int)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_crack_Layer*layer_GP*i.out -time -ele *\
+recorder Element -file ShellDKGQ_TempKtKc_Layer*layer_GP*i.out -time -ele *\
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *ElemsNum *\
 *endif
 *end elems
-material *i fiber *layer damage
+material *i fiber *layer TempAndElong
 *endfor
 *endif
-*if(GenData(Cracking_in_layer_B,int)==1)
+*if(GenData(Temp_and_KtKc_in_layer_B,int)==1)
 
-*set var layer = GenData(Cracking_layer_B,int)
+*set var layer = GenData(Temp_KtKc_layer_B,int)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_crack_Layer*layer_GP*i.out -time -ele *\
+recorder Element -file ShellDKGQ_TempKtKc_Layer*layer_GP*i.out -time -ele *\
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *ElemsNum *\
 *endif
 *end elems
-material *i fiber *layer damage
+material *i fiber *layer TempAndElong
 *endfor
 *endif
-*if(GenData(Cracking_in_layer_C,int)==1)
+*if(GenData(Temp_and_KtKc_in_layer_C,int)==1)
 
-*set var layer = GenData(Cracking_layer_C,int)
+*set var layer = GenData(Temp_KtKc_layer_C,int)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_crack_Layer*layer_GP*i.out -time -ele *\
+recorder Element -file ShellDKGQ_TempKtKc_Layer*layer_GP*i.out -time -ele *\
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *ElemsNum *\
 *endif
 *end elems
-material *i fiber *layer damage
+material *i fiber *layer TempAndElong
 *endfor
 *endif
 *endif

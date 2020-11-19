@@ -240,20 +240,20 @@ QUESTION: Strain_layer_C
 VALUE: 1#WIDTH#(10)
 QUESTION: _#CB#(_)
 VALUE:
-QUESTION: Cracking_in_layer_A#CB#(1,0)
+QUESTION: Temp_and_DtDc_in_layer_A#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Cracking_layer_A,#CURRENT#) (1,RESTORE,Cracking_layer_A,#CURRENT#)
-QUESTION: Cracking_layer_A
+DEPENDENCIES: (0,HIDE,Temp_DtDc_layer_A,#CURRENT#) (1,RESTORE,Temp_DtDc_layer_A,#CURRENT#)
+QUESTION: Temp_DtDc_layer_A
 VALUE: 1#WIDTH#(10)
-QUESTION: Cracking_in_layer_B#CB#(1,0)
+QUESTION: Temp_and_DtDc_in_layer_B#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Cracking_layer_B,#CURRENT#) (1,RESTORE,Cracking_layer_B,#CURRENT#)
-QUESTION: Cracking_layer_B
+DEPENDENCIES: (0,HIDE,Temp_DtDc_layer_B,#CURRENT#) (1,RESTORE,Temp_DtDc_layer_B,#CURRENT#)
+QUESTION: Temp_DtDc_layer_B
 VALUE: 1#WIDTH#(10)
-QUESTION: Cracking_in_layer_C#CB#(1,0)
+QUESTION: Temp_and_DtDc_in_layer_C#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Cracking_layer_C,#CURRENT#) (1,RESTORE,Cracking_layer_C,#CURRENT#)
-QUESTION: Cracking_layer_C
+DEPENDENCIES: (0,HIDE,Temp_DtDc_layer_C,#CURRENT#) (1,RESTORE,Temp_DtDc_layer_C,#CURRENT#)
+QUESTION: Temp_DtDc_layer_C
 VALUE: 1#WIDTH#(10)
 TITLE: Custom Recorders
 QUESTION: _#CB#(_)

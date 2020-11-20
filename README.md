@@ -12,6 +12,7 @@
 *(c) 2020*
 
 **Based on the tremendous work of the original GiD + OpenSees Interface team**
+
 https://github.com/rclab-auth/gidopensees
 
 *Lab of R/C and Masonry Structures, School of Civil Engineering, Aristotle University of Thessaloniki, Greece*

@@ -1,8 +1,12 @@
 # GiD + OpenSees Thermo-mechanical Interface
 *Department of Building Services Engineering, Faculty of Construction and Environment, The Hong Kong Polytechnic University, China*
+
 **Development team**
+
 - M.A. Orabi, MSc (DIC)
+
 **Special thanks**
+
 - T. Yarlagadda, M.Tech (IITR)
 
 *(c) 2020*

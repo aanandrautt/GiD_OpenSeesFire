@@ -9,6 +9,7 @@
 
 - T. Yarlagadda, M.Tech (IITR)
 , who came up with the idea to extend the interface in the first place, and who helped me understand how to do it myself. 
+
 *(c) 2020*
 
 **Based on the tremendous work of the original GiD + OpenSees Interface team**

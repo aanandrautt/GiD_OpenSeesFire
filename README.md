@@ -38,8 +38,8 @@ https://github.com/rclab-auth/gidopensees
 - Requires the OpenSees for Fire executable from: http://openseesforfire.github.io/download.html
 - The interface does not currently work with GiD 14.0.5. It works fine with GiD 15.0.1 and 14.0.2.
 - Thermo-mechanical elements, sections, and material replaced their ambient counterparts (from the original OpenSees and interface).
-- The post-processor is bugged right now and may not work on every project.
 - If the project is actively backed up by OneDrive on a Windows system, the Windows Explorer may lock the project folder which prevents GiD from performing any actions on the project files. To remedy this issue restart windows explorer from the task manager (ctrl + shift + esc).
+- Make sure to delete old output files when running a new analysis to prevent the post processor from bugging out.
 - Baed on Version 2.8.0 of the original GiD + OpenSees Interface so any known issues there also apply here.
 ---
 

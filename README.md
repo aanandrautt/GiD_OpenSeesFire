@@ -39,7 +39,7 @@ https://github.com/rclab-auth/gidopensees
 - The interface does not currently work with GiD 14.0.5. It works fine with GiD 15.0.1 and 14.0.2.
 - Currently the interface has only been tested with 3D analysis. 2D analysis has some bugs. Make sure Z is set as the vertical axis and that 3D analysis is on from the General Data window.
 - Thermo-mechanical elements, sections, and material replaced their ambient counterparts (from the original OpenSees and interface).
-- If the project is actively backed up by OneDrive on a Windows system, the Windows Explorer may lock the project folder which prevents GiD from performing any actions on the project files. To remedy this issue restart windows explorer from the task manager (ctrl + shift + esc).
+- If the project is actively backed up by OneDrive on a Windows system, Windows Explorer may lock the project folder which prevents GiD from performing any actions on the project files. To remedy this issue restart windows explorer from the task manager (ctrl + shift + esc).
 - Make sure to delete old output files when running a new analysis to prevent the post processor from bugging out.
 - Baed on Version 2.8.0 of the original GiD + OpenSees Interface so any known issues there also apply here.
 ---

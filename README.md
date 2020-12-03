@@ -38,7 +38,7 @@ https://github.com/rclab-auth/gidopensees
 - Download and install a compatible version of GiD (i.e. 15.0.1 or 14.0.2) from https://www.gidhome.com/
 - Download this repository, and only copy OpenSees.exe executable to a path of your choosing. Recommended: C:\Program Files\OpenSees\bin
 - Download and install tcl, making sure that the environmental variable is created during the installation by ticking the corresponding box: https://www.activestate.com/products/tcl/
-- Download and install the original GiD OpenSees interface MAKING SURE select the path for OpenSees.exe that you chose earlier: https://github.com/rclab-auth/gidopensees
+- Download and install the original GiD OpenSees interface making sure to select the path for OpenSees.exe that you chose earlier: https://github.com/rclab-auth/gidopensees
 - Copy all the files which you downloaded from this repository EXCEPT for OpenSees.path and OpenSees.exe, and replace the files in your GiD problem type which can typically be found in: C:\Program Files\GiD\GiD 15.0.1\problemtypes\OpenSees.gid
 ---
 

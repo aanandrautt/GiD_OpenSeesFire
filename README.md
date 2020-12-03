@@ -32,10 +32,20 @@ https://github.com/rclab-auth/gidopensees
 
 ---
 
+### Installation information
+
+---
+- Download and install a compatible version of GiD (i.e. 15.0.1 or 14.0.2) from https://www.gidhome.com/
+- Download this repository, and only copy OpenSees.exe executable to a path of your choosing. Recommended: C:\Program Files\OpenSees\bin
+- Download and install tcl, making sure that the environmental variable is created during the installation by ticking the corresponding box: https://www.activestate.com/products/tcl/
+- Download and install the original GiD OpenSees interface and selecting the path for OpenSees.exe that you chose earlier: https://github.com/rclab-auth/gidopensees
+- Copy all the files which you downloaded from this repository EXCEPT for OpenSees.path and OpenSees.exe, and replace the files in your GiD problem type which can typically be found in: C:\Program Files\GiD\GiD 15.0.1\problemtypes\OpenSees.gid
+---
+
 ### KNOWN ISSUES
 
 ---
-- Requires the OpenSees for Fire executable from: http://openseesforfire.github.io/download.html
+- Works with the OpenSees for fire executable included with the download.
 - The interface does not currently work with GiD 14.0.5. It works fine with GiD 15.0.1 and 14.0.2.
 - Currently the interface has only been tested with 3D analysis. 2D analysis has some bugs. Make sure Z is set as the vertical axis and that 3D analysis is on from the General Data window.
 - Thermo-mechanical elements, sections, and material replaced their ambient counterparts (from the original OpenSees and interface).

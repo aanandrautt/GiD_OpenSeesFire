@@ -11,10 +11,9 @@ proc NumofCoverFibers { depth Totaldepth Fibers } {
 	return $coverFibers
 }
 
-proc GetTorsionalConstant { h tw b1 tf1 b2 tf2 } {
+proc GetTorsionalConstant { h tw b tf } {
 
-	set tf [expr ($tf1 + $tf2)/2.0]
-	set J [expr ($b2*pow($tf2,3.0) + $b1*pow($tf1,3.0) + ($h - $tf*pow($tw,3.0)))/3.0]
+	set J [expr (2*$b*pow($tf,3.0) + ($h - $tf)*pow($tw,3.0))/3.0]
 	return $J
 }
 

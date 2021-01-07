@@ -1304,21 +1304,13 @@ QUESTION: Height_h#UNITS#
 VALUE: 250 mm
 QUESTION: Web_thickness_tw#UNITS#
 VALUE: 8 mm
-QUESTION: Top_flange_Y_fibers
+QUESTION: Flange_Y_fibers
 VALUE: 5
-QUESTION: Top_flange_Z_fibers
+QUESTION: Flange_Z_fibers
 VALUE: 3
-QUESTION: Top_flange_width_b1#UNITS#
+QUESTION: Flange_width_b#UNITS#
 VALUE: 200 mm
-QUESTION: Top_flange_thickness_tf1#UNITS#
-VALUE: 10 mm
-QUESTION: Bot_flange_Y_fibers
-VALUE: 5
-QUESTION: Bot_flange_Z_fibers
-VALUE: 3
-QUESTION: Bot_flange_width_b2#UNITS#
-VALUE: 200 mm
-QUESTION: Bot_flange_thickness_tf2#UNITS#
+QUESTION: Flange_thickness_tf#UNITS#
 VALUE: 10 mm
 QUESTION: Rotation_angle
 VALUE: 0

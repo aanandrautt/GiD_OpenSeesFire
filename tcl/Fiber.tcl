@@ -426,45 +426,21 @@ proc Fiber::CalcArea { event args } {
 				} elseif {$CrossSectionType == "I_Section"} {
 						set heightUnit [DWLocalGetValue $GDN $STRUCT Height_h]
 						set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
-						set TopFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Top_flange_width_b1]
-						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf1]
-						set BotFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_width_b2]
-						set BotFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_thickness_tf2]
-						
-
+						set FlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Flange_width_b]
+						set FlangeThickUnit [DWLocalGetValue $GDN $STRUCT Flange_thickness_tf]
 						
 						set temp [GidConvertValueUnit $heightUnit]
 						set temp [ParserNumberUnit $temp h HUnit]
 						set temp [GidConvertValueUnit $WebThickUnit]
 						set temp [ParserNumberUnit $temp tw twUnit]
-						set temp [GidConvertValueUnit $TopFlangeWidthUnit]
-						set temp [ParserNumberUnit $temp b1 b1Unit]
-						set temp [GidConvertValueUnit $TopFlangeThickUnit]
-						set temp [ParserNumberUnit $temp tf1 tf1Unit]
-						set temp [GidConvertValueUnit $BotFlangeWidthUnit]
-						set temp [ParserNumberUnit $temp b2 b2Unit]
-						set temp [GidConvertValueUnit $BotFlangeThickUnit]
-						set temp [ParserNumberUnit $temp tf2 tf2Unit]
-						
-						set H [expr $h*0.5 - $tf2*0.5]
-						set z1 [expr $H*1]
-						set z2 [expr 0.5*$b1*0]
-						set z3 [expr 0.5*$tf1*1]
-						set Kz [expr $z1 + $z2 + $z3]
-						set Z2 $Kz$HUnit
-						# set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
-						
-						set H [expr $h*0.5 - $tf2*0.5]
-						set z1 [expr $H*1]
-						set z2 [expr 0.5*$b2*0]
-						set z3 [expr 0.5*$tf2*1]
-						set Iz [expr -$z1 - $z2 - $z3]
-						set Z1 $Iz$HUnit
-						# set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
-						
+						set temp [GidConvertValueUnit $FlangeWidthUnit]
+						set temp [ParserNumberUnit $temp b bUnit]
+						set temp [GidConvertValueUnit $FlangeThickUnit]
+						set temp [ParserNumberUnit $temp tf tfUnit]
+											
 						set Areaunit $HUnit^2
 
-						set AreaSize [expr ($h - $tf1 - $tf2)*$tw + $b1*$tf1 + $b2*$tf2]
+						set AreaSize [expr ($h - $tf*2)*$tw + $b*$tf*2]
 						set Area $AreaSize$Areaunit
 						set ok [DWLocalSetValue $GDN $STRUCT "Cross_section_area" $Area]
 						
@@ -493,10 +469,8 @@ proc Fiber::CalcCorners { event args } {
 				if {$CrossSectionType == "I_Section"} {
 						set heightUnit [DWLocalGetValue $GDN $STRUCT Height_h]
 						set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
-						set TopFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Top_flange_width_b1]
-						set TopFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Top_flange_thickness_tf1]
-						set BotFlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_width_b2]
-						set BotFlangeThickUnit [DWLocalGetValue $GDN $STRUCT Bot_flange_thickness_tf2]
+						set FlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Flange_width_b]
+						set FlangeThickUnit [DWLocalGetValue $GDN $STRUCT Flange_thickness_tf]
 						set Angle [DWLocalGetValue $GDN $STRUCT Rotation_angle]
 
 						
@@ -504,45 +478,34 @@ proc Fiber::CalcCorners { event args } {
 						set temp [ParserNumberUnit $temp h HUnit]
 						set temp [GidConvertValueUnit $WebThickUnit]
 						set temp [ParserNumberUnit $temp tw twUnit]
-						set temp [GidConvertValueUnit $TopFlangeWidthUnit]
-						set temp [ParserNumberUnit $temp b1 b1Unit]
-						set temp [GidConvertValueUnit $TopFlangeThickUnit]
-						set temp [ParserNumberUnit $temp tf1 tf1Unit]
-						set temp [GidConvertValueUnit $BotFlangeWidthUnit]
-						set temp [ParserNumberUnit $temp b2 b2Unit]
-						set temp [GidConvertValueUnit $BotFlangeThickUnit]
-						set temp [ParserNumberUnit $temp tf2 tf2Unit]
+						set temp [GidConvertValueUnit $FlangeWidthUnit]
+						set temp [ParserNumberUnit $temp b bUnit]
+						set temp [GidConvertValueUnit $FlangeThickUnit]
+						set temp [ParserNumberUnit $temp tf tfUnit]
 						
 						set pi 3.14159265359
 						set sine [expr sin($Angle*$pi/180)]
 						set cosine [expr cos($Angle*$pi/180)]
 						
 						#Based on top flange point K
-						set H [expr $h*0.5 - $tf1*0.5]
+						set H [expr $h*0.5 - $tf]
 						set z1 [expr $H*$cosine]
-						set z2 [expr 0.5*$b1*$sine]
-						set z3 [expr 0.5*$tf1*$cosine]
+						set z2 [expr 0.5*$b*$sine]
+						set z3 [expr 0.5*$tf*$cosine]
 						set Kz [expr $z1 + $z2 + $z3]
-						set Z2 $Kz$HUnit
+						set Z2 $z1$HUnit
 						set ok [DWLocalSetValue $GDN $STRUCT "Z2" $Z2]
 						set y1 [expr $H*$sine]
-						set y2 [expr 0.5*$b1*$cosine]
-						set y3 [expr 0.5*$tf1*$sine]
+						set y2 [expr 0.5*$b*$cosine]
+						set y3 [expr 0.5*$tf*$sine]
 						set Ky [expr -$y1 + $y2 - $y3]
 						set Y2 $Ky$HUnit
 						set ok [DWLocalSetValue $GDN $STRUCT "Y2" $Y2]
 						
 						#Based on bottom flange point I
-						set H [expr $h*0.5 - $tf2*0.5]
-						set z1 [expr $H*$cosine]
-						set z2 [expr 0.5*$b2*$sine]
-						set z3 [expr 0.5*$tf2*$cosine]
 						set Iz [expr -$z1 - $z2 - $z3]
-						set Z1 $Iz$HUnit
+						set Z1 -$z1$HUnit
 						set ok [DWLocalSetValue $GDN $STRUCT "Z1" $Z1]
-						set y1 [expr $H*$sine]
-						set y2 [expr 0.5*$b2*$cosine]
-						set y3 [expr 0.5*$tf2*$sine]
 						set Iy [expr $y1 - $y2 + $y3]
 						set Y1 $Iy$HUnit
 						set ok [DWLocalSetValue $GDN $STRUCT "Y1" $Y1]

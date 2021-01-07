@@ -144,7 +144,7 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *endif
 *end materials
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -source *cond(1) *fiberZ1 *fiberZ2 *fiberY1 *fiberY2
+    eleLoad -ele *ElemsNum -type -beamThermal -z -source *cond(1) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *endif
 *end elems
 *endif
@@ -158,8 +158,9 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(SelectedSection==SectionID)
 *set var dummy=tcl(AddUsedMaterials *SelectedSection)
 *if(strcmp(MatProp(Section:),"Fiber")==0)
-*set var botFiber=MatProp(Z1,real)
-*set var topFiber=MatProp(Z2,real)
+*set var secHeight = MatProp(Height_h,real)
+*set var botFiber=operation(-0.500001*secHeight)
+*set var topFiber=operation(0.500001*secHeight)
 *set var area=MatProp(Cross_section_area,real)
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
@@ -170,7 +171,7 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(angle!=0)
 *endif
 *format "%6d%8g%8g%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal *cond(2,real) *botFiber *cond(1,real) *topFiber	
+    eleLoad -ele *ElemsNum -type -beamThermal -z *cond(2,real) *botFiber *cond(1,real) *topFiber	
 *endif
 *end elems
 *endif

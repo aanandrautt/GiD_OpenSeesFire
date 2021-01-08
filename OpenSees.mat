@@ -1287,6 +1287,7 @@ BOOK: Section_Force-Deformation
 
 MATERIAL: Predefined Fiber Section
 COMMENT: \n
+IMAGE: img/Sections/I-section.jpg
 TITLE: Section properties
 QUESTION: Cross_section#CB#(I_Section,Stiffened_I_Section_1)
 VALUE: I_Section
@@ -1331,7 +1332,6 @@ QUESTION: Young_modulus#UNITS#
 VALUE: 206 GPa
 QUESTION: Poisson_ratio
 VALUE: 0.3
-IMAGE: img/Sections/I-section.jpg
 QUESTION: Cross_section_area#UNITS#
 VALUE: 0.25 m^2
 STATE: HIDDEN

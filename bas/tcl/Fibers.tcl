@@ -26,6 +26,7 @@ proc GetWebIy { h tw tf2 angle } {
 	set Iy [expr $H*$sine - 0.5*$tw*$cosine]
 	return $Iy
 }
+
 proc GetWebIz { h tw tf2 angle } {
 	set pi 3.141592653589793238
 	set theta [expr ($pi/180)*$angle]
@@ -267,6 +268,167 @@ proc GetBotFlangeKz { h b2 tf2 angle } {
 	set Kz [expr -$z1 + $z2 + $z3]
 	return $Kz
 }
+
+proc GetLeftPlateIy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Iy [expr $H*$sine - 0.5*$pt*$cosine - 0.5*($b+$pt)*$cosine]
+	return $Iy
+}
+
+proc GetLeftPlateIz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Iz [expr -$H*$cosine - 0.5*$pt*$sine - 0.5*($b+$pt)*$sine]
+	return $Iz
+}
+
+proc GetLeftPlateJy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Jy [expr $H*$sine + 0.5*$pt*$cosine - 0.5*($b+$pt)*$cosine]
+	return $Jy
+}
+
+proc GetLeftPlateJz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Jz [expr -$H*$cosine + 0.5*$pt*$sine - 0.5*($b+$pt)*$sine]
+	return $Jz
+}
+
+proc GetLeftPlateKy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Ky [expr -$H*$sine + 0.5*$pt*$cosine - 0.5*($b+$pt)*$cosine]
+	return $Ky
+}
+
+proc GetLeftPlateKz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Kz [expr $H*$cosine + 0.5*$pt*$sine - 0.5*($b+$pt)*$sine]
+	return $Kz
+}
+
+proc GetLeftPlateLy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Ly [expr -$H*$sine - 0.5*$pt*$cosine - 0.5*($b+$pt)*$cosine]
+	return $Ly
+}
+
+proc GetLeftPlateLz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Lz [expr $H*$cosine - 0.5*$pt*$sine - 0.5*($b+$pt)*$sine]
+	return $Lz
+}
+
+proc GetRightPlateIy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Iy [expr $H*$sine - 0.5*$pt*$cosine + 0.5*($b+$pt)*$cosine]
+	return $Iy
+}
+
+proc GetRightPlateIz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Iz [expr -$H*$cosine - 0.5*$pt*$sine + 0.5*($b+$pt)*$sine]
+	return $Iz
+}
+
+proc GetRightPlateJy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Jy [expr $H*$sine + 0.5*$pt*$cosine + 0.5*($b+$pt)*$cosine]
+	return $Jy
+}
+
+proc GetRightPlateJz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Jz [expr -$H*$cosine + 0.5*$pt*$sine + 0.5*($b+$pt)*$sine]
+	return $Jz
+}
+
+proc GetRightPlateKy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Ky [expr -$H*$sine + 0.5*$pt*$cosine + 0.5*($b+$pt)*$cosine]
+	return $Ky
+}
+
+proc GetRightPlateKz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Kz [expr $H*$cosine + 0.5*$pt*$sine + 0.5*($b+$pt)*$sine]
+	return $Kz
+}
+
+proc GetRightPlateLy { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Ly [expr -$H*$sine - 0.5*$pt*$cosine + 0.5*($b+$pt)*$cosine]
+	return $Ly
+}
+
+proc GetRightPlateLz { pl b pt angle } {
+	set pi 3.141592653589793238
+	set theta [expr ($pi/180)*$angle]
+	set cosine [expr cos($theta)]
+	set sine [expr sin($theta)]
+	set H [expr $pl*0.5]
+	set Lz [expr $H*$cosine - 0.5*$pt*$sine + 0.5*($b+$pt)*$sine]
+	return $Lz
+}
+
 
 proc GetBotFlangeLy { h b2 tf2 angle } {
 	set pi 3.141592653589793238

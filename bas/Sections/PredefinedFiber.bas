@@ -32,30 +32,15 @@
 *set var tf=MatProp(Flange_thickness_tf,real)
 *set var angle=MatProp(Rotation_angle,real)
 *set var E=MatProp(Young_modulus,real)
-*set var G=operation(E/2.6)
-*set var J=tcl(GetTorsionalConstant *h *tw *b *tf)
-*set var JG=operation(J*G)
+*set var JG=MatProp(Torsional_stiffness,real)
 *# Area of the section is *MatProp(Cross_section_area,real)
 *format "%d"
 section fiberSecThermal *FiberTag *\
 *format "%g"
 -GJ *JG *\
  {
-*# Web
-*set var zdivision=MatProp(Web_Z_fibers,int)
-*set var ydivision=MatProp(Web_Y_fibers,int)
-*set var Iy=tcl(GetWebIy *h *tw *tf *angle)
-*set var Iz=tcl(GetWebIz *h *tw *tf *angle)
-*set var Jy=tcl(GetWebJy *h *tw *tf *angle)
-*set var Jz=tcl(GetWebJz *h *tw *tf *angle)
-*set var Ky=tcl(GetWebKy *h *tw *tf *angle)
-*set var Kz=tcl(GetWebKz *h *tw *tf *angle)
-*set var Ly=tcl(GetWebLy *h *tw *tf *angle)
-*set var Lz=tcl(GetWebLz *h *tw *tf *angle)
+# Top flange
 # patch rect $matTag $numSubdivIJ $numSubdivJK $yI $zI $yJ $zJ $yK $zK $yL $zL
-*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
-patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
-*# Top flange
 *set var zdivision=MatProp(Flange_Z_fibers,int)
 *set var ydivision=MatProp(Flange_Y_fibers,int)
 *set var Iy=tcl(GetTopFlangeIy *h *b *tf *angle)
@@ -68,7 +53,49 @@ patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz 
 *set var Lz=tcl(GetTopFlangeLz *h *b *tf *angle)
 *format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
 patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
-*#Bottom flange
+# Web
+*set var zdivision=MatProp(Web_Z_fibers,int)
+*set var ydivision=MatProp(Web_Y_fibers,int)
+*set var Iy=tcl(GetWebIy *h *tw *tf *angle)
+*set var Iz=tcl(GetWebIz *h *tw *tf *angle)
+*set var Jy=tcl(GetWebJy *h *tw *tf *angle)
+*set var Jz=tcl(GetWebJz *h *tw *tf *angle)
+*set var Ky=tcl(GetWebKy *h *tw *tf *angle)
+*set var Kz=tcl(GetWebKz *h *tw *tf *angle)
+*set var Ly=tcl(GetWebLy *h *tw *tf *angle)
+*set var Lz=tcl(GetWebLz *h *tw *tf *angle)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+
+*if(strcmp(Matprop(Cross_section),"Stiffened_I_Section_1")==0 && MatProp(Plate_t,real) > 0)
+# Left stiffening plate
+*set var pt = MatProp(Plate_t,real)
+*set var pl = MatProp(Plate_l,real)
+*set var zdivision=MatProp(Plate_Z_fibers,int)
+*set var ydivision=MatProp(Plate_Y_fibers,int)
+*set var Iy=tcl(GetLeftPlateIy *pl *b *pt *angle)
+*set var Iz=tcl(GetLeftPlateIz *pl *b *pt *angle)
+*set var Jy=tcl(GetLeftPlateJy *pl *b *pt *angle)
+*set var Jz=tcl(GetLeftPlateJz *pl *b *pt *angle)
+*set var Ky=tcl(GetLeftPlateKy *pl *b *pt *angle)
+*set var Kz=tcl(GetLeftPlateKz *pl *b *pt *angle)
+*set var Ly=tcl(GetLeftPlateLy *pl *b *pt *angle)
+*set var Lz=tcl(GetLeftPlateLz *pl *b *pt *angle)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Right stiffening plate
+*set var Iy=tcl(GetRightPlateIy *pl *b *pt *angle)
+*set var Iz=tcl(GetRightPlateIz *pl *b *pt *angle)
+*set var Jy=tcl(GetRightPlateJy *pl *b *pt *angle)
+*set var Jz=tcl(GetRightPlateJz *pl *b *pt *angle)
+*set var Ky=tcl(GetRightPlateKy *pl *b *pt *angle)
+*set var Kz=tcl(GetRightPlateKz *pl *b *pt *angle)
+*set var Ly=tcl(GetRightPlateLy *pl *b *pt *angle)
+*set var Lz=tcl(GetRightPlateLz *pl *b *pt *angle)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*endif 
+# Bottom flange
 *set var zdivision=MatProp(Flange_Z_fibers,int)
 *set var ydivision=MatProp(Flange_Y_fibers,int)
 *set var Iy=tcl(GetBotFlangeIy *h *b *tf *angle)

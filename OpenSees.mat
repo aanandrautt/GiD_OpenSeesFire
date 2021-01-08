@@ -1288,41 +1288,58 @@ BOOK: Section_Force-Deformation
 MATERIAL: Predefined Fiber Section
 COMMENT: \n
 TITLE: Section properties
-QUESTION: Cross_section
+QUESTION: Cross_section#CB#(I_Section,Stiffened_I_Section_1)
 VALUE: I_Section
-STATE: HIDDEN
+DEPENDENCIES: (I_Section,HIDE,Plate_l,#CURRENT#,HIDE,Plate_t,#CURRENT#,HIDE,Plate_Y_fibers,#CURRENT#,HIDE,Plate_Z_fibers,#CURRENT#,HIDE,Plate_Steel_material,#CURRENT#)
+DEPENDENCIES: (Stiffened_I_Section_1,RESTORE,Plate_l,#CURRENT#,RESTORE,Plate_t,#CURRENT#,RESTORE,Plate_Y_fibers,#CURRENT#,RESTORE,Plate_Z_fibers,#CURRENT#,RESTORE,Plate_Steel_material,#CURRENT#)
 QUESTION: Section:#CB#(Fiber)
 VALUE: Fiber
 STATE: HIDDEN
 QUESTION: Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
 VALUE: Steel01
-QUESTION: Web_Y_fibers
-VALUE: 1
-QUESTION: Web_Z_fibers
-VALUE: 6
 QUESTION: Height_h#UNITS#
 VALUE: 250 mm
 QUESTION: Web_thickness_tw#UNITS#
 VALUE: 8 mm
-QUESTION: Flange_Y_fibers
-VALUE: 5
-QUESTION: Flange_Z_fibers
-VALUE: 3
+QUESTION: Web_Y_fibers
+VALUE: 1
+QUESTION: Web_Z_fibers
+VALUE: 6
 QUESTION: Flange_width_b#UNITS#
 VALUE: 200 mm
 QUESTION: Flange_thickness_tf#UNITS#
 VALUE: 10 mm
+QUESTION: Flange_Y_fibers
+VALUE: 5
+QUESTION: Flange_Z_fibers
+VALUE: 3
 QUESTION: Rotation_angle
 VALUE: 0
 HELP: Enter angle in degrees
+HELP: For finding torsional stiffness JG
+QUESTION: Plate_Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
+VALUE: Steel01
+QUESTION: Plate_l#UNITS#
+VALUE: 250 mm
+QUESTION: Plate_t#UNITS#
+VALUE: 25 mm
+QUESTION: Plate_Y_fibers
+VALUE: 3
+QUESTION: Plate_Z_fibers
+VALUE: 6
 QUESTION: Young_modulus#UNITS#
 VALUE: 206 GPa
-HELP: For finding torsional stiffness JG
+QUESTION: Poisson_ratio
+VALUE: 0.3
 IMAGE: img/Sections/I-section.jpg
 QUESTION: Cross_section_area#UNITS#
 VALUE: 0.25 m^2
 STATE: HIDDEN
 TKWIDGET: Fiber::CalcArea
+QUESTION: Torsional_stiffness#UNITS#
+VALUE: 1.0e7 kNm^2
+STATE: HIDDEN
+TKWIDGET: Fiber::CalcJG
 QUESTION: Y1#UNITS#
 VALUE: -0.1 m
 STATE: HIDDEN

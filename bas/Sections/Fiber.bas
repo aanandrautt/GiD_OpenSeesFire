@@ -1,7 +1,7 @@
 *set var FiberTag=SectionID
 *if(ndime==3)
 *# ANWAR ORABI: For some reason I cannot seem to get both the bridge deck and I sections to work. Need to use !=0 for I_section, in stead of for bridge deck.
-*if(strcmp(Matprop(Cross_section),"I_Section")==0)
+*if(strcmp(Matprop(Cross_section),"I_Section")==0 || strcmp(Matprop(Cross_section),"Stiffened_I_Section_1")==0 )
 *include PredefinedFiber.bas
 *endif 
 *if(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)

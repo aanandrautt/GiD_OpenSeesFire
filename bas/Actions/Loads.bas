@@ -162,6 +162,8 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *set var botFiber=operation(-0.500001*secHeight)
 *set var topFiber=operation(0.500001*secHeight)
 *set var area=MatProp(Cross_section_area,real)
+*set var angle=MatProp(Rotation_angle,real)
+*else
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
 *endif

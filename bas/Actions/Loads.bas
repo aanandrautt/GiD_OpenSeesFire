@@ -40,6 +40,12 @@
 *set var PrintPlainPatternPathTimeseries=1
 *break
 *end elems
+*set cond Line_Gas_Temperatures *elems *CanRepeat
+*loop elems *OnlyInCond
+*set var PrintPlainPattern=1
+*set var PrintPlainPatternPathTimeseries=1
+*break
+*end elems
 *set cond Surface_Uniform_Load *elems *CanRepeat
 *loop elems *OnlyInCond
 *set var PrintPlainPattern=1
@@ -145,6 +151,33 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *end materials
 *format "%6d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -beamThermal -z -source *cond(1) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*endif
+*end elems
+*endif
+*if(ndime==3)
+*set cond Line_Gas_Temperatures *elems
+*loop elems *OnlyInCond
+*if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
+*set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
+*loop materials *NotUsed
+*set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
+*if(SelectedSection==SectionID)
+*set var dummy=tcl(AddUsedMaterials *SelectedSection)
+*if(strcmp(MatProp(Section:),"Fiber")==0)
+*set var fiberZ1=MatProp(Z1,real)
+*set var fiberZ2=MatProp(Z2,real)
+*set var fiberY1=MatProp(Y1,real)
+*set var fiberY2=MatProp(Y2,real)
+*else
+*MessageBox Error: Cannot grab section properties from anything other than a Fiber section
+*endif
+*break
+*endif
+*end materials
+*#set var tempFileDir=tcl(GetTempFileDir *cond(1))
+*#cannot assign a string to a variable in .bas, thus invoke function directly in load command.
+*format "%d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(1)) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *endif
 *end elems
 *endif

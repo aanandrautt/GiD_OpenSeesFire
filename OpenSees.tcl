@@ -1341,7 +1341,7 @@ proc HelpOnOpenSees { dir } {
 
 proc OpenSees::ReturnProjectDimensions { } {
 
-	set ndm 2
+	set ndm 3
 	foreach layername [GiD_Info layers] {
 		foreach i [GiD_Info layers -entities points $layername] {
 			set zcoord [lindex [GiD_Geometry get point $i] 3]

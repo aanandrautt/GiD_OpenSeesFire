@@ -131,6 +131,16 @@ DEPENDENCIES: (Pin_YZ,RESTORE,Y-Translation,1,RESTORE,Z-Translation,1,RESTORE,X-
 TKWIDGET: TK_RestraintsWikiInfo
 END CONDITION
 
+BOOK: Thermal_hidden
+
+CONDITION: Line_Thermo_Couple
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+QUESTION: Id#CB#(_)
+VALUE: 0
+STATE: HIDDEN
+END CONDITION
 
 BOOK: Loads
 
@@ -263,12 +273,31 @@ END CONDITION
 CONDITION: Line_Temperature_History
 CONDTYPE: over lines
 CONDMESHTYPE: over body elements
-COMMENT: \n\tThis condition is assigned on surfaces and is transferred on shell elements.\n\tYou must add the temperature files to the folder "Records" which you placed manually in the project OpenSees folder.
+COMMENT: \n\tThis condition is assigned on surfaces and is transferred on line elements.\n\tYou must add the temperature files to the folder "Records" which you placed manually in the project OpenSees folder.
 QUESTION: Record_file_name
 VALUE: "../Records/.dat"
 QUESTION: _#CB#(_)
 VALUE:
 STATE: HIDDEN
+TKWIDGET: TK_LocalAxesInfo
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Gas_Temperatures
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: \n\tThis condition is a test case.
+QUESTION: Id#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: Stress#UNITS#
+VALUE: 1.69 kPa
+QUESTION: Strain
+VALUE: 0.00689
 TKWIDGET: TK_LocalAxesInfo
 QUESTION: _#CB#(_)
 VALUE:

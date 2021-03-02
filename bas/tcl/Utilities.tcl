@@ -188,7 +188,6 @@ proc ResetAnalysis { confirm } {
 }
 
 # Analysis commands
-
 proc Create_tcl_file { } {
 
 	global GidProcWin
@@ -519,6 +518,145 @@ proc Opt1_dialog { } {
 	return ""
 }
 
+proc Create_tcouples_file { } {
+
+	global GidProcWin
+
+	set info [GiD_Info Project]
+	set ProjectName [lindex $info 1]
+
+	if { $ProjectName == "UNNAMED" } {
+
+		tk_dialog .gid.errorMsg "Error" "Please save project before creating the thermocouples file." error 0 "  Ok  "
+
+	} else {
+
+		file mkdir [file join [OpenSees::GetProjectPath] Records]
+		Fire::GenerateLineTCouples
+	}
+
+	UpdateInfoBar
+	return ""
+}
+
+proc Create_HT_dat_file { } {
+
+	global GidProcWin
+
+	set info [GiD_Info Project]
+	set ProjectName [lindex $info 1]
+
+	if { $ProjectName == "UNNAMED" } {
+
+		tk_dialog .gid.errorMsg "Error" "Please save project before creating the HT.dat file." error 0 "  Ok  "
+
+	} else {
+
+		file mkdir [file join [OpenSees::GetProjectPath] OpenSees]
+		GiD_Process Mescape Files WriteForBAS "[OpenSees::GetProblemTypePath]/../OpenSees.gid/HTData.bas" "[OpenSees::GetProjectPath]/Records/HT.dat"
+	}
+
+	UpdateInfoBar
+	return ""
+}
+
+
+
+proc TCouples_dialog {} {
+	set w .gid.warn2
+	set mustRegenMesh [GiD_Info Project MustReMesh]; # 0 no, 1 yes
+	
+		if {$mustRegenMesh} {
+
+		WantToRegenMeshMessage
+
+	} else {
+
+		OpenSees::SetProjectNameAndPath
+		set GiDProjectDir [OpenSees::GetProjectPath]
+		set GiDProjectName [OpenSees::GetProjectName]
+
+		set file "$GiDProjectDir/Records/TCouples.txt"
+		set fexists [file exist $file]
+
+		if { $fexists == 1 } {
+
+			set response [tk_dialog $w "Warning" "Creating the thermocouples .txt file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+
+			if { $response == 0 } {
+
+				Create_tcouples_file
+
+				set fexists [file exist $file]
+				if { $fexists == 1 } {
+
+					tk_dialog $w "Success" "TCouples.txt was created" info 0 "  Ok  "
+				}
+
+			}
+		} else {
+
+			Create_tcouples_file
+
+			set fexists [file exist $file]
+			if { $fexists == 1 } {
+
+				tk_dialog $w "Success" "TCouples.txt was created" info 0 "  Ok  "
+			}
+
+		}
+	}
+
+	return ""
+}
+
+proc HT_data_dialog {} {
+	set w .gid.warn2
+	set mustRegenMesh [GiD_Info Project MustReMesh]; # 0 no, 1 yes
+	
+		if {$mustRegenMesh} {
+
+		WantToRegenMeshMessage
+
+	} else {
+
+		OpenSees::SetProjectNameAndPath
+		set GiDProjectDir [OpenSees::GetProjectPath]
+		set GiDProjectName [OpenSees::GetProjectName]
+
+		set file "$GiDProjectDir/Records/HT.dat"
+		set fexists [file exist $file]
+
+		if { $fexists == 1 } {
+
+			set response [tk_dialog $w "Warning" "Creating the HT.dat file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+
+			if { $response == 0 } {
+
+				Create_HT_dat_file
+
+				set fexists [file exist $file]
+				if { $fexists == 1 } {
+
+					tk_dialog $w "Success" "HT.dat was created" info 0 "  Ok  "
+				}
+
+			}
+		} else {
+
+			Create_HT_dat_file
+
+			set fexists [file exist $file]
+			if { $fexists == 1 } {
+
+				tk_dialog $w "Success" "HT.dat was created" info 0 "  Ok  "
+			}
+
+		}
+	}
+
+	return ""
+}
 proc Opt2_dialog { } {
 
 	set w .gid.warn2
@@ -902,6 +1040,8 @@ proc OpenSees_Menu { dir } {
 	"---" \
 	[= "Create .tcl, run analysis and postprocess"] \
 	"---" \
+	[= "Create FDS thermocouples only"] \
+	[= "Create heat transfer data only"] \
 	[= "Create .tcl only"] \
 	[= "Create and view .tcl only"] \
 	[= "Run analysis only"] \
@@ -933,6 +1073,8 @@ proc OpenSees_Menu { dir } {
 	{} \
 	{Opt1_dialog} \
 	{} \
+	{TCouples_dialog} \
+	{HT_data_dialog} \
 	{Opt2_dialog} \
 	{Opt3_dialog} \
 	{Opt4_dialog} \
@@ -964,6 +1106,8 @@ proc OpenSees_Menu { dir } {
 	"" \
 	mnu_Analysis.png \
 	"" \
+	mnu_tcpl.png \
+	mnu_ht.png \
 	mnu_TCL.png \
 	mnu_TCL.png \
 	mnu_TCL_Analysis.png \

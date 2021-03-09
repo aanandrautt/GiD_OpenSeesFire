@@ -1328,6 +1328,13 @@ QUESTION: Plate_Y_fibers
 VALUE: 3
 QUESTION: Plate_Z_fibers
 VALUE: 6
+QUESTION: protection_material#CB#(1,2,3)
+VALUE: 1
+HELP: 1. Material 1\n2. Material 2\n3. Material 3
+QUESTION: protection_thickness#UNITS#
+VALUE: 0 mm
+HELP: Set thickness to 0 to indicate no protection
+HELP:Specify if the heat transfer is to be performed for the section as a composite section with slab
 QUESTION: Young_modulus#UNITS#
 VALUE: 206 GPa
 QUESTION: Poisson_ratio

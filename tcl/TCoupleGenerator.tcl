@@ -11,16 +11,22 @@ proc Fire::GenerateLineTCouples {} {
 	lappend geometric_entities_ids($id) $args
 	}
 	set geometric_entity_list [array names geometric_entities_ids]
-	set fileHandle [open "[OpenSees::GetProjectPath]/Records/TCouples.txt" w+]
+	array unset thermocouple_parameters
+	
     set parameters 0.5
 	foreach line_entity_id $geometric_entity_list {
-	# set xyz [GiD_Info Parametric line $line_entity_id coord {*}$parameters]
-	set xyz [GidUtils::GetEntityCenter line $line_entity_id]
+		set xyz [GidUtils::GetEntityCenter line $line_entity_id]
+		lappend thermocouple_parameters(L$line_entity_id) $xyz
+	}
+	set sorted_thermocouple_parameters [lsort [array names thermocouple_parameters]]
+	
+	set fileHandle [open "[OpenSees::GetProjectPath]/Records/TCouples.txt" w+]
+	foreach thermocouple $sorted_thermocouple_parameters {
+		set xyz [lindex $thermocouple_parameters($thermocouple) 0]
 		set x [lindex $xyz 0]; set y [lindex $xyz 1]; set z [lindex $xyz 2];
-		puts $fileHandle "&DEVC ID = 'L$line_entity_id', QUANTITY='GAS TEMPERATURE', XYZ=$x,$y,$z/"
+		puts $fileHandle "&DEVC ID = '$thermocouple', QUANTITY='GAS TEMPERATURE', XYZ=$x,$y,$z/"
 	}
 	close $fileHandle
-	WarnWinText "Using new command. Created TCouples.txt at:[OpenSees::GetProjectPath]/Records/TCouples.txt"
 }
 
 proc Fire::AssignLineThermalCoupleCondition {} {
@@ -39,13 +45,16 @@ proc Fire::AssignLineThermalCoupleCondition {} {
 		set xyz [GidUtils::GetEntityCenter line $line]
 		set elem_ID [GidUtils::GetClosestElement line $xyz $lines_and_elems($line)]
 		#thermocouple id is lower case L (for line) followed by geometric line number
-		set t_couple_id "l$line"
+		set t_couple_id "L$line"
 		#assign hidden condition 'Line_Thermo_Couple' to central element to loop over 
 		#it when creating the data file in bas. Much easier to get info about section
 		#in bas than here. 
 		GiD_AssignData condition Line_Thermo_Couple Elements "$t_couple_id" $elem_ID
 	}
 }
-
+#method for generating string for the directory of the thermal loading files
+proc Fire::GetTempFileDir {line_id} {
+	return "\"../Records/BeamL$line_id.dat\""
+}
 
 

@@ -45,7 +45,7 @@ proc checkIfAnalysisFailed { line_data } {
 
 		if { $line == "Analysis FAILED" } {
 
-			set success 0
+		        set success 0
 
 		}
 	}
@@ -76,14 +76,14 @@ proc CheckLogAndPost { projectDir projectName doPost only_post } {
 	foreach line $data {
 
 		if { ([string match *Analysis* $line]) == 1 && ([string match *time* $line] == 1) } {
-			set words [split $line]
-			if { [lindex $words 0] == "Analysis" && [lindex $words 1] == "time" } {
+		        set words [split $line]
+		        if { [lindex $words 0] == "Analysis" && [lindex $words 1] == "time" } {
 
-					set pos [string last ":" $line]
-					set ElapsedTime [string range $line $pos+2 $pos+100]
+		                        set pos [string last ":" $line]
+		                        set ElapsedTime [string range $line $pos+2 $pos+100]
 
-					break
-			}
+		                        break
+		        }
 		}
 	}
 
@@ -101,47 +101,47 @@ proc CheckLogAndPost { projectDir projectName doPost only_post } {
 
 		if { $doPost == 0 } {
 
-			AnalysisInformationWindow "RunSuccess"
+		        AnalysisInformationWindow "RunSuccess"
 
 		} else {
 
-			ExecutePost
-			if { !$only_post } {
+		        ExecutePost
+		        if { !$only_post } {
 
-				AnalysisInformationWindow "RunSuccessPost"
+		                AnalysisInformationWindow "RunSuccessPost"
 
-			} else {
+		        } else {
 
-				AnalysisInformationWindow "PostSuccess"
+		                AnalysisInformationWindow "PostSuccess"
 
-			}
+		        }
 		}
 
 	} else {
 
 		if { $crashed } {
 
-			AnalysisInformationWindow "RunCrashed"
+		        AnalysisInformationWindow "RunCrashed"
 
-			return ""
+		        return ""
 		}
 
 		if { $doPost == 0 } {
 
-			AnalysisInformationWindow "RunFailed"
+		        AnalysisInformationWindow "RunFailed"
 
 		} else {
 
-			ExecutePost
-			if { !$only_post } {
+		        ExecutePost
+		        if { !$only_post } {
 
-				AnalysisInformationWindow "RunFailedPost"
+		                AnalysisInformationWindow "RunFailedPost"
 
-			} else {
+		        } else {
 
-				AnalysisInformationWindow "PostFailed"
+		                AnalysisInformationWindow "PostFailed"
 
-			}
+		        }
 		}
 	}
 
@@ -151,7 +151,7 @@ proc CheckLogAndPost { projectDir projectName doPost only_post } {
 proc deleteFiles { files } {
 	foreach run_file $files {
 		if {[file exists $run_file]} {
-			file delete -force -- $run_file
+		        file delete -force -- $run_file
 		}
 	}
 }
@@ -171,10 +171,10 @@ proc ResetAnalysis { confirm } {
 	# clear post-processor files
 
 	set post_files [list [file join "$GiDProjectDir" "$GiDProjectName.post.res.ascii"] \
-						 [file join "$GiDProjectDir" "$GiDProjectName.post.res"] \
-						 [file join "$GiDProjectDir" "$GiDProjectName.post.png"] \
-						 [file join "$GiDProjectDir" "$GiDProjectName.post.vv"] \
-						 [file join "$GiDProjectDir" "$GiDProjectName.post.grf"] ]
+		                                 [file join "$GiDProjectDir" "$GiDProjectName.post.res"] \
+		                                 [file join "$GiDProjectDir" "$GiDProjectName.post.png"] \
+		                                 [file join "$GiDProjectDir" "$GiDProjectName.post.vv"] \
+		                                 [file join "$GiDProjectDir" "$GiDProjectName.post.grf"] ]
 
 	deleteFiles $post_files
 
@@ -257,11 +257,11 @@ proc Run_existing_tcl { doPost } {
 
 		if {[file exists "$GiDProjectName.log"] } {
 
-			CheckLogAndPost $GiDProjectDir $GiDProjectName $doPost 0
+		        CheckLogAndPost $GiDProjectDir $GiDProjectName $doPost 0
 
 		} else {
 
-			AnalysisInformationWindow "NoRun"
+		        AnalysisInformationWindow "NoRun"
 		}
 
 	} else {
@@ -270,6 +270,48 @@ proc Run_existing_tcl { doPost } {
 
 	}
 
+	UpdateInfoBar
+	return ""
+}
+
+proc Run_existing_HT {} {
+
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set GiDProjectName [OpenSees::GetProjectName]
+	set OpenSeesPath [OpenSees::GetOpenSeesPath]
+	set HTScriptPath "[OpenSees::GetProblemTypePath]/exe/HTScript.tcl"
+	set OSPCRPath "[OpenSees::GetProblemTypePath]/exe/OSPCR-MP"
+	global GidProcWin
+	
+	
+	set HT_data_file [file join "$GiDProjectDir" "Records" "HT.dat" ]
+	set records_folder [file join "$GiDProjectDir" "Records"]
+
+	if {[file exists $HT_data_file] } {
+
+		GiD_Process Mescape Files Save
+		
+		file copy $HTScriptPath $records_folder
+		
+		cd $records_folder
+
+		# run analysis
+		eval exec [auto_execok start] \"\" mpiexec -n 5 \"$OSPCRPath\" OpenSeesDEBUG3.2.1 HTScript.tcl \"$HT_data_file\"
+
+		if {[file exists "Report.txt"] } {
+
+
+		} else {
+
+		        AnalysisInformationWindow "NoRun"
+		}
+
+	} else {
+
+		tk_dialog .gid.errorMsg "Error" "The HT.dat file was not created." error 0 "  Ok  "
+
+	}
+	file delete $records_folder/HTScript.tcl
 	UpdateInfoBar
 	return ""
 }
@@ -322,9 +364,9 @@ proc Create_tcl_run_analysis_and_postprocess { } {
 
 		if {[file exists $tcl_file] } {
 
-			# run and postprocess
+		        # run and postprocess
 
-			Run_existing_tcl_and_postprocess
+		        Run_existing_tcl_and_postprocess
 		}
 
 	}
@@ -367,103 +409,103 @@ proc AnalysisInformationWindow { AnalResult } {
 	switch -- $AnalResult {
 
 		"NoRun" {
-			set response [tk_dialog $w "Analysis failed" "Analysis could not run !\n\nPlease check generated .tcl file and report any issues to https://github.com/rclab-auth/gidopensees/issues" error 0 "  Open .tcl file  " "  Close  " ]
+		        set response [tk_dialog $w "Analysis failed" "Analysis could not run !\n\nPlease check generated .tcl file and report any issues to https://github.com/rclab-auth/gidopensees/issues" error 0 "  Open .tcl file  " "  Close  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Open_tcl_file
+		                Open_tcl_file
 
-			}
+		        }
 		}
 
 		"RunFailed" {
-			set response [tk_dialog $w "Analysis failed" "Analysis completed with ERRORS after $ElapsedTime.\n\nErrors were reported during analysis, please check generated .log file for more information." error 0 "  Open log file  " "  Close  " ]
+		        set response [tk_dialog $w "Analysis failed" "Analysis completed with ERRORS after $ElapsedTime.\n\nErrors were reported during analysis, please check generated .log file for more information." error 0 "  Open log file  " "  Close  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Open_log_file
+		                Open_log_file
 
-			}
+		        }
 		}
 
 		"RunFailedPost" {
-			set response [tk_dialog $w "Analysis failed" "Analysis completed with ERRORS after $ElapsedTime.\n\nErrors were reported during analysis, please check generated .log file for more information." error 0 "Postprocess anyway" "Open log file" "Close" ]
+		        set response [tk_dialog $w "Analysis failed" "Analysis completed with ERRORS after $ElapsedTime.\n\nErrors were reported during analysis, please check generated .log file for more information." error 0 "Postprocess anyway" "Open log file" "Close" ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				GoToPostProcess
+		                GoToPostProcess
 
-			} elseif { $response == 1 } {
+		        } elseif { $response == 1 } {
 
-				Open_log_file
+		                Open_log_file
 
-			}
+		        }
 		}
 
 		"RunSuccess" {
-			set response [tk_dialog $w "Analysis successful" "Analysis completed SUCCESSFULLY after $ElapsedTime." info 0 "  Open log file  " "  Close  " ]
+		        set response [tk_dialog $w "Analysis successful" "Analysis completed SUCCESSFULLY after $ElapsedTime." info 0 "  Open log file  " "  Close  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Open_log_file
+		                Open_log_file
 
-			}
+		        }
 		}
 
 		"RunSuccessPost" {
-			set response [tk_dialog $w "Analysis successful" "Analysis completed SUCCESSFULLY after $ElapsedTime.\n\nContinue to postprocessing ?" info 0 "  Postprocess  " "  Open log file  " "  Close  " ]
+		        set response [tk_dialog $w "Analysis successful" "Analysis completed SUCCESSFULLY after $ElapsedTime.\n\nContinue to postprocessing ?" info 0 "  Postprocess  " "  Open log file  " "  Close  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				GoToPostProcess
+		                GoToPostProcess
 
-			} elseif { $response == 1 } {
+		        } elseif { $response == 1 } {
 
-				Open_log_file
+		                Open_log_file
 
-			}
+		        }
 		}
 
 		"RunCrashed" {
 
-			set response [tk_dialog $w "Analysis crashed" "Analysis has crashed.\n\nPlease check generated .log file for more information." error 0 "  Open log file  " "  Close  " ]
+		        set response [tk_dialog $w "Analysis crashed" "Analysis has crashed.\n\nPlease check generated .log file for more information." error 0 "  Open log file  " "  Close  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Open_log_file
+		                Open_log_file
 
-			}
+		        }
 		}
 
 		"PostSuccess" {
 
-			set response [tk_dialog $w "Translation completed" "Proceed to postprocess ?" info 0 "  Yes  " "  No  " ]
+		        set response [tk_dialog $w "Translation completed" "Proceed to postprocess ?" info 0 "  Yes  " "  No  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				GoToPostProcess
+		                GoToPostProcess
 
-			}
+		        }
 		}
 
 		"PostFailed" {
 
-			set response [tk_dialog $w "Analysis has been completed with ERRORS.\n\nPlease check generated .log file for more information." info 0 " Postprocess anyway " " Open log file " " Close " ]
+		        set response [tk_dialog $w "Analysis has been completed with ERRORS.\n\nPlease check generated .log file for more information." info 0 " Postprocess anyway " " Open log file " " Close " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				GoToPostProcess
+		                GoToPostProcess
 
-			} elseif { $response == 1 } {
+		        } elseif { $response == 1 } {
 
-				Open_log_file
+		                Open_log_file
 
-			}
+		        }
 		}
 
 		default {
 
-			return ""
+		        return ""
 
 		}
 	}
@@ -475,7 +517,7 @@ proc WantToRegenMeshMessage { } {
 
 	if { $response == 0 } {
 
-			GiD_Process Mescape Meshing generate
+		        GiD_Process Mescape Meshing generate
 
 		}
 }
@@ -502,16 +544,16 @@ proc Opt1_dialog { } {
 
 		if { $fexists == 1 } {
 
-			set response [tk_dialog $w "Warning" "Creating the .tcl file and running the analysis will overwrite any user modifications and delete any existing results.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+		        set response [tk_dialog $w "Warning" "Creating the .tcl file and running the analysis will overwrite any user modifications and delete any existing results.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Create_tcl_run_analysis_and_postprocess
+		                Create_tcl_run_analysis_and_postprocess
 
-			}
+		        }
 		} else {
 
-			Create_tcl_run_analysis_and_postprocess
+		        Create_tcl_run_analysis_and_postprocess
 		}
 	}
 
@@ -581,28 +623,28 @@ proc TCouples_dialog {} {
 
 		if { $fexists == 1 } {
 
-			set response [tk_dialog $w "Warning" "Creating the thermocouples .txt file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+		        set response [tk_dialog $w "Warning" "Creating the thermocouples .txt file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Create_tcouples_file
+		                Create_tcouples_file
 
-				set fexists [file exist $file]
-				if { $fexists == 1 } {
+		                set fexists [file exist $file]
+		                if { $fexists == 1 } {
 
-					tk_dialog $w "Success" "TCouples.txt was created" info 0 "  Ok  "
-				}
+		                        tk_dialog $w "Success" "TCouples.txt was created" info 0 "  Ok  "
+		                }
 
-			}
+		        }
 		} else {
 
-			Create_tcouples_file
+		        Create_tcouples_file
 
-			set fexists [file exist $file]
-			if { $fexists == 1 } {
+		        set fexists [file exist $file]
+		        if { $fexists == 1 } {
 
-				tk_dialog $w "Success" "TCouples.txt was created" info 0 "  Ok  "
-			}
+		                tk_dialog $w "Success" "TCouples.txt was created" info 0 "  Ok  "
+		        }
 
 		}
 	}
@@ -629,28 +671,28 @@ proc HT_data_dialog {} {
 
 		if { $fexists == 1 } {
 
-			set response [tk_dialog $w "Warning" "Creating the HT.dat file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+		        set response [tk_dialog $w "Warning" "Creating the HT.dat file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Create_HT_dat_file
+		                Create_HT_dat_file
 
-				set fexists [file exist $file]
-				if { $fexists == 1 } {
+		                set fexists [file exist $file]
+		                if { $fexists == 1 } {
 
-					tk_dialog $w "Success" "HT.dat was created" info 0 "  Ok  "
-				}
+		                        tk_dialog $w "Success" "HT.dat was created" info 0 "  Ok  "
+		                }
 
-			}
+		        }
 		} else {
 
-			Create_HT_dat_file
+		        Create_HT_dat_file
 
-			set fexists [file exist $file]
-			if { $fexists == 1 } {
+		        set fexists [file exist $file]
+		        if { $fexists == 1 } {
 
-				tk_dialog $w "Success" "HT.dat was created" info 0 "  Ok  "
-			}
+		                tk_dialog $w "Success" "HT.dat was created" info 0 "  Ok  "
+		        }
 
 		}
 	}
@@ -677,28 +719,28 @@ proc Opt2_dialog { } {
 
 		if { $fexists == 1 } {
 
-			set response [tk_dialog $w "Warning" "Creating the .tcl file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+		        set response [tk_dialog $w "Warning" "Creating the .tcl file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Create_tcl_file
+		                Create_tcl_file
 
-				set fexists [file exist $file]
-				if { $fexists == 1 } {
+		                set fexists [file exist $file]
+		                if { $fexists == 1 } {
 
-					tk_dialog $w "Success" "The .tcl file was created" info 0 "  Ok  "
-				}
+		                        tk_dialog $w "Success" "The .tcl file was created" info 0 "  Ok  "
+		                }
 
-			}
+		        }
 		} else {
 
-			Create_tcl_file
+		        Create_tcl_file
 
-			set fexists [file exist $file]
-			if { $fexists == 1 } {
+		        set fexists [file exist $file]
+		        if { $fexists == 1 } {
 
-				tk_dialog $w "Success" "The .tcl file was created" info 0 "  Ok  "
-			}
+		                tk_dialog $w "Success" "The .tcl file was created" info 0 "  Ok  "
+		        }
 
 		}
 	}
@@ -726,17 +768,46 @@ proc Opt3_dialog { } {
 
 		if { $fexists == 1 } {
 
-			set response [tk_dialog $w "Warning" "Creating the .tcl file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+		        set response [tk_dialog $w "Warning" "Creating the .tcl file will overwrite any user modifications.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
 
-			if { $response == 0 } {
+		        if { $response == 0 } {
 
-				Create_and_open_tcl_file
+		                Create_and_open_tcl_file
 
-			}
+		        }
 		} else {
 
-			Create_and_open_tcl_file
+		        Create_and_open_tcl_file
 		}
+	}
+
+	return ""
+}
+
+proc run_HT_dialog { } {
+
+	OpenSees::SetProjectNameAndPath
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set GiDProjectName [OpenSees::GetProjectName]
+
+	set report_file "$GiDProjectDir/Records/Report.txt"
+	set fexists [file exist $report_file]
+	set w .gid.warn4
+	set false 0
+
+	if { $fexists == 1 } {
+
+		set response [tk_dialog $w "Warning" "Running the heat transfer analysis will delete any existing temperature files.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+
+		if { $response == 0 } {
+
+		        Run_existing_HT
+
+		}
+
+	} else {
+
+		Run_existing_HT
 	}
 
 	return ""
@@ -759,7 +830,7 @@ proc Opt4_dialog { } {
 
 		if { $response == 0 } {
 
-			Run_existing_tcl $false
+		        Run_existing_tcl $false
 
 		}
 
@@ -794,7 +865,7 @@ proc Opt6_dialog { } {
 
 		if { $response == 0 } {
 
-			Run_existing_tcl_and_postprocess
+		        Run_existing_tcl_and_postprocess
 
 		}
 	} else {
@@ -823,7 +894,7 @@ proc Opt7_dialog { } {
 
 		if { $response == 0 } {
 
-			ResetAnalysis 1
+		        ResetAnalysis 1
 		}
 	}
 
@@ -847,17 +918,17 @@ proc executeImportExe { tcl_file project_dir units_system } {
 	set imp_intv_data [GiD_AccessValue get GenData Interval_settings]
 
 	exec {*}[auto_execok start] "TclToGiD.exe" \
-								"$tcl_file" \
-								"$project_dir" \
-								"$units_system" \
-								$imp_geom \
-								$imp_rest \
-								$imp_cons \
-								$imp_load \
-								$imp_mat \
-								$imp_sec \
-								$imp_elem \
-								$imp_intv_data
+		                                                "$tcl_file" \
+		                                                "$project_dir" \
+		                                                "$units_system" \
+		                                                $imp_geom \
+		                                                $imp_rest \
+		                                                $imp_cons \
+		                                                $imp_load \
+		                                                $imp_mat \
+		                                                $imp_sec \
+		                                                $imp_elem \
+		                                                $imp_intv_data
 }
 
 proc Import_tcl_dialog { } {
@@ -884,19 +955,19 @@ proc Import_tcl_dialog { } {
 		append bch ".bch"
 
 		if {[file exists $bch] } {
-			# read batch
+		        # read batch
 
-			GiD_Process Mescape Files BatchFile $bch
+		        GiD_Process Mescape Files BatchFile $bch
 
-			file delete -force -- $bch
+		        file delete -force -- $bch
 
-			GiD_Process 'Zoom Frame
+		        GiD_Process 'Zoom Frame
 
-			tk_dialog .gid.msgImpSuccess "Import finished" "Geometry was successfully imported from $tcl." info 0 "  Ok  "
+		        tk_dialog .gid.msgImpSuccess "Import finished" "Geometry was successfully imported from $tcl." info 0 "  Ok  "
 
 		} else {
 
-			tk_dialog .gid.msgImpFailed "Import failed" "Could not import model geometry.\n\nPlease report your model to GitHub issues.\n(https://github.com/rclab-auth/gidopensees/issues)" error 0 "  Ok  "
+		        tk_dialog .gid.msgImpFailed "Import failed" "Could not import model geometry.\n\nPlease report your model to GitHub issues.\n(https://github.com/rclab-auth/gidopensees/issues)" error 0 "  Ok  "
 
 		}
 	}
@@ -1045,6 +1116,7 @@ proc OpenSees_Menu { dir } {
 	[= "Create .tcl only"] \
 	[= "Create and view .tcl only"] \
 	[= "Run analysis only"] \
+	[= "Run Heat Transfer"] \
 	[= "Postprocess only"] \
 	[= "Run analysis and postprocess"] \
 	"---" \
@@ -1078,6 +1150,7 @@ proc OpenSees_Menu { dir } {
 	{Opt2_dialog} \
 	{Opt3_dialog} \
 	{Opt4_dialog} \
+	{run_HT_dialog}\
 	{Opt5_dialog} \
 	{Opt6_dialog} \
 	{} \
@@ -1111,6 +1184,7 @@ proc OpenSees_Menu { dir } {
 	mnu_TCL.png \
 	mnu_TCL.png \
 	mnu_TCL_Analysis.png \
+	mnu_HT_Analysis.png  \
 	mnu_TCL_Analysis.png \
 	mnu_TCL_Analysis.png \
 	"" \

@@ -14,15 +14,21 @@ ID	SidesHeated(3/4?)	Protected?	composite?	thickness_flange	thickness_web	sectio
 *set var tw=MatProp(Web_thickness_tw,real)
 *set var h=MatProp(Height_h,real)
 *set var b=MatProp(Flange_width_b,real)
-*set var area=MatProp(Cross_section_area,real)
+*set var p_mat=MatProp(protection_material,int)
+*set var dp=MatProp(protection_thickness,real)
+*if(dp==0)
+*set var protected = 0.0
+*else
+*set var protected = 1.0
+*endif
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
 *endif
 *break
 *endif
 *end materials
-*format "%s%g%g%g%g
-*cond(1)	4	FALSE	FALSE	*tf	*tw	*h	*b	0.0	0.0	150.0	1000.0
+*format "%s%g%g%g%g%g
+*cond(1)	4	*protected	FALSE	*tf	*tw	*h	*b	*dp	0.0	150.0	1000.0
 *endif
 *end elems
 *endif

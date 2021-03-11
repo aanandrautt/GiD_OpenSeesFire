@@ -131,7 +131,7 @@ DEPENDENCIES: (Pin_YZ,RESTORE,Y-Translation,1,RESTORE,Z-Translation,1,RESTORE,X-
 TKWIDGET: TK_RestraintsWikiInfo
 END CONDITION
 
-BOOK: Thermal_hidden
+BOOK: Debug_conditions
 
 CONDITION: Line_Thermo_Couple
 CONDTYPE: over lines
@@ -141,6 +141,42 @@ QUESTION: Id#CB#(_)
 VALUE: 0
 STATE: HIDDEN
 END CONDITION
+
+CONDITION: Line_body_elements_debug
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+QUESTION: Id#CB#(_)
+VALUE: 0
+STATE: HIDDEN
+END CONDITION
+
+CONDITION: Surface_Composite_Section
+CONDTYPE: over surfaces
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: \n\tThis condition is a test case.
+QUESTION: condition_ID
+VALUE: 0
+STATE:HIDDEN
+QUESTION: connection_type#CB#(equal_DOF, rigid_link)
+VALUE: rigid_link
+QUESTION:x_translation#CB#(1, 0)
+VALUE: 1 
+QUESTION:y_translation#CB#(1, 0)
+VALUE: 1 
+QUESTION:z_translation#CB#(1, 0)
+VALUE: 1
+QUESTION:x_rotation#CB#(1, 0)
+VALUE: 0 
+QUESTION:y_rotation#CB#(1, 0)
+VALUE: 1 
+QUESTION:z_rotation#CB#(1, 0)
+VALUE: 1 
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+
 
 BOOK: Loads
 
@@ -302,6 +338,48 @@ TKWIDGET: TK_LocalAxesInfo
 QUESTION: _#CB#(_)
 VALUE:
 STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Composite_Section
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: \n\tThis condition is a test case.
+QUESTION: Id#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: condition_ID
+VALUE: 0
+STATE:HIDDEN
+TKWIDGET: TK_LocalAxesInfo
+QUESTION: _#CB#(_)
+VALUE:
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Composite_Section_nodes
+CONDTYPE: over lines
+CONDMESHTYPE: over nodes
+CANREPEAT: no
+COMMENT: \n\tThis condition is a test case.
+QUESTION: Id#FUNC#(NumEntity)
+VALUE: 0
+QUESTION: connection_type#CB#(equal_DOF, rigid_link)
+VALUE: rigid_link
+QUESTION:x_translation#CB#(1, 0)
+VALUE: 1 
+QUESTION:y_translation#CB#(1, 0)
+VALUE: 1 
+QUESTION:z_translation#CB#(1, 0)
+VALUE: 1
+QUESTION:x_rotation#CB#(1, 0)
+VALUE: 0 
+QUESTION:y_rotation#CB#(1, 0)
+VALUE: 1 
+QUESTION:z_rotation#CB#(1, 0)
+VALUE: 1 
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 

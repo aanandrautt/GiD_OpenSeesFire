@@ -155,11 +155,12 @@ CONDITION: Surface_Composite_Section
 CONDTYPE: over surfaces
 CONDMESHTYPE: over body elements
 CANREPEAT: no
-COMMENT: \n\tThis condition is a test case.
-QUESTION: condition_ID
+COMMENT: \n\tThis condition is applied automatically. Please don't apply it manually.
+QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
-STATE:HIDDEN
-QUESTION: connection_type#CB#(equal_DOF, rigid_link)
+QUESTION: ID
+VALUE: 0
+QUESTION: connection_type#CB#(common_nodes, equal_DOF, rigid_link)
 VALUE: rigid_link
 QUESTION:x_translation#CB#(1, 0)
 VALUE: 1 
@@ -176,6 +177,101 @@ VALUE: 1
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
+BOOK: Thermocouples
+
+CONDITION: Line_Gas_Temperatures
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: Gas temperatures applied to beam-column elements.\nThermocouples and Heat transfer data files will be generated\nand temperatures assigned in the corresponding interval.\nMust be using predefined fiber section disp-beam-column.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: ID
+VALUE: 0
+STATE: HIDDEN
+QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+VALUE: standard_fire
+QUESTION: central_element#CB#(1,0)
+VALUE: 0
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Surface_Gas_Temperatures
+CONDTYPE: over surfaces
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: Gas temperatures applied to shell elements.\nThermocouples and Heat transfer data files will be generated\nand temperatures assigned in the corresponding interval.\nMust be using layered shell sections and NLDKGQ/MITC4 elements.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: ID
+VALUE: 0
+STATE: HIDDEN
+QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+VALUE: standard_fire
+QUESTION: central_element#CB#(1,0)
+VALUE: 0
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Composite_Section_Beam
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: \tApply condition over beams of composite beams.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: ID
+VALUE: 0
+STATE: HIDDEN
+QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+VALUE: standard_fire
+QUESTION: central_element#CB#(1,0)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: slab_width#UNITS#
+VALUE: 666 mm
+STATE: HIDDEN
+QUESTION: slab_depth#UNITS#
+VALUE: 666 mm
+STATE: HIDDEN
+QUESTION: slab_protection#UNITS#
+VALUE: 66 mm
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Composite_Section_Slab
+CONDTYPE: over lines
+CONDMESHTYPE: over nodes
+CANREPEAT: no
+COMMENT: \tApply condition over slab line of composite beams.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: ID
+VALUE: 0
+STATE: HIDDEN
+QUESTION: connection_type#CB#(common_nodes, equal_DOF, rigid_link)
+VALUE: rigid_link
+QUESTION:x_translation#CB#(1, 0)
+VALUE: 1 
+QUESTION:y_translation#CB#(1, 0)
+VALUE: 1 
+QUESTION:z_translation#CB#(1, 0)
+VALUE: 1
+QUESTION:x_rotation#CB#(1, 0)
+VALUE: 0 
+QUESTION:y_rotation#CB#(1, 0)
+VALUE: 1 
+QUESTION:z_rotation#CB#(1, 0)
+VALUE: 1 
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
 
 
 BOOK: Loads
@@ -319,67 +415,6 @@ TKWIDGET: TK_LocalAxesInfo
 QUESTION: _#CB#(_)
 VALUE:
 STATE: HIDDEN
-TKWIDGET: TK_ActiveIntervalinLoads
-END CONDITION
-
-CONDITION: Line_Gas_Temperatures
-CONDTYPE: over lines
-CONDMESHTYPE: over body elements
-CANREPEAT: no
-COMMENT: \n\tThis condition is a test case.
-QUESTION: Id#FUNC#(NumEntity)
-VALUE: 0
-STATE: HIDDEN
-QUESTION: Stress#UNITS#
-VALUE: 1.69 kPa
-QUESTION: Strain
-VALUE: 0.00689
-TKWIDGET: TK_LocalAxesInfo
-QUESTION: _#CB#(_)
-VALUE:
-STATE: HIDDEN
-TKWIDGET: TK_ActiveIntervalinLoads
-END CONDITION
-
-CONDITION: Line_Composite_Section
-CONDTYPE: over lines
-CONDMESHTYPE: over body elements
-CANREPEAT: no
-COMMENT: \n\tThis condition is a test case.
-QUESTION: Id#FUNC#(NumEntity)
-VALUE: 0
-STATE: HIDDEN
-QUESTION: condition_ID
-VALUE: 0
-STATE:HIDDEN
-TKWIDGET: TK_LocalAxesInfo
-QUESTION: _#CB#(_)
-VALUE:
-STATE: HIDDEN
-TKWIDGET: TK_ActiveIntervalinLoads
-END CONDITION
-
-CONDITION: Line_Composite_Section_nodes
-CONDTYPE: over lines
-CONDMESHTYPE: over nodes
-CANREPEAT: no
-COMMENT: \n\tThis condition is a test case.
-QUESTION: Id#FUNC#(NumEntity)
-VALUE: 0
-QUESTION: connection_type#CB#(equal_DOF, rigid_link)
-VALUE: rigid_link
-QUESTION:x_translation#CB#(1, 0)
-VALUE: 1 
-QUESTION:y_translation#CB#(1, 0)
-VALUE: 1 
-QUESTION:z_translation#CB#(1, 0)
-VALUE: 1
-QUESTION:x_rotation#CB#(1, 0)
-VALUE: 0 
-QUESTION:y_rotation#CB#(1, 0)
-VALUE: 1 
-QUESTION:z_rotation#CB#(1, 0)
-VALUE: 1 
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 

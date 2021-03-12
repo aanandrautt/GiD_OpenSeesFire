@@ -574,7 +574,7 @@ proc Create_tcouples_file { } {
 	} else {
 
 		file mkdir [file join [OpenSees::GetProjectPath] Records]
-		Fire::GenerateLineTCouples
+		Fire::GenerateThermoCouples
 	}
 
 	UpdateInfoBar

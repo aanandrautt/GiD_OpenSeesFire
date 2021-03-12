@@ -309,6 +309,16 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		GidOpenConditions Loads
 		HideInfoBar
 	}
+	proc Opt1_12 { } {
+
+		GidOpenConditions Thermocouples
+		HideInfoBar
+	}
+	proc Opt1_13 { } {
+
+		GidOpenConditions Debug_conditions
+		HideInfoBar
+	}
 
 	set ToolbarBitmaps1(0) " \
 		img/Toolbar/$GiDtheme/btn_Mat_Uni.png \
@@ -323,6 +333,8 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		img/Toolbar/$GiDtheme/btn_Constraints.png \
 		img/Toolbar/$GiDtheme/btn_Mass.png \
 		img/Toolbar/$GiDtheme/btn_Loads.png \
+		img/Toolbar/$GiDtheme/btn_Thermo.png \
+		img/Toolbar/$GiDtheme/btn_Debug.png \
 		img/Toolbar/$GiDtheme/btn_Separator.png \
 		img/Toolbar/$GiDtheme/btn_About.png \
 		"
@@ -339,6 +351,8 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		[list -np- OpenSees::Opt1_9] \
 		[list -np- OpenSees::Opt1_10] \
 		[list -np- OpenSees::Opt1_11] \
+		[list -np- OpenSees::Opt1_12] \
+		[list -np- OpenSees::Opt1_13] \
 		"" \
 		"-np- VisitWeb http://gidopensees.rclab.civil.auth.gr" \
 	]
@@ -356,6 +370,8 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		"Assign Constraints" \
 		"Assign Mass/Damping" \
 		"Assign Loads" \
+		"Assign thermocouples" \
+		"Check debug conditions" \
 		"" \
 		"GiD+OpenSees Website" \
 		}

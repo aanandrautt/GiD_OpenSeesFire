@@ -62,17 +62,24 @@ foreach master_node [array names master_nodes] {
 		}
 	}
 }
+set nodes_to_collapse ""
 foreach key [array names master_nodes] {
 	set cond_type [lindex [lindex $master_nodes($key) 1] 1]
 	if {$cond_type == "rigid_link"} {
 		set follower_node [lindex $master_nodes($key) end]
-		GiD_Process Mescape Utilities Collapse Nodes "$key $follower_node" escape
-		# GiD_Process Mescape Utilities Collapse Nodes $follower_node escape
-		WarnWinText "collapsed node $key, so node $follower_node should also be gone."
+		lappend nodes_to_collapse $key $follower_node
+		# WarnWinText "collapsed node $key, so node $follower_node should also be gone."
 	}
 	# WarnWinText "[array get master_nodes $key]"
 	# WarnWinText "condition type is: $cond_type"
 }
+WarnWinText "nodes to collapse: $nodes_to_collapse"
+set cmd [join "GiD_Process Mescape Utilities Collapse Nodes" " "]
+# set nodes_to_collapse_string [join $nodes_to_collapse " "]
+foreach node $nodes_to_collapse {
+	lappend cmd $node
+}
+lappend cmd escape
+WarnWinText "$cmd"
+eval $cmd
 
-
-# GiD_Process Mescape Utilities Collapse Points

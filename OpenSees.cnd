@@ -186,10 +186,10 @@ CANREPEAT: no
 COMMENT: Gas temperatures applied to beam-column elements.\nThermocouples and Heat transfer data files will be generated\nand temperatures assigned in the corresponding interval.\nMust be using predefined fiber section disp-beam-column.\n
 QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
 VALUE: standard_fire
 QUESTION: central_element#CB#(1,0)
@@ -205,15 +205,15 @@ CANREPEAT: no
 COMMENT: Gas temperatures applied to shell elements.\nThermocouples and Heat transfer data files will be generated\nand temperatures assigned in the corresponding interval.\nMust be using layered shell sections and NLDKGQ/MITC4 elements.\n
 QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
 VALUE: standard_fire
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
@@ -224,24 +224,24 @@ CANREPEAT: no
 COMMENT: \tApply condition over beams of composite beams.\n
 QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
 VALUE: standard_fire
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: slab_width#UNITS#
 VALUE: 666 mm
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: slab_depth#UNITS#
 VALUE: 666 mm
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: slab_protection#UNITS#
 VALUE: 6.6 mm
-STATE: HIDDEN
+STATE: DISABLED
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
@@ -252,10 +252,10 @@ CANREPEAT: no
 COMMENT: \tApply condition over slab line of composite beams.\n
 QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: connection_type#CB#(common_nodes, equal_DOF, rigid_link)
 VALUE: rigid_link
 QUESTION:x_translation#CB#(1, 0)

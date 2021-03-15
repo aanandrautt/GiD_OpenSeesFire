@@ -72,14 +72,11 @@ proc Fire::PairCompositeSections {} {
 	array unset leader_line_data_list
 	foreach line_instance $line_list {
 		set line_id [lindex $line_instance 1]
-		set composite_id [lindex $line_instance 3]
+		set composite_id [lindex $line_instance 4]
 		# set args [lrange $line_instance 4 end]
 		set pts_xyz [OS_Geom::GetPointCoords $line_id]
-		WarnWinText "points x y z: $pts_xyz"
 		set xyz_i [lrange $pts_xyz 0 2]
-		WarnWinText "xyz_i: $xyz_i"
 		set xyz_f [lrange $pts_xyz 3 5]
-		WarnWinText "xyz_f: $xyz_f"
 		lappend leader_line_data_list($line_id) $composite_id $xyz_i $xyz_f
 	}
 	
@@ -92,11 +89,8 @@ proc Fire::PairCompositeSections {} {
 		# set composite_id [lindex $line_instance 3]
 		set args [lrange $line_instance 3 end]
 		set pts_xyz [OS_Geom::GetPointCoords $line_id]
-		WarnWinText "points x y z: $pts_xyz"
 		set xyz_i [lrange $pts_xyz 0 2]
-		WarnWinText "xyz_i: $xyz_i"
 		set xyz_f [lrange $pts_xyz 3 5]
-		WarnWinText "xyz_f: $xyz_f"
 		lappend follower_line_data_list($line_id) $args $xyz_i $xyz_f
 	}
 	
@@ -128,7 +122,7 @@ proc Fire::PairCompositeSections {} {
 		        if {$err < 1e-5} {
 		                set composite_id [lindex $leader_line_data_list($leader_line) 0]
 		                set args [lreplace [lindex $follower_line_data_list($follower_line) 0] 1 1 $composite_id]
-						WarnWinText "args are: $args"
+						WarnWinText "args for line $follower_line are: $args"
 		                GiD_AssignData condition $follower_condition_name lines $args $follower_line
 		        }        
 		}

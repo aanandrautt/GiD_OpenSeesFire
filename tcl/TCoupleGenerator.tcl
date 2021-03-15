@@ -12,7 +12,6 @@ proc Fire::GenerateThermoCouples {} {
 				
 				set condition_args [lrange $geometric_entity 3 end]
 				WarnWinText "condition $ID arguments are = $condition_args"
-				
 				set condition_args [lreplace $condition_args 0 0 $geometric_entity_id]
 				WarnWinText "condition $ID arguments are changed to = $condition_args"
 				set condition_args [lreplace $condition_args 1 1 $ID]
@@ -39,33 +38,34 @@ proc Fire::GenerateThermoCouples {} {
 	}
 	close $fileHandle
 }
-# proc Fire::GenerateLineTCouplesOriginal {} {
-	# set condition_name {Line_Gas_Temperatures}
-	# set line_list [GiD_Info Conditions $condition_name geometry]
-	# array unset geometric_entities_ids
-	# foreach geometric_entity $line_list {
-	# set id [lindex $geometric_entity 1]
-	# set args [lrange $geometric_entity 3 end]
-	# lappend geometric_entities_ids($id) $args
-	# }
-	# set geometric_entity_list [array names geometric_entities_ids]
-	# array unset thermocouple_parameters
+proc Fire::AssignCentralElementFlag {} {
+	array unset geometry_elements
+	set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam Surface_Gas_Temperatures"
+	foreach cond $condition_name {
+		set elem_list [GiD_Info Conditions $cond mesh]
+		foreach elem $elem_list {
+			set elem_id [lindex $line_elem 1]
+			set geometric_entity_id [lindex $line_elem 3]
+			lappend geometry_elements($geometric_entity_id) $elem_id
+		}
+		foreach geometric_entity [array names geometry_elements] {
+			if {$cond == "Surface_Gas_Temperatures"} {
+				set xyz [GidUtils::GetEntityCenter surface $geometric_entity]
+				set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements($geometric_entity)]
+				# GiD_AssignData condition Line_Thermo_Couple Elements "$t_couple_id" $elem_ID 
+				Line 56 is still incomplete; i need to get the condition arguments and then assign the central element boolean to 1.
+			} elseif {$cond == "Line_Composite_Section_Beam"} {
+				Here I need to go to the surface that is connected to this particular composite beam and get its section properties, or
+				assign a unique condition to it to make it easy to find and navigate. 
+			
+			} elseif {$cond == "Line_Gas_Temperatures"}{
+				This should be the easiest. 
+			
+			}
+		}
 	
-    # set parameters 0.5
-	# foreach line_entity_id $geometric_entity_list {
-		# set xyz [GidUtils::GetEntityCenter line $line_entity_id]
-		# lappend thermocouple_parameters(L$line_entity_id) $xyz
-	# }
-	# set sorted_thermocouple_parameters [lsort [array names thermocouple_parameters]]
-	
-	# set fileHandle [open "[OpenSees::GetProjectPath]/Records/TCouples.txt" w+]
-	# foreach thermocouple $sorted_thermocouple_parameters {
-		# set xyz [lindex $thermocouple_parameters($thermocouple) 0]
-		# set x [lindex $xyz 0]; set y [lindex $xyz 1]; set z [lindex $xyz 2];
-		# puts $fileHandle "&DEVC ID = '$thermocouple', QUANTITY='GAS TEMPERATURE', XYZ=$x,$y,$z/"
-	# }
-	# close $fileHandle
-# }
+	}
+}
 
 proc Fire::AssignLineThermalCoupleCondition {} {
 	set condition_name {Line_Gas_Temperatures}

@@ -1111,7 +1111,7 @@ proc OpenSees_Menu { dir } {
 	"---" \
 	[= "Create .tcl, run analysis and postprocess"] \
 	"---" \
-	[= "Create FDS thermocouples only"] \
+	[= "Create thermocouples only"] \
 	[= "Create heat transfer data only"] \
 	[= "Create .tcl only"] \
 	[= "Create and view .tcl only"] \

@@ -65,7 +65,7 @@ foreach master_node [array names master_nodes] {
 set nodes_to_collapse ""
 foreach key [array names master_nodes] {
 	set cond_type [lindex [lindex $master_nodes($key) 1] 1]
-	if {$cond_type == "rigid_link"} {
+	if {$cond_type == "common_nodes"} {
 		set follower_node [lindex $master_nodes($key) end]
 		lappend nodes_to_collapse $key $follower_node
 		# WarnWinText "collapsed node $key, so node $follower_node should also be gone."

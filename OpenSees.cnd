@@ -158,22 +158,29 @@ CANREPEAT: no
 COMMENT: \n\tThis condition is applied automatically. Please don't apply it manually.
 QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
-QUESTION: connection_type#CB#(common_nodes, equal_DOF, rigid_link)
+STATE: DISABLED
+QUESTION: connection_type#CB#(rigid_link, equal_DOF, common_nodes)
 VALUE: rigid_link
-QUESTION:x_translation#CB#(1, 0)
-VALUE: 1 
-QUESTION:y_translation#CB#(1, 0)
-VALUE: 1 
-QUESTION:z_translation#CB#(1, 0)
+DEPENDENCIES: (rigid_link,RESTORE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#)
+DEPENDENCIES: (equal_DOF,HIDE,Rigid_link_type,#CURRENT#,RESTORE,X-Translation,#CURRENT#,RESTORE,Y-Translation,#CURRENT#,RESTORE,Z-Translation,#CURRENT#,RESTORE,X-Rotation,#CURRENT#,RESTORE,Y-Rotation,#CURRENT#,RESTORE,Z-Rotation,#CURRENT#)
+DEPENDENCIES: (common_nodes,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#)
+QUESTION: Rigid_link_type#CB#(Bar,Beam)
+VALUE: Beam
+QUESTION: X-Translation#CB#(1,0)
 VALUE: 1
-QUESTION:x_rotation#CB#(1, 0)
-VALUE: 0 
-QUESTION:y_rotation#CB#(1, 0)
-VALUE: 1 
-QUESTION:z_rotation#CB#(1, 0)
-VALUE: 1 
+QUESTION: Y-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: X-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Y-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Rotation#CB#(1,0)
+VALUE: 1
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
@@ -256,20 +263,25 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: connection_type#CB#(common_nodes, equal_DOF, rigid_link)
+QUESTION: connection_type#CB#(rigid_link, equal_DOF, common_nodes)
 VALUE: rigid_link
-QUESTION:x_translation#CB#(1, 0)
-VALUE: 1 
-QUESTION:y_translation#CB#(1, 0)
-VALUE: 1 
-QUESTION:z_translation#CB#(1, 0)
+DEPENDENCIES: (rigid_link,RESTORE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#)
+DEPENDENCIES: (equal_DOF,HIDE,Rigid_link_type,#CURRENT#,RESTORE,X-Translation,#CURRENT#,RESTORE,Y-Translation,#CURRENT#,RESTORE,Z-Translation,#CURRENT#,RESTORE,X-Rotation,#CURRENT#,RESTORE,Y-Rotation,#CURRENT#,RESTORE,Z-Rotation,#CURRENT#)
+DEPENDENCIES: (common_nodes,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#)
+QUESTION: Rigid_link_type#CB#(Bar,Beam)
+VALUE: Beam
+QUESTION: X-Translation#CB#(1,0)
 VALUE: 1
-QUESTION:x_rotation#CB#(1, 0)
-VALUE: 0 
-QUESTION:y_rotation#CB#(1, 0)
-VALUE: 1 
-QUESTION:z_rotation#CB#(1, 0)
-VALUE: 1 
+QUESTION: Y-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: X-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Y-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Rotation#CB#(1,0)
+VALUE: 1
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 

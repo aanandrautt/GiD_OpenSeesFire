@@ -170,6 +170,7 @@ proc Fire::AssignCentralElementFlag {} {
 	}
 }
 proc Fire::AssignCompositeConnection {} {
+	set nodes_to_collapse ""
 	set leader_condition_name "Line_Composite_Section_Slab"
 	set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
 	array unset leader_node_array
@@ -212,12 +213,13 @@ proc Fire::AssignCompositeConnection {} {
 		} else {WarnWinText "All good\nleaders: $leader_conditions\nfollowers: $follower_conditions\ncommon: $common_conds"}
 	} else {
 		WarnWinText "Number of leader and follower conditions inequal"
+		WarnWinText "([llength $leader_conditions])leaders: $leader_conditions\n([llength $follower_conditions])followers: $follower_conditions"
 		return -1
 	}
 	
 	# pair up nodes and apply connection condition
 	array unset node_pairs
-	
+	set count 1 
 	foreach cond_id $leader_conditions {
 		set args [lindex $leader_node_array($cond_id) 0]
 		set leader_node_ids [lrange $leader_node_array($cond_id) 1 end]
@@ -242,8 +244,48 @@ proc Fire::AssignCompositeConnection {} {
 			}
 		}
 		WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
+		WarnWinText "out of [llength $leader_node_ids] leader nodes and [llength $follower_node_ids] follower nodes created [llength [lrange $node_pairs($cond_id) 1 end]] pairs."
+		set condition_type [lindex $args 2]
+		
+		if {$condition_type == "rigid_link"} {
+			foreach pair [lrange $node_pairs($cond_id) 1 end] {
+				set cond_args "$count [lindex $args 3]"
+				GiD_AssignData condition Point_Rigid_link_master_node Nodes $cond_args [lindex $pair 0]
+				GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1] 
+				set count [expr $count + 1]
+			}
+		#	0 1 2		   3	4 5 6 7 8 9	
+		# {10 5 rigid_link Beam 1 1 1 1 1 1}
+		} elseif {$condition_type == "equal_DOF"} {
+			foreach pair [lrange $node_pairs($cond_id) 1 end] {
+				set cond_args_follower "$count [lrange $args 4 end]"
+				GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$count 0 0" [lindex $pair 0]
+				GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1] 
+				set count [expr $count + 1]
+			}
+		
+		} elseif {$condition_type == "common_nodes"} {
+			foreach pair [lrange $node_pairs($cond_id) 1 end] {
+				set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
+				WarnWinText "condition $cond_id nodes_to_collapse: $nodes_to_collapse"
+			}
+		}
+		
 	}
+	WarnWinText "nodes_to_collapse: $nodes_to_collapse"
+	set cmd [join "GiD_Process Mescape Utilities Collapse Nodes" " "]
+	
+	foreach node $nodes_to_collapse {
+		lappend cmd $node
+	}
+	lappend cmd escape escape
+	WarnWinText "$cmd"
+	eval $cmd
+	
 }
+
+
+
 
 proc FindListCommonItems { list1 list2 } {
 	set common ""
@@ -255,9 +297,11 @@ proc FindListCommonItems { list1 list2 } {
 	return $common
 }
 
-proc LappendUnique { a_list item } {
-	if {!($item in $a_list)} {
-		lappend a_list $item
+proc LappendUnique { a_list another_list } {
+	foreach item $another_list {
+		if {!($item in $a_list)} {
+			lappend a_list $item
+		}
 	}
 	return $a_list
 }

@@ -1,4 +1,5 @@
 namespace eval Fire {
+	
 }
 proc Fire::GenerateThermoCouples {} {
 	set ID 1
@@ -58,7 +59,6 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 		GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
 	}
 }
-
 proc Fire::GetLineEndPoints { line_ID } {
 	set line_data [GiD_Geometry get line $line_ID]
 	return [lrange $line_data 2 3]
@@ -129,6 +129,18 @@ proc Fire::PairCompositeSections {} {
 	}
 }
 
+proc Fire::GetCompositeSectionSurface { cond_id over} {
+	set surf_condition_name "Surface_Composite_Section"
+	set result " "
+	set surfaces_list [GiD_Info Conditions $surf_condition_name $over]
+	foreach surface $surfaces_list {
+		set current_id [lindex $surface 4]
+		if {$cond_id == $current_id} {
+			lappend result [lindex $surface 1]
+		}
+	}
+	return $result
+}
 proc Fire::AssignCentralElementFlag {} {
 	array unset geometry_elements
 	set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam Surface_Gas_Temperatures"
@@ -157,7 +169,98 @@ proc Fire::AssignCentralElementFlag {} {
 	
 	}
 }
+proc Fire::AssignCompositeConnection {} {
+	set leader_condition_name "Line_Composite_Section_Slab"
+	set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
+	array unset leader_node_array
+	foreach leader_node $leader_node_list {
+		set node_id [lindex $leader_node 1] 
+		set cond_id [lindex $leader_node 4]
+		set args [lrange $leader_node 3 end]
+		if {![info exists leader_node_array($cond_id)]} {
+			lappend leader_node_array($cond_id) "$args"
+		}		
+		lappend leader_node_array($cond_id) $node_id
+	}
+	foreach key [array names leader_node_array] {
+		WarnWinText "Leader node $key has items: $leader_node_array($key)"
+		WarnWinText "first item of which is [lindex $leader_node_array($key) 0]"
+	}
+	
+	set follower_condition_name "Line_Composite_Section_Beam"
+	set follower_elem_list [GiD_Info Conditions $follower_condition_name mesh]
+	array unset follower_node_array
+	foreach follower_elem $follower_elem_list {
+		set elem_id [lindex $follower_elem 1] 
+		set cond_id [lindex $follower_elem 4]
+		set elem_info [GiD_Mesh get element $elem_id]
+		if {![info exists follower_node_array($cond_id)]} {
+			set follower_node_array($cond_id) ""
+		}
+		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 3]]
+		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 4]]		
+	}
+	
+	# check if the conditions match
+	set leader_conditions [array names leader_node_array]
+	set follower_conditions [array names follower_node_array]
+	if {[llength $leader_conditions] == [llength $follower_conditions]} {
+		set common_conds [FindListCommonItems $leader_conditions $follower_conditions]
+		if {[llength $leader_conditions] != [llength $common_conds]} {
+			WarnWinText "Conditions applied to leader and follower nodes don't have the same IDs"
+			return -1
+		} else {WarnWinText "All good\nleaders: $leader_conditions\nfollowers: $follower_conditions\ncommon: $common_conds"}
+	} else {
+		WarnWinText "Number of leader and follower conditions inequal"
+		return -1
+	}
+	
+	# pair up nodes and apply connection condition
+	array unset node_pairs
+	
+	foreach cond_id $leader_conditions {
+		set args [lindex $leader_node_array($cond_id) 0]
+		set leader_node_ids [lrange $leader_node_array($cond_id) 1 end]
+		set follower_node_ids $follower_node_array($cond_id)
+		lappend node_pairs($cond_id) $args
+		foreach leader_node $leader_node_ids {
+			set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
+			foreach follower_node $follower_node_ids {
+				set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
+				set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
+				set delta_x [lindex $distance_vect 0]
+				set delta_y [lindex $distance_vect 1]
+				if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
+					if {$leader_node == $follower_node} {
+						WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
+						return -1
+					} else {
+						WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
+						lappend node_pairs($cond_id) "$leader_node $follower_node"
+					}
+				}
+			}
+		}
+		WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
+	}
+}
 
+proc FindListCommonItems { list1 list2 } {
+	set common ""
+	foreach item $list1 {
+		if {$item in $list2} {
+			lappend common $item
+		}
+	}
+	return $common
+}
+
+proc LappendUnique { a_list item } {
+	if {!($item in $a_list)} {
+		lappend a_list $item
+	}
+	return $a_list
+}
 proc Fire::AssignLineThermalCoupleCondition {} {
 	set condition_name {Line_Gas_Temperatures}
 	set line_elem_list [GiD_Info Conditions $condition_name mesh]

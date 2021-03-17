@@ -71,42 +71,59 @@ proc Fire::GenerateThermoCouples {} {
 proc Fire::AssignSurfaceCompositeSectionCond {} {
 	set condition_name "Line_Composite_Section_Slab"
 	set line_list [GiD_Info Conditions $condition_name geometry]
-	
 	array unset line_id_list
+
 	foreach line_instance $line_list {
-		set line_id [lindex $line_instance 1]
+		set id [lindex $line_instance 1]
 		set args [lrange $line_instance 3 end]
-		# set args [lreplace $args 0 0 $line_id]
-		set line_id_list($line_id) $args
+		WarnWinText "arguments: $args"
+		set line_id_list($id) $args
 	}
 
 	set surf_condition_name "Surface_Composite_Section"
 	set material_list [GiD_Info material]
 	GiD_UnAssignData condition $surf_condition_name surfaces all
-	WarnWinText "should have unassigned all surfaces"
+
 	foreach line_id [array names line_id_list] {
 		# set associated_surf_ids [GetLineHigherEntities $line_id]
-		set associated_surf_ids [GidUtils::GetEntityHigherEntities line $line_id]
-		WarnWinText "associated surfaces are: $associated_surf_ids"
-		WarnWinText "first item is: [lindex $associated_surf_ids 0]"
-		GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
-		# GiD_Info condition $surf_condition_name surfaces
-		# set info [GiD_Info list_entities surface $associated_surf_ids]
-		# WarnWinText "surface info:\n$info"
-		# set element_type_num [lindex $info [expr [lsearch $info "material:"]+1]]
-		# WarnWinText "getting material: $element_type_num"
-		# set element_type_name [lindex [.central.s info materials] [expr $element_type_num-1]]
-		# WarnWinText "Which corresponds to $element_type_name"
-		# set element_type_info [GiD_Info materials $element_type_name]
-		# WarnWinText "and has the info:$element_type_info"
+		set associated_surf_ids [GidUtils::GetEntityHigherEntities line $line_id] 
+		set width 0
+		foreach surf $associated_surf_ids {
+			set xyz_surf [GidUtils::GetEntityCenter surface $surf]
+			set xyz_line [GidUtils::GetEntityCenter line $line_id]
+			set distance_vect [math::linearalgebra::sub_vect  $xyz_line  $xyz_surf]
+			WarnWinText "distance vector is: $distance_vect"
+			set distance [expr 2*[math::linearalgebra::norm_two $distance_vect]]
+			WarnWinText "Which has the distance: $distance"
+			set width [expr $width + $distance]
+		}
+		WarnWinText "giving line $line_id a width of $width"
 		
-		# set section_type_name [lindex $info [expr [lsearch $element_type_info "Type#MAT#(Section_Force-Deformation,User_Materials)"]+1]]
-		# set section_type_num [lindex $info 6]
-		# WarnWinText "getting material: $section_type_name"
-		# set section_type_name [lindex [.central.s info materials] [expr $section_type_num-1]]
-		# WarnWinText "Which corresponds to $section_type_name"
-		# set section_type_info [GiD_Info materials $section_type_name]
-		# WarnWinText "and has the info:$section_type_info"
+		set info [GiD_Info list_entities surface $associated_surf_ids]
+		set element_type_index [lsearch $info "material:"]
+		set element_type_num [lindex $info [expr $element_type_index +1]]
+		set element_type_name [lindex [.central.s info materials] [expr $element_type_num-1]]
+		set element_type_info [GiD_Info materials $element_type_name]
+		
+		set section_type_num [lsearch $element_type_info "Type#MAT#(Section_Force-Deformation,User_Materials)"]
+		set section_type_name [lindex $element_type_info  [expr $section_type_num+1]]
+		set section_type_info [GiD_Info materials $section_type_name]
+
+		set slab_thickness_index [lsearch $section_type_info "Slab_thickness#UNITS#"]
+		set slab_thickness [lindex $section_type_info [expr $slab_thickness_index + 1]]
+		
+		set slab_protection_index [lsearch $section_type_info "Protection_thickness#UNITS#"]
+		set slab_protection_thickness [lindex $section_type_info [expr $slab_protection_index + 1]]
+		
+		set slab_protection_mat_index [lsearch $section_type_info "protection_material#CB#(1,2,3)"]
+		set slab_protection_mat [lindex $section_type_info [expr $slab_protection_mat_index + 1]]
+		WarnWinText "old arguments $line_id_list($line_id)"
+		set line_id_list($line_id) [lreplace $line_id_list($line_id) end-3 end $width $slab_thickness $slab_protection_thickness $slab_protection_mat]
+		WarnWinText "new arguments $line_id_list($line_id)"
+		
+		GiD_AssignData condition $condition_name lines $line_id_list($line_id)  $line_id
+		GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
+
 	}
 }
 proc GetLineHigherEntities { line_ID } {
@@ -131,11 +148,11 @@ proc Fire::PairCompositeSections {} {
 	foreach line_instance $line_list {
 		set line_id [lindex $line_instance 1]
 		set composite_id [lindex $line_instance 4]
-		# set args [lrange $line_instance 4 end]
+		set slab_props [lrange $line_instance end-3 end]
 		set pts_xyz [OS_Geom::GetPointCoords $line_id]
 		set xyz_i [lrange $pts_xyz 0 2]
 		set xyz_f [lrange $pts_xyz 3 5]
-		lappend leader_line_data_list($line_id) $composite_id $xyz_i $xyz_f
+		lappend leader_line_data_list($line_id) $composite_id $slab_props $xyz_i $xyz_f
 	}
 	
 	set follower_condition_name "Line_Composite_Section_Beam"
@@ -155,8 +172,8 @@ proc Fire::PairCompositeSections {} {
 	array unset line_pairs
 	
 	foreach leader_line [array names leader_line_data_list] {
-		set xyz_i_leader [lindex $leader_line_data_list($leader_line) 1]
-		set xyz_f_leader [lindex $leader_line_data_list($leader_line) 2]
+		set xyz_i_leader [lindex $leader_line_data_list($leader_line) 2]
+		set xyz_f_leader [lindex $leader_line_data_list($leader_line) 3]
 		
 		foreach follower_line [array names follower_line_data_list] {
 		        set xyz_i_follower [lindex $follower_line_data_list($follower_line) 1]
@@ -169,19 +186,24 @@ proc Fire::PairCompositeSections {} {
 		        set delta_y_f [lindex $distance_f_f 1] 
 		        set err [expr abs($delta_x_i)  + abs($delta_y_i) + abs($delta_x_f)  + abs($delta_y_f)]
 		        if {$err > 1e-5} {
-		                set distance_i_f [math::linearalgebra::sub_vect  $xyz_i_follower  $xyz_f_leader]
-		                set distance_f_i [math::linearalgebra::sub_vect  $xyz_f_follower  $xyz_i_leader]
-		                set delta_x_i [lindex $distance_i_f 0]
-		                set delta_y_i [lindex $distance_i_f 1]
-		                set delta_x_f [lindex $distance_f_i 0]
-		                set delta_y_f [lindex $distance_f_i 1] 
-		                set err [expr abs($delta_x_i)  + abs($delta_y_i) + abs($delta_x_f)  + abs($delta_y_f)]
+					set distance_i_f [math::linearalgebra::sub_vect  $xyz_i_follower  $xyz_f_leader]
+					set distance_f_i [math::linearalgebra::sub_vect  $xyz_f_follower  $xyz_i_leader]
+					set delta_x_i [lindex $distance_i_f 0]
+					set delta_y_i [lindex $distance_i_f 1]
+					set delta_x_f [lindex $distance_f_i 0]
+					set delta_y_f [lindex $distance_f_i 1] 
+					set err [expr abs($delta_x_i)  + abs($delta_y_i) + abs($delta_x_f)  + abs($delta_y_f)]
 		        }
 		        if {$err < 1e-5} {
-		                set composite_id [lindex $leader_line_data_list($leader_line) 0]
-		                set args [lreplace [lindex $follower_line_data_list($follower_line) 0] 1 1 $composite_id]
-		                                # WarnWinText "args for line $follower_line are: $args"
-		                GiD_AssignData condition $follower_condition_name lines $args $follower_line
+					set composite_id [lindex $leader_line_data_list($leader_line) 0]
+					set slab_props [lindex $leader_line_data_list($leader_line) 1]
+					WarnWinText "first, args for follower line $follower_line are: $[lindex $follower_line_data_list($follower_line) 0]"
+					set args [lreplace [lindex $follower_line_data_list($follower_line) 0] 1 1 $composite_id]
+					
+					WarnWinText "second, args for follower line $follower_line are: $args"
+					set args [lreplace $args end-3 end {*}$slab_props]
+					WarnWinText "finally, args for follower line $follower_line are: $args"
+					GiD_AssignData condition $follower_condition_name lines $args $follower_line
 		        }        
 		}
 	}
@@ -200,29 +222,41 @@ proc Fire::GetCompositeSectionSurface { cond_id over} {
 	return $result
 }
 proc Fire::AssignCentralElementFlag {} {
-	array unset geometry_elements
 	set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam Surface_Gas_Temperatures"
 	foreach cond $condition_name {
+		array unset geometry_elements_mesh
+		array unset geometry_elements_args
+		WarnWinText "condition = $cond"
 		set elem_list [GiD_Info Conditions $cond mesh]
 		foreach elem $elem_list {
-		        set elem_id [lindex $line_elem 1]
-		        set geometric_entity_id [lindex $line_elem 3]
-		        lappend geometry_elements($geometric_entity_id) $elem_id
+		
+				set elem_id [lindex $elem 1]
+				set geometric_entity_id [lindex $elem 3]
+				set condition_id [lindex $elem 4]
+				set args [lrange $elem 3 end]
+				WarnWinText "elem_id = $elem_id\ngeometric_parent = $geometric_entity_id\ncond_id = $condition_id\n args = $args"
+				lappend geometry_elements_mesh($geometric_entity_id) $elem_id
+				set geometry_elements_args($geometric_entity_id) $args
 		}
-		foreach geometric_entity [array names geometry_elements] {
-		        if {$cond == "Surface_Gas_Temperatures"} {
-		                set xyz [GidUtils::GetEntityCenter surface $geometric_entity]
-		                set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements($geometric_entity)]
-		                # GiD_AssignData condition Line_Thermo_Couple Elements "$t_couple_id" $elem_ID 
-		                # Line 56 is still incomplete; i need to get the condition arguments and then assign the central element boolean to 1.
-		        } elseif {$cond == "Line_Composite_Section_Beam"} {
-		                # Here I need to go to the surface that is connected to this particular composite beam and get its section properties, or
-		                # assign a unique condition to it to make it easy to find and navigate. 
-		        
-		        } elseif {$cond == "Line_Gas_Temperatures"} {
-		                # This should be the easiest. 
-		        
-		        }
+		
+		WarnWinText "geometric entities are: [array names geometry_elements_mesh]"
+		foreach geometric_entity [array names geometry_elements_mesh] {
+			WarnWinText "entity $geometric_entity mesh: $geometry_elements_mesh($geometric_entity)"
+			WarnWinText "entity $geometric_entity arguments: $geometry_elements_args($geometric_entity)"
+			
+				if {$cond == "Surface_Gas_Temperatures"} {
+						set xyz [GidUtils::GetEntityCenter surface $geometric_entity]
+						set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements_mesh($geometric_entity)]
+						GiD_AssignData condition Surface_Gas_Temperatures_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
+				} elseif {$cond == "Line_Composite_Section_Beam"} {
+						set xyz [GidUtils::GetEntityCenter line $geometric_entity]
+						set central_elem_id [GidUtils::GetClosestElement line $xyz $geometry_elements_mesh($geometric_entity)]
+						GiD_AssignData condition Line_Composite_Section_Beam_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
+				} elseif {$cond == "Line_Gas_Temperatures"} {
+						set xyz [GidUtils::GetEntityCenter line $geometric_entity]
+						set central_elem_id [GidUtils::GetClosestElement line $xyz $geometry_elements_mesh($geometric_entity)]
+						GiD_AssignData condition Line_Gas_Temperatures_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
+				}
 		}
 	}
 }
@@ -266,7 +300,7 @@ proc Fire::AssignCompositeConnection {} {
 	if {[llength $leader_conditions] == [llength $follower_conditions]} {
 		set common_conds [FindListCommonItems $leader_conditions $follower_conditions]
 		if {[llength $leader_conditions] != [llength $common_conds]} {
-		        WarnWinText "Conditions applied to leader and follower nodes don't have the same IDs"
+		        WarnWinText "ERROR: Conditions applied to leader and follower nodes don't have the same IDs"
 		        return -1
 		} else {WarnWinText "All good\nleaders: $leader_conditions\nfollowers: $follower_conditions\ncommon: $common_conds"}
 	} else {
@@ -312,8 +346,6 @@ proc Fire::AssignCompositeConnection {} {
 		                GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1] 
 		                set count [expr $count + 1]
 		        }
-		#        0 1 2                   3        4 5 6 7 8 9        
-		# {10 5 rigid_link Beam 1 1 1 1 1 1}
 		} elseif {$condition_type == "equal_DOF"} {
 		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
 		                set cond_args_follower "$count [lrange $args 4 end]"
@@ -390,5 +422,3 @@ proc Fire::AssignLineThermalCoupleCondition {} {
 proc Fire::GetTempFileDir {line_id} {
 	return "\"../Records/BeamL$line_id.dat\""
 }
-
-

@@ -133,13 +133,72 @@ END CONDITION
 
 BOOK: Debug_conditions
 
-CONDITION: Line_Thermo_Couple
+CONDITION: Surface_Gas_Temperatures_central
+CONDTYPE: over surfaces
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: Gas temperatures applied to shell elements.\nThermocouples and Heat transfer data files will be generated\nand temperatures assigned in the corresponding interval.\nMust be using layered shell sections and NLDKGQ/MITC4 elements.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: DISABLED
+QUESTION: ID
+VALUE: 0
+STATE: DISABLED
+QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+VALUE: standard_fire
+QUESTION: central_element#CB#(1,0)
+VALUE: 1
+STATE: DISABLED
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Composite_Section_Beam_central
 CONDTYPE: over lines
 CONDMESHTYPE: over body elements
 CANREPEAT: no
-QUESTION: Id#CB#(_)
+COMMENT: \tApply condition over beams of composite beams.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: DISABLED
+QUESTION: ID
+VALUE: 0
+STATE: DISABLED
+QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+VALUE: standard_fire
+QUESTION: central_element#CB#(1,0)
+VALUE: 1
+STATE: DISABLED
+QUESTION: slab_width#UNITS#
+VALUE: 666 mm
+STATE: DISABLED
+QUESTION: slab_depth#UNITS#
+VALUE: 666 mm
+STATE: DISABLED
+QUESTION: slab_protection#UNITS#
+VALUE: 6.6 mm
+STATE:DISABLED
+QUESTION: Protection_material
+VALUE: 1
+STATE: DISABLED
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Gas_Temperatures_Central
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: DISABLED
+QUESTION: ID
+VALUE: 0
+STATE: DISABLED
+QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+VALUE: standard_fire
+QUESTION: central_element#CB#(1,0)
 VALUE: 0
 STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
 CONDITION: Line_body_elements_debug
@@ -181,6 +240,18 @@ QUESTION: Y-Rotation#CB#(1,0)
 VALUE: 1
 QUESTION: Z-Rotation#CB#(1,0)
 VALUE: 1
+QUESTION: slab_width#UNITS#
+VALUE: 666 mm
+STATE: DISABLED
+QUESTION: slab_depth#UNITS#
+VALUE: 666 mm
+STATE: DISABLED
+QUESTION: slab_protection#UNITS#
+VALUE: 6.6 mm
+STATE:DISABLED
+QUESTION: Protection_material
+VALUE: 1
+STATE: DISABLE
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
@@ -285,6 +356,18 @@ QUESTION: Y-Rotation#CB#(1,0)
 VALUE: 1
 QUESTION: Z-Rotation#CB#(1,0)
 VALUE: 1
+QUESTION: slab_width#UNITS#
+VALUE: 666 mm
+STATE: DISABLED
+QUESTION: slab_depth#UNITS#
+VALUE: 666 mm
+STATE: DISABLED
+QUESTION: slab_protection#UNITS#
+VALUE: 6.6 mm
+STATE:DISABLED
+QUESTION: Protection_material
+VALUE: 1
+STATE: DISABLE
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 

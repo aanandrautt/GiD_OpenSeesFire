@@ -1403,6 +1403,11 @@ QUESTION: Core_layers
 VALUE: 4
 QUESTION: Bot_cover_layers
 VALUE: 1
+QUESTION: Protection_thickness#UNITS#
+VALUE: 0 mm
+QUESTION: protection_material#CB#(1,2,3)
+VALUE: 1
+HELP: 1. Material 1\n2. Material 2\n3. Material 3
 TITLE: Concrete
 QUESTION: Concrete_compressive_strength#UNITS#
 VALUE: 20 MPa

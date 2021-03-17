@@ -48,15 +48,15 @@ proc Fire::GenerateThermoCouples {} {
 	foreach cond $condition_name {
 		set geometric_entity_list [GiD_Info Conditions $cond geometry]
 		foreach geometric_entity $geometric_entity_list {
-				set geometric_entity_id [lindex $geometric_entity 1]
-				set condition_id [lindex $geometric_entity 4]
-				set xyz ""
-				if {$cond == "Surface_Gas_Temperatures"} {
-						set xyz [GidUtils::GetEntityCenter surface $geometric_entity_id]
-				} else {
-						set xyz [GidUtils::GetEntityCenter line $geometric_entity_id]
-				}
-				set thermocouple_data($condition_id) $xyz
+		                set geometric_entity_id [lindex $geometric_entity 1]
+		                set condition_id [lindex $geometric_entity 4]
+		                set xyz ""
+		                if {$cond == "Surface_Gas_Temperatures"} {
+		                                set xyz [GidUtils::GetEntityCenter surface $geometric_entity_id]
+		                } else {
+		                                set xyz [GidUtils::GetEntityCenter line $geometric_entity_id]
+		                }
+		                set thermocouple_data($condition_id) $xyz
 		}
 	}
 	set sorted_thermocouple_data_keys [lsort [array names thermocouple_data]]
@@ -74,20 +74,48 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 	
 	array unset line_id_list
 	foreach line_instance $line_list {
-		set id [lindex $line_instance 1]
+		set line_id [lindex $line_instance 1]
 		set args [lrange $line_instance 3 end]
-		set args [lreplace $args 0 0 $id]
-		set line_id_list($id) $args
+		# set args [lreplace $args 0 0 $line_id]
+		set line_id_list($line_id) $args
 	}
 
 	set surf_condition_name "Surface_Composite_Section"
+	set material_list [GiD_Info material]
+	GiD_UnAssignData condition $surf_condition_name surfaces all
+	WarnWinText "should have unassigned all surfaces"
 	foreach line_id [array names line_id_list] {
 		# set associated_surf_ids [GetLineHigherEntities $line_id]
-		set associated_surf_ids [GidUtils::GetEntityHigherEntities line $line_id] 
+		set associated_surf_ids [GidUtils::GetEntityHigherEntities line $line_id]
+		WarnWinText "associated surfaces are: $associated_surf_ids"
+		WarnWinText "first item is: [lindex $associated_surf_ids 0]"
 		GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
-		set info [GiD_Info list_entities surface $associated_surf_ids]
-		set mat_num [lsearch $info "material:"]
+		# GiD_Info condition $surf_condition_name surfaces
+		# set info [GiD_Info list_entities surface $associated_surf_ids]
+		# WarnWinText "surface info:\n$info"
+		# set element_type_num [lindex $info [expr [lsearch $info "material:"]+1]]
+		# WarnWinText "getting material: $element_type_num"
+		# set element_type_name [lindex [.central.s info materials] [expr $element_type_num-1]]
+		# WarnWinText "Which corresponds to $element_type_name"
+		# set element_type_info [GiD_Info materials $element_type_name]
+		# WarnWinText "and has the info:$element_type_info"
+		
+		# set section_type_name [lindex $info [expr [lsearch $element_type_info "Type#MAT#(Section_Force-Deformation,User_Materials)"]+1]]
+		# set section_type_num [lindex $info 6]
+		# WarnWinText "getting material: $section_type_name"
+		# set section_type_name [lindex [.central.s info materials] [expr $section_type_num-1]]
+		# WarnWinText "Which corresponds to $section_type_name"
+		# set section_type_info [GiD_Info materials $section_type_name]
+		# WarnWinText "and has the info:$section_type_info"
 	}
+}
+proc GetLineHigherEntities { line_ID } {
+	set line_info_list [split [GiD_Info list_entities -more line $line_ID] \n]
+	WarnWinText "line_info_list = $line_info_list"
+	set higher_entity_list [lindex  $line_info_list [expr [llength $line_info_list] - 3]]
+	WarnWinText "higher_entity_list = $higher_entity_list"
+	WarnWinText "returning = [lrange $higher_entity_list 3 end]"
+	return [lrange $higher_entity_list 3 end]
 }
 proc Fire::GetLineEndPoints { line_ID } {
 	set line_data [GiD_Geometry get line $line_ID]
@@ -152,7 +180,7 @@ proc Fire::PairCompositeSections {} {
 		        if {$err < 1e-5} {
 		                set composite_id [lindex $leader_line_data_list($leader_line) 0]
 		                set args [lreplace [lindex $follower_line_data_list($follower_line) 0] 1 1 $composite_id]
-						WarnWinText "args for line $follower_line are: $args"
+		                                # WarnWinText "args for line $follower_line are: $args"
 		                GiD_AssignData condition $follower_condition_name lines $args $follower_line
 		        }        
 		}
@@ -166,7 +194,7 @@ proc Fire::GetCompositeSectionSurface { cond_id over} {
 	foreach surface $surfaces_list {
 		set current_id [lindex $surface 4]
 		if {$cond_id == $current_id} {
-			lappend result [lindex $surface 1]
+		        lappend result [lindex $surface 1]
 		}
 	}
 	return $result
@@ -186,13 +214,13 @@ proc Fire::AssignCentralElementFlag {} {
 		                set xyz [GidUtils::GetEntityCenter surface $geometric_entity]
 		                set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements($geometric_entity)]
 		                # GiD_AssignData condition Line_Thermo_Couple Elements "$t_couple_id" $elem_ID 
-		                Line 56 is still incomplete; i need to get the condition arguments and then assign the central element boolean to 1.
+		                # Line 56 is still incomplete; i need to get the condition arguments and then assign the central element boolean to 1.
 		        } elseif {$cond == "Line_Composite_Section_Beam"} {
-		                Here I need to go to the surface that is connected to this particular composite beam and get its section properties, or
-		                assign a unique condition to it to make it easy to find and navigate. 
+		                # Here I need to go to the surface that is connected to this particular composite beam and get its section properties, or
+		                # assign a unique condition to it to make it easy to find and navigate. 
 		        
 		        } elseif {$cond == "Line_Gas_Temperatures"} {
-		                This should be the easiest. 
+		                # This should be the easiest. 
 		        
 		        }
 		}
@@ -209,14 +237,14 @@ proc Fire::AssignCompositeConnection {} {
 		set cond_id [lindex $leader_node 4]
 		set args [lrange $leader_node 3 end]
 		if {![info exists leader_node_array($cond_id)]} {
-			lappend leader_node_array($cond_id) "$args"
-		}		
+		        lappend leader_node_array($cond_id) "$args"
+		}                
 		lappend leader_node_array($cond_id) $node_id
 	}
-	foreach key [array names leader_node_array] {
-		WarnWinText "Leader node $key has items: $leader_node_array($key)"
-		WarnWinText "first item of which is [lindex $leader_node_array($key) 0]"
-	}
+	# foreach key [array names leader_node_array] {
+		# WarnWinText "Leader node $key has items: $leader_node_array($key)"
+		# WarnWinText "first item of which is [lindex $leader_node_array($key) 0]"
+	# }
 	
 	set follower_condition_name "Line_Composite_Section_Beam"
 	set follower_elem_list [GiD_Info Conditions $follower_condition_name mesh]
@@ -226,10 +254,10 @@ proc Fire::AssignCompositeConnection {} {
 		set cond_id [lindex $follower_elem 4]
 		set elem_info [GiD_Mesh get element $elem_id]
 		if {![info exists follower_node_array($cond_id)]} {
-			set follower_node_array($cond_id) ""
+		        set follower_node_array($cond_id) ""
 		}
 		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 3]]
-		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 4]]		
+		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 4]]                
 	}
 	
 	# check if the conditions match
@@ -238,8 +266,8 @@ proc Fire::AssignCompositeConnection {} {
 	if {[llength $leader_conditions] == [llength $follower_conditions]} {
 		set common_conds [FindListCommonItems $leader_conditions $follower_conditions]
 		if {[llength $leader_conditions] != [llength $common_conds]} {
-			WarnWinText "Conditions applied to leader and follower nodes don't have the same IDs"
-			return -1
+		        WarnWinText "Conditions applied to leader and follower nodes don't have the same IDs"
+		        return -1
 		} else {WarnWinText "All good\nleaders: $leader_conditions\nfollowers: $follower_conditions\ncommon: $common_conds"}
 	} else {
 		WarnWinText "Number of leader and follower conditions inequal"
@@ -256,60 +284,60 @@ proc Fire::AssignCompositeConnection {} {
 		set follower_node_ids $follower_node_array($cond_id)
 		lappend node_pairs($cond_id) $args
 		foreach leader_node $leader_node_ids {
-			set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
-			foreach follower_node $follower_node_ids {
-				set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
-				set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
-				set delta_x [lindex $distance_vect 0]
-				set delta_y [lindex $distance_vect 1]
-				if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
-					if {$leader_node == $follower_node} {
-						WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
-						return -1
-					} else {
-						WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
-						lappend node_pairs($cond_id) "$leader_node $follower_node"
-					}
-				}
-			}
+		        set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
+		        foreach follower_node $follower_node_ids {
+		                set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
+		                set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
+		                set delta_x [lindex $distance_vect 0]
+		                set delta_y [lindex $distance_vect 1]
+		                if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
+		                        if {$leader_node == $follower_node} {
+		                                WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
+		                                return -1
+		                        } else {
+		                                # WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
+		                                lappend node_pairs($cond_id) "$leader_node $follower_node"
+		                        }
+		                }
+		        }
 		}
-		WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
+		# WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
 		WarnWinText "out of [llength $leader_node_ids] leader nodes and [llength $follower_node_ids] follower nodes created [llength [lrange $node_pairs($cond_id) 1 end]] pairs."
 		set condition_type [lindex $args 2]
 		
 		if {$condition_type == "rigid_link"} {
-			foreach pair [lrange $node_pairs($cond_id) 1 end] {
-				set cond_args "$count [lindex $args 3]"
-				GiD_AssignData condition Point_Rigid_link_master_node Nodes $cond_args [lindex $pair 0]
-				GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1] 
-				set count [expr $count + 1]
-			}
-		#	0 1 2		   3	4 5 6 7 8 9	
+		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
+		                set cond_args "$count [lindex $args 3]"
+		                GiD_AssignData condition Point_Rigid_link_master_node Nodes $cond_args [lindex $pair 0]
+		                GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1] 
+		                set count [expr $count + 1]
+		        }
+		#        0 1 2                   3        4 5 6 7 8 9        
 		# {10 5 rigid_link Beam 1 1 1 1 1 1}
 		} elseif {$condition_type == "equal_DOF"} {
-			foreach pair [lrange $node_pairs($cond_id) 1 end] {
-				set cond_args_follower "$count [lrange $args 4 end]"
-				GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$count 0 0" [lindex $pair 0]
-				GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1] 
-				set count [expr $count + 1]
-			}
+		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
+		                set cond_args_follower "$count [lrange $args 4 end]"
+		                GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$count 0 0" [lindex $pair 0]
+		                GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1] 
+		                set count [expr $count + 1]
+		        }
 		
 		} elseif {$condition_type == "common_nodes"} {
-			foreach pair [lrange $node_pairs($cond_id) 1 end] {
-				set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
-				WarnWinText "condition $cond_id nodes_to_collapse: $nodes_to_collapse"
-			}
+		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
+		                set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
+		                # WarnWinText "condition $cond_id nodes_to_collapse: $nodes_to_collapse"
+		        }
 		}
 		
 	}
-	WarnWinText "nodes_to_collapse: $nodes_to_collapse"
+	# WarnWinText "nodes_to_collapse: $nodes_to_collapse"
 	set cmd [join "GiD_Process Mescape Utilities Collapse Nodes" " "]
 	
 	foreach node $nodes_to_collapse {
 		lappend cmd $node
 	}
 	lappend cmd escape escape
-	WarnWinText "$cmd"
+	# WarnWinText "$cmd"
 	eval $cmd
 	
 }
@@ -321,7 +349,7 @@ proc FindListCommonItems { list1 list2 } {
 	set common ""
 	foreach item $list1 {
 		if {$item in $list2} {
-			lappend common $item
+		        lappend common $item
 		}
 	}
 	return $common
@@ -330,7 +358,7 @@ proc FindListCommonItems { list1 list2 } {
 proc LappendUnique { a_list another_list } {
 	foreach item $another_list {
 		if {!($item in $a_list)} {
-			lappend a_list $item
+		        lappend a_list $item
 		}
 	}
 	return $a_list

@@ -1,7 +1,16 @@
 namespace eval Fire {
 	
 }
-proc Fire::GenerateThermoCouples {} {
+proc GiD_Event_BeforeMeshGeneration { element_size } {
+	Fire::AssignConditionIds
+}
+proc GiD_Event_AfterMeshGeneration { fail } { 
+	if {!$fail} {
+		Fire::AssignCompositeConnection 
+	}
+}
+# should be performed BEFORE meshing
+proc Fire::AssignConditionIds {} {
 	set ID 1
 	array unset thermocouple_data
 	set condition_name "Line_Gas_Temperatures Surface_Gas_Temperatures Line_Composite_Section_Slab"
@@ -31,6 +40,25 @@ proc Fire::GenerateThermoCouples {} {
 		        }
 		}
 	Fire::PairCompositeSections
+}
+
+proc Fire::GenerateThermoCouples {} {
+	array unset thermocouple_data
+	set condition_name "Line_Gas_Temperatures Surface_Gas_Temperatures Line_Composite_Section_Slab"
+	foreach cond $condition_name {
+		set geometric_entity_list [GiD_Info Conditions $cond geometry]
+		foreach geometric_entity $geometric_entity_list {
+				set geometric_entity_id [lindex $geometric_entity 1]
+				set condition_id [lindex $geometric_entity 4]
+				set xyz ""
+				if {$cond == "Surface_Gas_Temperatures"} {
+						set xyz [GidUtils::GetEntityCenter surface $geometric_entity_id]
+				} else {
+						set xyz [GidUtils::GetEntityCenter line $geometric_entity_id]
+				}
+				set thermocouple_data($condition_id) $xyz
+		}
+	}
 	set sorted_thermocouple_data_keys [lsort [array names thermocouple_data]]
 	set fileHandle [open "[OpenSees::GetProjectPath]/Records/TCouples.txt" w+]
 	foreach key $sorted_thermocouple_data_keys {
@@ -57,6 +85,8 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 		# set associated_surf_ids [GetLineHigherEntities $line_id]
 		set associated_surf_ids [GidUtils::GetEntityHigherEntities line $line_id] 
 		GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
+		set info [GiD_Info list_entities surface $associated_surf_ids]
+		set mat_num [lsearch $info "material:"]
 	}
 }
 proc Fire::GetLineEndPoints { line_ID } {
@@ -166,9 +196,9 @@ proc Fire::AssignCentralElementFlag {} {
 		        
 		        }
 		}
-	
 	}
 }
+# should be done AFTER meshing
 proc Fire::AssignCompositeConnection {} {
 	set nodes_to_collapse ""
 	set leader_condition_name "Line_Composite_Section_Slab"

@@ -1403,7 +1403,7 @@ QUESTION: Core_layers
 VALUE: 4
 QUESTION: Bot_cover_layers
 VALUE: 1
-QUESTION: Protection_thickness#UNITS#
+QUESTION: protection_thickness#UNITS#
 VALUE: 0 mm
 QUESTION: protection_material#CB#(1,2,3)
 VALUE: 1

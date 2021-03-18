@@ -57,6 +57,14 @@ VALUE:
 QUESTION: Enable_6_DOFs_for_truss_elements#CB#(0,1)
 VALUE: 0
 HELP: For 3D models, enable this option to use trusses with 6 DOF elements (e.g. shells).
+QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+VALUE: standard_fire
+QUESTION: fire_duration#UNITS#
+VALUE: 7200 sec
+HELP: fire duration for which the heat transfer analysis will be performed
+QUESTION: HT_time_step#UNITS#
+VALUE: 5 sec
+HELP: time step to be used in the heat transfer analysis
 QUESTION: override_default_h#CB#(0,1)
 VALUE: 0
 HELP: if yes, then h values defined below will be used for standard and hydrocarbon fires.\notherwise, defaults of 25, 50 and 10 will be used for standard, hydrocarbon and ambient respectively.
@@ -66,12 +74,6 @@ HELP: User defined h coefficient for thermally-exposed members
 QUESTION: convective_h_ambient
 VALUE: 10
 HELP: User defined h coefficient for unexposed side of slabs and composite beams
-QUESTION: fire_duration#UNITS#
-VALUE: 7200 sec
-HELP: fire duration for which the heat transfer analysis will be performed
-QUESTION: HT_time_step#UNITS#
-VALUE: 5 sec
-HELP: time step to be used in the heat transfer analysis
 TITLE: Eigenvalue_Analysis
 QUESTION: _#CB#(_)
 VALUE:

@@ -144,8 +144,8 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
-VALUE: standard_fire
+QUESTION: convective_coefficient
+VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 1
 STATE: DISABLED
@@ -163,8 +163,8 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
-VALUE: standard_fire
+QUESTION: convective_coefficient
+VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 1
 STATE: DISABLED
@@ -193,8 +193,8 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
-VALUE: standard_fire
+QUESTION: convective_coefficient
+VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
 STATE: HIDDEN
@@ -268,8 +268,8 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
-VALUE: standard_fire
+QUESTION: convective_coefficient
+VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
 STATE: HIDDEN
@@ -287,8 +287,8 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
-VALUE: standard_fire
+QUESTION: convective_coefficient
+VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
 STATE: DISABLED
@@ -306,8 +306,8 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
-VALUE: standard_fire
+QUESTION: convective_coefficient
+VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
 STATE: DISABLED

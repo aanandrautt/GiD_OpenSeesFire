@@ -1084,6 +1084,7 @@ if {$slab} {
 		HTRecorder -file "Column$ID.dat" -NodeSet $StiffenedBeamTemp
 	}
 }
+HTPrintNodes
 HTAnalysis HeatTransfer TempIncr 0.1 1000 2 Newton
 HTAnalyze [expr $tFinal/$dt] $dt
 set reachedTime [getHTTime]

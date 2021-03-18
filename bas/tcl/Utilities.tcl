@@ -279,7 +279,7 @@ proc Run_existing_HT {} {
 	set GiDProjectDir [OpenSees::GetProjectPath]
 	set GiDProjectName [OpenSees::GetProjectName]
 	set OpenSeesPath [OpenSees::GetOpenSeesPath]
-	set HTScriptPath "[OpenSees::GetProblemTypePath]/exe/HTScript.tcl"
+	set HTScriptPath "[OpenSees::GetProblemTypePath]/exe/HTScript2.tcl"
 	set OSPCRPath "[OpenSees::GetProblemTypePath]/exe/OSPCR-MP"
 	global GidProcWin
 	
@@ -296,7 +296,7 @@ proc Run_existing_HT {} {
 		cd $records_folder
 
 		# run analysis
-		eval exec [auto_execok start] \"\" mpiexec -n 5 \"$OSPCRPath\" OpenSeesDEBUG3.2.1 HTScript.tcl \"$HT_data_file\"
+		eval exec [auto_execok start] \"\" mpiexec -n 4 \"$OSPCRPath\" OpenSeesDEBUG3.2.1 HTScript2.tcl \"$HT_data_file\"
 
 		if {[file exists "Report.txt"] } {
 
@@ -311,7 +311,7 @@ proc Run_existing_HT {} {
 		tk_dialog .gid.errorMsg "Error" "The HT.dat file was not created." error 0 "  Ok  "
 
 	}
-	file delete $records_folder/HTScript.tcl
+	file delete $records_folder/HTScript2.tcl
 	UpdateInfoBar
 	return ""
 }

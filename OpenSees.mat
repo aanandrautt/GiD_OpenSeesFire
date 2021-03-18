@@ -1372,9 +1372,9 @@ VALUE: LayeredShell
 TKWIDGET: TK_SectionWikiInfo
 TITLE: Section_properties
 QUESTION: Slab_thickness#UNITS#
-VALUE: 0.25 m
+VALUE: 125 mm
 QUESTION: Offset#UNITS#
-VALUE: 0 m
+VALUE: 0 mm
 QUESTION: Decking_thickness#UNITS#
 VALUE: 9 mm
 QUESTION: Top_reinforcement_cover#UNITS#

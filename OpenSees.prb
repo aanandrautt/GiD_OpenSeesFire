@@ -50,12 +50,22 @@ DEPENDENCIES: (2,SET,Vertical_axis,Y)
 TKWIDGET: TK_EditModelDim
 QUESTION: Vertical_axis#CB#(Y,Z)
 VALUE: Z
-HELP: Default vertical axis is global Z. For 3D models, selecting global Z is recommended.
+STATE: DISABLED
+HELP: Current version of this interface has only been checked with Z as vertical. 
 QUESTION: _#CB#(_)
 VALUE:
 QUESTION: Enable_6_DOFs_for_truss_elements#CB#(0,1)
 VALUE: 0
 HELP: For 3D models, enable this option to use trusses with 6 DOF elements (e.g. shells).
+QUESTION: override_default_h#CB#(0,1)
+VALUE: 0
+HELP: if yes, then h values defined below will be used for standard and hydrocarbon fires.\notherwise, defaults of 25, 50 and 10 will be used for standard, hydrocarbon and ambient respectively.
+QUESTION: convective_h_fire
+VALUE: 25
+HELP: User defined h coefficient for thermally-exposed members
+QUESTION: convective_h_ambient
+VALUE: 10
+HELP: User defined h coefficient for unexposed side of slabs and composite beams
 TITLE: Eigenvalue_Analysis
 QUESTION: _#CB#(_)
 VALUE:

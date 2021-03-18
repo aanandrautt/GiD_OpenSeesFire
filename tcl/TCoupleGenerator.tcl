@@ -97,6 +97,7 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 			WarnWinText "Which has the distance: $distance"
 			set width [expr $width + $distance]
 		}
+		set width "$width [GiD_Units get model_unit_length]"
 		WarnWinText "giving line $line_id a width of $width"
 		
 		set info [GiD_Info list_entities surface $associated_surf_ids]

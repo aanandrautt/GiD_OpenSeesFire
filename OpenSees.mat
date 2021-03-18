@@ -1289,10 +1289,10 @@ MATERIAL: Predefined Fiber Section
 COMMENT: \n
 IMAGE: img/Sections/I-section.jpg
 TITLE: Section properties
-QUESTION: Cross_section#CB#(I_Section,Stiffened_I_Section_1)
+QUESTION: Cross_section#CB#(I_Section,Stiffened_I_Section)
 VALUE: I_Section
 DEPENDENCIES: (I_Section,HIDE,Plate_l,#CURRENT#,HIDE,Plate_t,#CURRENT#,HIDE,Plate_Y_fibers,#CURRENT#,HIDE,Plate_Z_fibers,#CURRENT#,HIDE,Plate_Steel_material,#CURRENT#)
-DEPENDENCIES: (Stiffened_I_Section_1,RESTORE,Plate_l,#CURRENT#,RESTORE,Plate_t,#CURRENT#,RESTORE,Plate_Y_fibers,#CURRENT#,RESTORE,Plate_Z_fibers,#CURRENT#,RESTORE,Plate_Steel_material,#CURRENT#)
+DEPENDENCIES: (Stiffened_I_Section,RESTORE,Plate_l,#CURRENT#,RESTORE,Plate_t,#CURRENT#,RESTORE,Plate_Y_fibers,#CURRENT#,RESTORE,Plate_Z_fibers,#CURRENT#,RESTORE,Plate_Steel_material,#CURRENT#)
 QUESTION: Section:#CB#(Fiber)
 VALUE: Fiber
 STATE: HIDDEN

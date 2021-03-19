@@ -13,6 +13,7 @@ if {$mode == "auto"} {
 	}
 }
 file mkdir log
+file mkdir Thermal_load
 logFile "log/log$ID.log"
 puts "This is job number $ID"
 foreach arg $variables {
@@ -979,7 +980,7 @@ if {$slab} {
 	
 	set slabTemp 210
 	HTNodeSet $slabTemp -NodeSet $sT1 $sT2 $sT3 $sT4 $sT5 $sT6 $sT7 $sT8 $sT9
-	HTRecorder -file "Slab$ID.dat" -NodeSet $slabTemp
+	HTRecorder -file "Thermal_load\\Slab$ID.dat" -NodeSet $slabTemp
 } else {
 
 	#Web
@@ -1027,7 +1028,7 @@ if {$slab} {
 	set beamTemp 116
 	HTNodeSet $beamTemp -NodeSet $T1 $T2 $T3 $T4 $T5 $T6 $T7 $T8 $T9 $T10 $T11 $T12 $T13 $T14 $T15
 	if {!$stiffened} {
-		HTRecorder -file "Beam$ID.dat" -NodeSet $beamTemp
+		HTRecorder -file "Thermal_load\\BeamColumn$ID.dat" -NodeSet $beamTemp
 	}
 	# Slab thermal load
 	if {$composite} {
@@ -1052,7 +1053,7 @@ if {$slab} {
 		
 		set slabTemp 210
 		HTNodeSet $slabTemp -NodeSet $sT1 $sT2 $sT3 $sT4 $sT5 $sT6 $sT7 $sT8 $sT9
-		HTRecorder -file "Slab$ID.dat" -NodeSet $slabTemp
+		HTRecorder -file "Thermal_load\\Slab$ID.dat" -NodeSet $slabTemp
 	}
 
 	if {$stiffened} {
@@ -1081,10 +1082,9 @@ if {$slab} {
 		
 		set StiffenedBeamTemp 311
 		HTNodeSet $StiffenedBeamTemp -NodeSet $beamTemp $lplT1 $lplT2 $lplT3 $lplT4 $lplT5 $rplT1 $rplT2 $rplT3 $rplT4 $rplT5
-		HTRecorder -file "Column$ID.dat" -NodeSet $StiffenedBeamTemp
+		HTRecorder -file "Thermal_load\\BeamColumn$ID.dat" -NodeSet $StiffenedBeamTemp
 	}
 }
-HTPrintNodes
 HTAnalysis HeatTransfer TempIncr 0.1 1000 2 Newton
 HTAnalyze [expr $tFinal/$dt] $dt
 set reachedTime [getHTTime]

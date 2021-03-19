@@ -420,6 +420,11 @@ proc Fire::AssignLineThermalCoupleCondition {} {
 	}
 }
 #method for generating string for the directory of the thermal loading files
-proc Fire::GetTempFileDir {line_id} {
-	return "\"../Records/BeamL$line_id.dat\""
+proc Fire::GetTempFileDir { ID a_string } {
+	if {$a_string == "slab"} {
+		return "\"../Records/Thermal_load/Slab$ID.dat\""
+	} elseif {$a_string == "beam-column"} {
+		return "\"../Records/Thermal_load/BeamColumn$ID.dat\""
+	}
+	
 }

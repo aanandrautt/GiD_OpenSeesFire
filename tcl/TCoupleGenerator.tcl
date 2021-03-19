@@ -52,14 +52,14 @@ proc Fire::GenerateThermoCouples {} {
 		                set condition_id [lindex $geometric_entity 4]
 		                set xyz ""
 		                if {$cond == "Surface_Gas_Temperatures"} {
-		                                set xyz [GidUtils::GetEntityCenter surface $geometric_entity_id]
+							set xyz [GidUtils::GetEntityCenter surface $geometric_entity_id]
 		                } else {
-		                                set xyz [GidUtils::GetEntityCenter line $geometric_entity_id]
+							set xyz [GidUtils::GetEntityCenter line $geometric_entity_id]
 		                }
 		                set thermocouple_data($condition_id) $xyz
 		}
 	}
-	set sorted_thermocouple_data_keys [lsort [array names thermocouple_data]]
+	set sorted_thermocouple_data_keys [lsort -integer [array names thermocouple_data]]
 	set fileHandle [open "[OpenSees::GetProjectPath]/Records/TCouples.txt" w+]
 	foreach key $sorted_thermocouple_data_keys {
 		set xyz $thermocouple_data($key)
@@ -183,19 +183,23 @@ proc Fire::PairCompositeSections {} {
 		        set distance_f_f [math::linearalgebra::sub_vect  $xyz_f_follower  $xyz_f_leader]
 		        set delta_x_i [lindex $distance_i_i 0]
 		        set delta_y_i [lindex $distance_i_i 1]
+				set delta_z_i [lindex $distance_i_i 2]
 		        set delta_x_f [lindex $distance_f_f 0]
 		        set delta_y_f [lindex $distance_f_f 1] 
+				set delta_z_f [lindex $distance_f_f 2] 
 		        set err [expr abs($delta_x_i)  + abs($delta_y_i) + abs($delta_x_f)  + abs($delta_y_f)]
 		        if {$err > 1e-5} {
 					set distance_i_f [math::linearalgebra::sub_vect  $xyz_i_follower  $xyz_f_leader]
 					set distance_f_i [math::linearalgebra::sub_vect  $xyz_f_follower  $xyz_i_leader]
 					set delta_x_i [lindex $distance_i_f 0]
 					set delta_y_i [lindex $distance_i_f 1]
+					set delta_z_i [lindex $distance_i_f 2]
 					set delta_x_f [lindex $distance_f_i 0]
 					set delta_y_f [lindex $distance_f_i 1] 
+					set delta_z_f [lindex $distance_f_i 2]
 					set err [expr abs($delta_x_i)  + abs($delta_y_i) + abs($delta_x_f)  + abs($delta_y_f)]
 		        }
-		        if {$err < 1e-5} {
+		        if {$err < 1e-5 && $delta_z_f < 0.5} {
 					set composite_id [lindex $leader_line_data_list($leader_line) 0]
 					set slab_props [lindex $leader_line_data_list($leader_line) 1]
 					WarnWinText "first, args for follower line $follower_line are: $[lindex $follower_line_data_list($follower_line) 0]"
@@ -276,10 +280,6 @@ proc Fire::AssignCompositeConnection {} {
 		}                
 		lappend leader_node_array($cond_id) $node_id
 	}
-	# foreach key [array names leader_node_array] {
-		# WarnWinText "Leader node $key has items: $leader_node_array($key)"
-		# WarnWinText "first item of which is [lindex $leader_node_array($key) 0]"
-	# }
 	
 	set follower_condition_name "Line_Composite_Section_Beam"
 	set follower_elem_list [GiD_Info Conditions $follower_condition_name mesh]

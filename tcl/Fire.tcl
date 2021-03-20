@@ -1,5 +1,5 @@
 namespace eval Fire {
-	
+	variable potato "mashed"
 }
 proc GiD_Event_BeforeMeshGeneration { element_size } {
 	Fire::AssignConditionIds
@@ -9,8 +9,10 @@ proc GiD_Event_BeforeMeshGeneration { element_size } {
 }
 proc GiD_Event_AfterMeshGeneration { fail } { 
 	if {!$fail} {
-		Fire::AssignCompositeConnection Line_Composite_Section_Slab Line_Composite_Section_Beam
-		Fire::AssignCompositeConnection Line_Composite_Section_Slab_AMBIENT Line_Composite_Section_Beam_AMBIENT
+		Fire::AssignCompositeConnection fire 0.00001
+		Fire::AssignCompositeConnection ambient 0.00001
+		
+		WarnWinText "potato is $potato"
 	}
 }
 # should be performed BEFORE meshing
@@ -140,8 +142,6 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 	WarnWinText "Entering function Fire::PairCompositeSections given state: $state"
 	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
 	WarnWinText "The tolerance for the z direction is given as: $ztolerance"
-	# set leader_condition_name ""
-	# set follower_condition_name ""
 	
 	if {$state == "fire"} {
 		set leader_condition_name "Line_Composite_Section_Slab"
@@ -150,7 +150,7 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 		set leader_condition_name "Line_Composite_Section_Slab_AMBIENT"
 		set follower_condition_name "Line_Composite_Section_Beam_AMBIENT"
 	} else {
-		WarnWinText "ERROR: Unknown state used for Fire:PairCompositeSections.\n can be either 'fire' or 'amient'."
+		WarnWinText "ERROR: Unknown state used for Fire:PairCompositeSections.\n can be either 'fire' or 'ambient'."
 		return -1
 	}   
 	WarnWinText "conditions are: $leader_condition_name and $follower_condition_name"
@@ -349,35 +349,64 @@ proc Fire::AssignCentralElementFlag {} {
 		}
 	}
 }
-# should be done AFTER meshing
-proc Fire::AssignCompositeConnection { leader_condition_name follower_condition_name } {
+# The following command assumes that all conditions have been assigned an ID number, all information 
+# was propagated successfully from leader to follower conditions by being paired up. This function 
+# operates upon the mesh and thus expects to be called only after the mesh has been created. Similar
+# to the function Fire::PairCompositeSections, this function takes a state ('fire' or 'ambient') as well
+# as a tolerance for xy. Since this function is only called after the various conditions/geometric 
+# entities have been paired up, it does not need to check for difference in z as that has already been
+# performed.  
+#
+proc Fire::AssignCompositeConnection { state xytolerance } {
+	WarnWinText "Entering function Fire::AssignCompositeConnection given state: $state"
+	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
+	
+	if {$state == "fire"} {
+		set leader_condition_name "Line_Composite_Section_Slab"
+		set follower_condition_name "Line_Composite_Section_Beam"
+	} elseif {$state == "ambient"} {
+		set leader_condition_name "Line_Composite_Section_Slab_AMBIENT"
+		set follower_condition_name "Line_Composite_Section_Beam_AMBIENT"
+	} else {
+		WarnWinText "ERROR: Unknown state used for Fire:PairCompositeSections.\n can be either 'fire' or 'amient'."
+		return -1
+	}   
+	WarnWinText "conditions are: $leader_condition_name and $follower_condition_name"
+
 	set nodes_to_collapse ""
-	# set leader_condition_name "Line_Composite_Section_Slab"
 	set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
-	WarnWinText "\n\nAssignign connections: $leader_condition_name & $ follower_condition_name\n"
-	WarnWinText "Leader nodes list: $leader_node_list"
+	WarnWinText "Leader nodes list:\n$leader_node_list"
 	array unset leader_node_array
 	foreach leader_node $leader_node_list {
 		set node_id [lindex $leader_node 1] 
 		set cond_id [lindex $leader_node 4]
 		set args [lrange $leader_node 3 end]
+		# Make sure that the item at index 0 of the condition ID is always
+		# the arguments for that condition, follower by the nodes over which
+		# the condition was applied. 
 		if {![info exists leader_node_array($cond_id)]} {
-		        lappend leader_node_array($cond_id) "$args"
+			lappend leader_node_array($cond_id) "$args"
 		}                
 		lappend leader_node_array($cond_id) $node_id
 	}
-	
-	
-	# set follower_condition_name "Line_Composite_Section_Beam"
+	# The follower condition is applied over elements rather than over nodes
+	# so that it can be used when applying the thermal load in the structural
+	# model using the bas file. The following loop finds the nodes overwhich
+	# the condition is applied by retrieving element information.
 	set follower_elem_list [GiD_Info Conditions $follower_condition_name mesh]
 	array unset follower_node_array
-	WarnWinText "Follower element list: $follower_elem_list"
+	WarnWinText "Follower element list:\n$follower_elem_list"
 	foreach follower_elem $follower_elem_list {
 		set elem_id [lindex $follower_elem 1] 
 		set cond_id [lindex $follower_elem 4]
+		set args [lrange $leader_node 3 end]
 		set elem_info [GiD_Mesh get element $elem_id]
+		# because the function LappendUnique expects the array key to already exist
+		# it is necessary that the array and its key are created if it does already
+		# already exist. LappendUnique is used here to ensure the nodes are not 
+		# repeated since elements share some nodes due to connectivity. 
 		if {![info exists follower_node_array($cond_id)]} {
-		        set follower_node_array($cond_id) ""
+			lappend follower_node_array($cond_id) $args
 		}
 		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 3]]
 		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 4]]                
@@ -386,43 +415,64 @@ proc Fire::AssignCompositeConnection { leader_condition_name follower_condition_
 	# check if the conditions match
 	set leader_conditions [array names leader_node_array]
 	set follower_conditions [array names follower_node_array]
-	if {[llength $leader_conditions] == [llength $follower_conditions]} {
-		set common_conds [FindListCommonItems $leader_conditions $follower_conditions]
-		if {[llength $leader_conditions] != [llength $common_conds]} {
-		        WarnWinText "ERROR: Conditions applied to leader and follower nodes don't have the same IDs"
-		        return -1
-		} else {WarnWinText "All good\nleaders: $leader_conditions\nfollowers: $follower_conditions\ncommon: $common_conds"}
+	set conds_commons [FindListCommonItems $leader_conditions $follower_conditions]
+	set common_conds [lindex $conds_commons 1]
+	if {[lindex $conds_commons 0]} {
+		WarnWinText "All leader conditions are common with follower conditions."
 	} else {
-		WarnWinText "Number of leader and follower conditions inequal"
-		WarnWinText "([llength $leader_conditions])leaders: $leader_conditions\n([llength $follower_conditions])followers: $follower_conditions"
-		return -1
+		set uncommon_conds [lindex $conds_commons 2]
+		WarnWinText "The following conditions are uncommon:\n$uncommon_conds"
+		foreach bug $uncommon_conds {
+		WarnWinText "bug is condition: $bug"
+		WarnWinText "leader conditions are: $leader_conditions"
+		WarnWinText "Bug is in leader conditions: [expr {$bug in $leader_conditions}]"
+			if {$bug in $leader_conditions} {
+				set debug_args [lrange [lindex $leader_node_array($bug) 0] 0 1]
+				set nodes_to_debug [lrange $leader_node_array($bug) 1 end]
+				lappend debug_args "leader without follower"
+			} else {
+				set debug_args [lrange [lindex $follower_node_array($bug) 0] 0 1]
+				set nodes_to_debug [lrange $follower_node_array($bug) 1 end]
+				lappend debug_args "follower without leader"
+			}
+			foreach bugged_node $nodes_to_debug {
+				GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $bugged_node
+			}
+		}
 	}
+
 	
 	# pair up nodes and apply connection condition
 	array unset node_pairs
 	set count 1 
-	foreach cond_id $leader_conditions {
+	foreach cond_id $common_conds {
 		set args [lindex $leader_node_array($cond_id) 0]
 		set leader_node_ids [lrange $leader_node_array($cond_id) 1 end]
-		set follower_node_ids $follower_node_array($cond_id)
+		set follower_node_ids [lrange $follower_node_array($cond_id) 1 end]
 		lappend node_pairs($cond_id) $args
 		foreach leader_node $leader_node_ids {
-		        set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
-		        foreach follower_node $follower_node_ids {
-		                set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
-		                set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
-		                set delta_x [lindex $distance_vect 0]
-		                set delta_y [lindex $distance_vect 1]
-		                if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
-		                        if {$leader_node == $follower_node} {
-		                                WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
-		                                return -1
-		                        } else {
-		                                # WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
-		                                lappend node_pairs($cond_id) "$leader_node $follower_node"
-		                        }
-		                }
-		        }
+			set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
+			WarnWinText "Leader node $leader_node x y z = $xyz_leader"
+			WarnWinText "follower nodes are: $follower_node_ids"
+			foreach follower_node $follower_node_ids {
+				
+				set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
+				# WarnWinText "Follower node $follower_node x y z = $xyz_follower"
+				set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
+				set delta_x [lindex $distance_vect 0]
+				set delta_y [lindex $distance_vect 1]
+				if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
+					if {$leader_node == $follower_node} {
+						WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
+						set debug_args [lrange $args 0 1]
+						lappend debug_args "identical leader and folower"
+						GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $leader_node
+					} else {
+						# WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
+						lappend node_pairs($cond_id) "$leader_node $follower_node"
+					}
+				}
+			}
 		}
 		# WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
 		WarnWinText "out of [llength $leader_node_ids] leader nodes and [llength $follower_node_ids] follower nodes created [llength [lrange $node_pairs($cond_id) 1 end]] pairs."
@@ -437,8 +487,9 @@ proc Fire::AssignCompositeConnection { leader_condition_name follower_condition_
 		        }
 		} elseif {$condition_type == "equal_DOF"} {
 		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
-		                set cond_args_follower "$count [lrange $args 4 end]"
+		                set cond_args_follower "$count [lrange $args 5 10]"
 		                GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$count 0 0" [lindex $pair 0]
+						WarnWinText "arguments are: $cond_args_follower"
 		                GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1] 
 		                set count [expr $count + 1]
 		        }
@@ -451,7 +502,7 @@ proc Fire::AssignCompositeConnection { leader_condition_name follower_condition_
 		}
 		
 	}
-	# WarnWinText "nodes_to_collapse: $nodes_to_collapse"
+	WarnWinText "nodes_to_collapse: $nodes_to_collapse"
 	set cmd [join "GiD_Process Mescape Utilities Collapse Nodes" " "]
 	
 	foreach node $nodes_to_collapse {
@@ -465,15 +516,55 @@ proc Fire::AssignCompositeConnection { leader_condition_name follower_condition_
 
 
 
-
+# a procedure to find items that are common in two lists. Returns a list 
+# that contains a boolean for weather all the two list items are common 
+# at index 0,all common items as a list at index 1, and all uncommon items
+# at index 2.
 proc FindListCommonItems { list1 list2 } {
 	set common ""
-	foreach item $list1 {
-		if {$item in $list2} {
-		        lappend common $item
+	set uncommon ""
+	set length1 [llength $list1]
+	set length2 [llength $list2]
+	if {$length1 >= $length2} {
+		foreach item $list1 {
+			if {$item in $list2} {
+				lappend common $item
+			} else {
+				lappend uncommon $item
+			}
+		}
+	} else {
+		foreach item $list2 {
+			if {$item in $list1} {
+				lappend common $item
+			} else {
+				lappend uncommon $item
+			}
 		}
 	}
-	return $common
+	set length_common [llength $common]
+	if {$length1 == $length_common && $length2 == $length_common} {
+		set all_common 1
+	} else {
+		set all_common 0
+	}
+	if {!$all_common} {
+		if {$length1 >= $length2} {
+			foreach item $list2 {
+				if {!($item in $common)} {
+					lappend uncommon $item
+				}
+			}
+		} else {
+			foreach item $list1 {
+				if {!($item in $common)} {
+					lappend uncommon $item
+				}
+			}
+		}
+	} 
+	lappend answer $all_common $common $uncommon
+	return $answer
 }
 
 proc LappendUnique { a_list another_list } {

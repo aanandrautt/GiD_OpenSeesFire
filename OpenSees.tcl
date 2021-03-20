@@ -807,7 +807,7 @@ proc InitGIDProject { dir } {
 						SeriesParallel.tcl \
 						SecAggregator.tcl \
 						UserMaterial.tcl \
-						TCoupleGenerator.tcl \
+						Fire.tcl \
 						Recorder.tcl} {
 
 		source [file join $dir tcl $filename]

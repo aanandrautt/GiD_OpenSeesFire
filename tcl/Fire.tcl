@@ -1,5 +1,6 @@
 namespace eval Fire {
-	variable potato "mashed"
+	variable constraint_ID
+	set constraint_ID 1
 }
 proc GiD_Event_BeforeMeshGeneration { element_size } {
 	Fire::AssignConditionIds
@@ -11,8 +12,6 @@ proc GiD_Event_AfterMeshGeneration { fail } {
 	if {!$fail} {
 		Fire::AssignCompositeConnection fire 0.00001
 		Fire::AssignCompositeConnection ambient 0.00001
-		
-		WarnWinText "potato is $potato"
 	}
 }
 # should be performed BEFORE meshing
@@ -310,45 +309,7 @@ proc Fire::GetCompositeSectionSurface { cond_id over} {
 	}
 	return $result
 }
-proc Fire::AssignCentralElementFlag {} {
-	set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam Surface_Gas_Temperatures"
-	foreach cond $condition_name {
-		array unset geometry_elements_mesh
-		array unset geometry_elements_args
-		WarnWinText "condition = $cond"
-		set elem_list [GiD_Info Conditions $cond mesh]
-		foreach elem $elem_list {
-		
-		                set elem_id [lindex $elem 1]
-		                set geometric_entity_id [lindex $elem 3]
-		                set condition_id [lindex $elem 4]
-		                set args [lrange $elem 3 end]
-		                WarnWinText "elem_id = $elem_id\ngeometric_parent = $geometric_entity_id\ncond_id = $condition_id\n args = $args"
-		                lappend geometry_elements_mesh($geometric_entity_id) $elem_id
-		                set geometry_elements_args($geometric_entity_id) $args
-		}
-		
-		WarnWinText "geometric entities are: [array names geometry_elements_mesh]"
-		foreach geometric_entity [array names geometry_elements_mesh] {
-		        WarnWinText "entity $geometric_entity mesh: $geometry_elements_mesh($geometric_entity)"
-		        WarnWinText "entity $geometric_entity arguments: $geometry_elements_args($geometric_entity)"
-		        
-		                if {$cond == "Surface_Gas_Temperatures"} {
-		                                set xyz [GidUtils::GetEntityCenter surface $geometric_entity]
-		                                set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements_mesh($geometric_entity)]
-		                                GiD_AssignData condition Surface_Gas_Temperatures_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
-		                } elseif {$cond == "Line_Composite_Section_Beam"} {
-		                                set xyz [GidUtils::GetEntityCenter line $geometric_entity]
-		                                set central_elem_id [GidUtils::GetClosestElement line $xyz $geometry_elements_mesh($geometric_entity)]
-		                                GiD_AssignData condition Line_Composite_Section_Beam_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
-		                } elseif {$cond == "Line_Gas_Temperatures"} {
-		                                set xyz [GidUtils::GetEntityCenter line $geometric_entity]
-		                                set central_elem_id [GidUtils::GetClosestElement line $xyz $geometry_elements_mesh($geometric_entity)]
-		                                GiD_AssignData condition Line_Gas_Temperatures_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
-		                }
-		}
-	}
-}
+
 # The following command assumes that all conditions have been assigned an ID number, all information 
 # was propagated successfully from leader to follower conditions by being paired up. This function 
 # operates upon the mesh and thus expects to be called only after the mesh has been created. Similar
@@ -444,6 +405,7 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 	
 	# pair up nodes and apply connection condition
 	array unset node_pairs
+	variable constraint_ID
 	set count 1 
 	foreach cond_id $common_conds {
 		set args [lindex $leader_node_array($cond_id) 0]
@@ -465,7 +427,7 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 					if {$leader_node == $follower_node} {
 						WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
 						set debug_args [lrange $args 0 1]
-						lappend debug_args "identical leader and folower"
+						lappend debug_args "identical leader and follower"
 						GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $leader_node
 					} else {
 						# WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
@@ -480,18 +442,18 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 		
 		if {$condition_type == "rigid_link"} {
 		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
-		                set cond_args "$count [lindex $args 3]"
+		                set cond_args "$constraint_ID [lindex $args 3]"
 		                GiD_AssignData condition Point_Rigid_link_master_node Nodes $cond_args [lindex $pair 0]
 		                GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1] 
-		                set count [expr $count + 1]
+		                set constraint_ID [expr $constraint_ID + 1]
 		        }
 		} elseif {$condition_type == "equal_DOF"} {
 		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
-		                set cond_args_follower "$count [lrange $args 5 10]"
-		                GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$count 0 0" [lindex $pair 0]
+		                set cond_args_follower "$constraint_ID [lrange $args 4 9]"
+		                GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$constraint_ID 0 0" [lindex $pair 0]
 						WarnWinText "arguments are: $cond_args_follower"
 		                GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1] 
-		                set count [expr $count + 1]
+		                set constraint_ID [expr $constraint_ID + 1]
 		        }
 		
 		} elseif {$condition_type == "common_nodes"} {
@@ -502,16 +464,17 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 		}
 		
 	}
-	WarnWinText "nodes_to_collapse: $nodes_to_collapse"
-	set cmd [join "GiD_Process Mescape Utilities Collapse Nodes" " "]
-	
-	foreach node $nodes_to_collapse {
-		lappend cmd $node
+	if {[llength $nodes_to_collapse] == 0} {
+		WarnWinText "nodes_to_collapse: none"
+	} else {
+		WarnWinText "nodes_to_collapse: $nodes_to_collapse"
+		set cmd [join "GiD_Process Mescape Utilities Collapse Nodes" " "]
+		foreach node $nodes_to_collapse {
+			lappend cmd $node
+		}
+		lappend cmd escape escape
+		eval $cmd
 	}
-	lappend cmd escape escape
-	# WarnWinText "$cmd"
-	eval $cmd
-	
 }
 
 
@@ -566,6 +529,48 @@ proc FindListCommonItems { list1 list2 } {
 	lappend answer $all_common $common $uncommon
 	return $answer
 }
+# The following command is used purely to select a representative element and apply a 
+# copy of one of the condition related to its HT analysis. The condition is used by 
+# the bas file to generate the HT data files.
+proc Fire::AssignCentralElementFlag {} {
+	set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam Surface_Gas_Temperatures"
+	foreach cond $condition_name {
+		array unset geometry_elements_mesh
+		array unset geometry_elements_args
+		WarnWinText "condition = $cond"
+		set elem_list [GiD_Info Conditions $cond mesh]
+		foreach elem $elem_list {
+		
+			set elem_id [lindex $elem 1]
+			set geometric_entity_id [lindex $elem 3]
+			set condition_id [lindex $elem 4]
+			set args [lrange $elem 3 end]
+			WarnWinText "elem_id = $elem_id\ngeometric_parent = $geometric_entity_id\ncond_id = $condition_id\n args = $args"
+			lappend geometry_elements_mesh($geometric_entity_id) $elem_id
+			set geometry_elements_args($geometric_entity_id) $args
+		}
+		
+		WarnWinText "geometric entities are: [array names geometry_elements_mesh]"
+		foreach geometric_entity [array names geometry_elements_mesh] {
+		WarnWinText "entity $geometric_entity mesh: $geometry_elements_mesh($geometric_entity)"
+		WarnWinText "entity $geometric_entity arguments: $geometry_elements_args($geometric_entity)"
+		
+			if {$cond == "Surface_Gas_Temperatures"} {
+							set xyz [GidUtils::GetEntityCenter surface $geometric_entity]
+							set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements_mesh($geometric_entity)]
+							GiD_AssignData condition Surface_Gas_Temperatures_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
+			} elseif {$cond == "Line_Composite_Section_Beam"} {
+							set xyz [GidUtils::GetEntityCenter line $geometric_entity]
+							set central_elem_id [GidUtils::GetClosestElement line $xyz $geometry_elements_mesh($geometric_entity)]
+							GiD_AssignData condition Line_Composite_Section_Beam_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
+			} elseif {$cond == "Line_Gas_Temperatures"} {
+							set xyz [GidUtils::GetEntityCenter line $geometric_entity]
+							set central_elem_id [GidUtils::GetClosestElement line $xyz $geometry_elements_mesh($geometric_entity)]
+							GiD_AssignData condition Line_Gas_Temperatures_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
+			}
+		}
+	}
+}
 
 proc LappendUnique { a_list another_list } {
 	foreach item $another_list {
@@ -574,29 +579,6 @@ proc LappendUnique { a_list another_list } {
 		}
 	}
 	return $a_list
-}
-proc Fire::AssignLineThermalCoupleCondition {} {
-	set condition_name {Line_Gas_Temperatures}
-	set line_elem_list [GiD_Info Conditions $condition_name mesh]
-	array unset lines_and_elems
-
-	#create an array whose keys are element ids and corresponding content is list of elements meshed into
-	foreach line_elem $line_elem_list {
-		set element_id [lindex $line_elem 1]
-		set line_id [lindex $line_elem 3]
-		lappend lines_and_elems($line_id) $element_id
-	}
-
-	foreach line [array names lines_and_elems] {
-		set xyz [GidUtils::GetEntityCenter line $line]
-		set elem_ID [GidUtils::GetClosestElement line $xyz $lines_and_elems($line)]
-		#thermocouple id is lower case L (for line) followed by geometric line number
-		set t_couple_id "L$line"
-		#assign hidden condition 'Line_Thermo_Couple' to central element to loop over 
-		#it when creating the data file in bas. Much easier to get info about section
-		#in bas than here. 
-		GiD_AssignData condition Line_Thermo_Couple Elements "$t_couple_id" $elem_ID
-	}
 }
 #method for generating string for the directory of the thermal loading files
 proc Fire::GetTempFileDir { ID a_string } {

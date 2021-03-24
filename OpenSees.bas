@@ -185,7 +185,13 @@
 *elseif(strcmp(GroupName,"3PDOF")==0)
 *set var DomainNum=30
 *endif
-*if(DomainNum != 0)
+*# Loop only to these auto made groups, because user may has created more groups manually.
+*if(strcmp(GroupName,"2DOF")==0 || strcmp(GroupName,"3DOF")==0 || strcmp(GroupName,"6DOF")==0 || strcmp(GroupName,"3PDOF")==0)
+*set var LoopThisGroup=1
+*else 
+*set var LoopThisGroup=0
+*endif
+*if(DomainNum != 0 && LoopThisGroup)
 *#
 *# Specify the current ndf
 *#

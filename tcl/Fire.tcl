@@ -1,15 +1,24 @@
 namespace eval Fire {
 	variable constraint_ID
-	set constraint_ID 1
+	set constraint_ID 10000
 }
 proc GiD_Event_BeforeMeshGeneration { element_size } {
+	variable constraint_ID
+	set constraint_ID 10000
 	Fire::AssignConditionIds
 	Fire::AssignSurfaceCompositeSectionCond
 	Fire::PairCompositeSections fire 0.00001 0.5
 	Fire::PairCompositeSections ambient 0.00001 0.5
 }
 proc GiD_Event_AfterMeshGeneration { fail } { 
+	PostMeshing $fail
+}
+proc AfterMeshGeneration { fail } { 
+	PostMeshing $fail
+}
+proc PostMeshing { fail } {
 	if {!$fail} {
+		WarnWinText "Assigning composite connections."
 		Fire::AssignCompositeConnection fire 0.00001
 		Fire::AssignCompositeConnection ambient 0.00001
 	}
@@ -333,137 +342,157 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 		return -1
 	}   
 	WarnWinText "conditions are: $leader_condition_name and $follower_condition_name"
-
+	set current_interval [lindex [GiD_Info intvdata num] 0]
+	set num_of_intervals [lindex [GiD_Info intvdata num] 1]
 	set nodes_to_collapse ""
-	set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
-	WarnWinText "Leader nodes list:\n$leader_node_list"
-	array unset leader_node_array
-	foreach leader_node $leader_node_list {
-		set node_id [lindex $leader_node 1] 
-		set cond_id [lindex $leader_node 4]
-		set args [lrange $leader_node 3 end]
-		# Make sure that the item at index 0 of the condition ID is always
-		# the arguments for that condition, follower by the nodes over which
-		# the condition was applied. 
-		if {![info exists leader_node_array($cond_id)]} {
-			lappend leader_node_array($cond_id) "$args"
-		}                
-		lappend leader_node_array($cond_id) $node_id
-	}
-	# The follower condition is applied over elements rather than over nodes
-	# so that it can be used when applying the thermal load in the structural
-	# model using the bas file. The following loop finds the nodes overwhich
-	# the condition is applied by retrieving element information.
-	set follower_elem_list [GiD_Info Conditions $follower_condition_name mesh]
-	array unset follower_node_array
-	WarnWinText "Follower element list:\n$follower_elem_list"
-	foreach follower_elem $follower_elem_list {
-		set elem_id [lindex $follower_elem 1] 
-		set cond_id [lindex $follower_elem 4]
-		set args [lrange $leader_node 3 end]
-		set elem_info [GiD_Mesh get element $elem_id]
-		# because the function LappendUnique expects the array key to already exist
-		# it is necessary that the array and its key are created if it does already
-		# already exist. LappendUnique is used here to ensure the nodes are not 
-		# repeated since elements share some nodes due to connectivity. 
-		if {![info exists follower_node_array($cond_id)]} {
-			lappend follower_node_array($cond_id) $args
-		}
-		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 3]]
-		set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 4]]                
-	}
+	WarnWinText "Current interval is: $current_interval"
+	for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
+		GiD_IntervalData set $interval
+		WarnWinText "Changed interval to $interval"
 	
-	# check if the conditions match
-	set leader_conditions [array names leader_node_array]
-	set follower_conditions [array names follower_node_array]
-	set conds_commons [FindListCommonItems $leader_conditions $follower_conditions]
-	set common_conds [lindex $conds_commons 1]
-	if {[lindex $conds_commons 0]} {
-		WarnWinText "All leader conditions are common with follower conditions."
-	} else {
-		set uncommon_conds [lindex $conds_commons 2]
-		WarnWinText "The following conditions are uncommon:\n$uncommon_conds"
-		foreach bug $uncommon_conds {
-		WarnWinText "bug is condition: $bug"
-		WarnWinText "leader conditions are: $leader_conditions"
-		WarnWinText "Bug is in leader conditions: [expr {$bug in $leader_conditions}]"
-			if {$bug in $leader_conditions} {
-				set debug_args [lrange [lindex $leader_node_array($bug) 0] 0 1]
-				set nodes_to_debug [lrange $leader_node_array($bug) 1 end]
-				lappend debug_args "leader without follower"
-			} else {
-				set debug_args [lrange [lindex $follower_node_array($bug) 0] 0 1]
-				set nodes_to_debug [lrange $follower_node_array($bug) 1 end]
-				lappend debug_args "follower without leader"
-			}
-			foreach bugged_node $nodes_to_debug {
-				GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $bugged_node
-			}
-		}
-	}
-
+		set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
 	
-	# pair up nodes and apply connection condition
-	array unset node_pairs
-	variable constraint_ID
-	set count 1 
-	foreach cond_id $common_conds {
-		set args [lindex $leader_node_array($cond_id) 0]
-		set leader_node_ids [lrange $leader_node_array($cond_id) 1 end]
-		set follower_node_ids [lrange $follower_node_array($cond_id) 1 end]
-		lappend node_pairs($cond_id) $args
-		foreach leader_node $leader_node_ids {
-			set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
-			WarnWinText "Leader node $leader_node x y z = $xyz_leader"
-			WarnWinText "follower nodes are: $follower_node_ids"
-			foreach follower_node $follower_node_ids {
-				
-				set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
-				# WarnWinText "Follower node $follower_node x y z = $xyz_follower"
-				set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
-				set delta_x [lindex $distance_vect 0]
-				set delta_y [lindex $distance_vect 1]
-				if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
-					if {$leader_node == $follower_node} {
-						WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
-						set debug_args [lrange $args 0 1]
-						lappend debug_args "identical leader and follower"
-						GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $leader_node
-					} else {
-						# WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
-						lappend node_pairs($cond_id) "$leader_node $follower_node"
-					}
+		
+	
+	
+		WarnWinText "Leader nodes list:\n$leader_node_list"
+		array unset leader_node_array
+		foreach leader_node $leader_node_list {
+			set node_id [lindex $leader_node 1] 
+			set cond_id [lindex $leader_node 4]
+			set args [lrange $leader_node 3 end]
+			# Make sure that the item at index 0 of the condition ID is always
+			# the arguments for that condition, follower by the nodes over which
+			# the condition was applied. 
+			if {![info exists leader_node_array($cond_id)]} {
+				lappend leader_node_array($cond_id) "$args"
+			}                
+			lappend leader_node_array($cond_id) $node_id
+		}
+		# The follower condition is applied over elements rather than over nodes
+		# so that it can be used when applying the thermal load in the structural
+		# model using the bas file. The following loop finds the nodes overwhich
+		# the condition is applied by retrieving element information.
+		set follower_elem_list [GiD_Info Conditions $follower_condition_name mesh]
+		array unset follower_node_array
+		WarnWinText "Follower element list:\n$follower_elem_list"
+		foreach follower_elem $follower_elem_list {
+			set elem_id [lindex $follower_elem 1] 
+			set cond_id [lindex $follower_elem 4]
+			set args [lrange $leader_node 3 end]
+			set elem_info [GiD_Mesh get element $elem_id]
+			# because the function LappendUnique expects the array key to already exist
+			# it is necessary that the array and its key are created if it does already
+			# already exist. LappendUnique is used here to ensure the nodes are not 
+			# repeated since elements share some nodes due to connectivity. 
+			if {![info exists follower_node_array($cond_id)]} {
+				lappend follower_node_array($cond_id) $args
+			}
+			set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 3]]
+			set follower_node_array($cond_id) [LappendUnique $follower_node_array($cond_id) [lindex $elem_info 4]]                
+		}
+		
+		# check if the conditions match
+		set leader_conditions [array names leader_node_array]
+		set follower_conditions [array names follower_node_array]
+		set conds_commons [FindListCommonItems $leader_conditions $follower_conditions]
+		set common_conds [lindex $conds_commons 1]
+		if {[lindex $conds_commons 0]} {
+			WarnWinText "All leader conditions are common with follower conditions."
+		} else {
+			set uncommon_conds [lindex $conds_commons 2]
+			WarnWinText "The following conditions are uncommon:\n$uncommon_conds"
+			foreach bug $uncommon_conds {
+			WarnWinText "bug is condition: $bug"
+			WarnWinText "leader conditions are: $leader_conditions"
+			WarnWinText "Bug is in leader conditions: [expr {$bug in $leader_conditions}]"
+				if {$bug in $leader_conditions} {
+					set debug_args [lrange [lindex $leader_node_array($bug) 0] 0 1]
+					set nodes_to_debug [lrange $leader_node_array($bug) 1 end]
+					lappend debug_args "leader without follower"
+				} else {
+					set debug_args [lrange [lindex $follower_node_array($bug) 0] 0 1]
+					set nodes_to_debug [lrange $follower_node_array($bug) 1 end]
+					lappend debug_args "follower without leader"
+				}
+				foreach bugged_node $nodes_to_debug {
+					GiD_IntervalData set 1
+					GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $bugged_node
+					GiD_IntervalData set $interval
 				}
 			}
 		}
-		# WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
-		WarnWinText "out of [llength $leader_node_ids] leader nodes and [llength $follower_node_ids] follower nodes created [llength [lrange $node_pairs($cond_id) 1 end]] pairs."
-		set condition_type [lindex $args 2]
+
 		
-		if {$condition_type == "rigid_link"} {
-		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
-		                set cond_args "$constraint_ID [lindex $args 3]"
-		                GiD_AssignData condition Point_Rigid_link_master_node Nodes $cond_args [lindex $pair 0]
-		                GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1] 
-		                set constraint_ID [expr $constraint_ID + 1]
-		        }
-		} elseif {$condition_type == "equal_DOF"} {
-		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
-		                set cond_args_follower "$constraint_ID [lrange $args 4 9]"
-		                GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$constraint_ID 0 0" [lindex $pair 0]
-						WarnWinText "arguments are: $cond_args_follower"
-		                GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1] 
-		                set constraint_ID [expr $constraint_ID + 1]
-		        }
-		
-		} elseif {$condition_type == "common_nodes"} {
-		        foreach pair [lrange $node_pairs($cond_id) 1 end] {
-		                set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
-		                # WarnWinText "condition $cond_id nodes_to_collapse: $nodes_to_collapse"
-		        }
+		# pair up nodes and apply connection condition
+		array unset node_pairs
+		variable constraint_ID
+		set count 1 
+		foreach cond_id $common_conds {
+			set args [lindex $leader_node_array($cond_id) 0]
+			set leader_node_ids [lrange $leader_node_array($cond_id) 1 end]
+			set follower_node_ids [lrange $follower_node_array($cond_id) 1 end]
+			lappend node_pairs($cond_id) $args
+			foreach leader_node $leader_node_ids {
+				set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
+				WarnWinText "Leader node $leader_node x y z = $xyz_leader"
+				WarnWinText "follower nodes are: $follower_node_ids"
+				foreach follower_node $follower_node_ids {
+					
+					set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
+					# WarnWinText "Follower node $follower_node x y z = $xyz_follower"
+					set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
+					set delta_x [lindex $distance_vect 0]
+					set delta_y [lindex $distance_vect 1]
+					if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
+						if {$leader_node == $follower_node} {
+							WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
+							set debug_args [lrange $args 0 1]
+							lappend debug_args "identical leader and follower"
+							GiD_IntervalData set 1
+							GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $leader_node
+							GiD_IntervalData set $interval
+						} else {
+							# WarnWinText "leader node xyz: $xyz_leader\nfollower node xyz: $xyz_follower"
+							lappend node_pairs($cond_id) "$leader_node $follower_node"
+						}
+					}
+				}
+			}
+			# WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
+			WarnWinText "out of [llength $leader_node_ids] leader nodes and [llength $follower_node_ids] follower nodes created [llength [lrange $node_pairs($cond_id) 1 end]] pairs."
+			set condition_type [lindex $args 2]
+			
+			if {$condition_type == "rigid_link"} {
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							set cond_args "$constraint_ID [lindex $args 3]"
+							GiD_IntervalData set 1
+							GiD_AssignData condition Point_Rigid_link_master_node Nodes $cond_args [lindex $pair 0]
+							GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1]
+							GiD_IntervalData set $interval							
+							set constraint_ID [expr $constraint_ID + 1]
+					}
+			} elseif {$condition_type == "equal_DOF"} {
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							GiD_IntervalData set 1
+							set cond_args_follower "$constraint_ID [lrange $args 4 9]"
+							GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$constraint_ID 0 0" [lindex $pair 0]
+							WarnWinText "arguments are: $cond_args_follower"
+							GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1]
+							GiD_IntervalData set $interval							
+							set constraint_ID [expr $constraint_ID + 1]
+					}
+			
+			} elseif {$condition_type == "common_nodes"} {
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
+							# WarnWinText "condition $cond_id nodes_to_collapse: $nodes_to_collapse"
+					}
+			}
+			
 		}
-		
 	}
+	GiD_IntervalData set $current_interval
 	if {[llength $nodes_to_collapse] == 0} {
 		WarnWinText "nodes_to_collapse: none"
 	} else {

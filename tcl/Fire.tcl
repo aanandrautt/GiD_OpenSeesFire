@@ -1,16 +1,29 @@
 namespace eval Fire {
-	variable constraint_ID
-	set constraint_ID 10000
+	variable condition_ID 1
+	variable constraint_ID 10000
+}
+proc Fire::ResetIDs { } {
+	set Fire::condition_ID 1
+	set Fire::constraint_ID 10000
 }
 proc GiD_Event_BeforeMeshGeneration { element_size } {
-	variable constraint_ID
-	set constraint_ID 10000
-	Fire::AssignConditionIds
-	Fire::AssignSurfaceCompositeSectionCond
-	Fire::PairCompositeSections fire 0.00001 0.5
-	Fire::PairCompositeSections ambient 0.00001 0.5
+	Fire::ResetIDs
+	
+	set current_interval [lindex [GiD_Info intvdata num] 0]
+	set num_of_intervals [lindex [GiD_Info intvdata num] 1]
+	WarnWinText "Current interval is: $current_interval"
+	for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
+		GiD_IntervalData set $interval
+		WarnWinText "Changed interval to $interval"
+		Fire::AssignConditionIds
+		Fire::AssignSurfaceCompositeSectionCond
+		Fire::PairCompositeSections fire 0.00001 0.5
+		Fire::PairCompositeSections ambient 0.00001 0.5
+	}
+	GiD_IntervalData set $current_interval
 }
 proc GiD_Event_AfterMeshGeneration { fail } { 
+	
 	PostMeshing $fail
 }
 proc AfterMeshGeneration { fail } { 
@@ -18,9 +31,19 @@ proc AfterMeshGeneration { fail } {
 }
 proc PostMeshing { fail } {
 	if {!$fail} {
-		WarnWinText "Assigning composite connections."
-		Fire::AssignCompositeConnection fire 0.00001
-		Fire::AssignCompositeConnection ambient 0.00001
+		set current_interval [lindex [GiD_Info intvdata num] 0]
+		set num_of_intervals [lindex [GiD_Info intvdata num] 1]
+		WarnWinText "Current interval is: $current_interval"
+		for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
+			GiD_IntervalData set $interval
+			WarnWinText "Changed interval to $interval"
+			WarnWinText "Assigning composite connections."
+			Fire::AssignCompositeConnection fire 0.00001
+			Fire::AssignCompositeConnection ambient 0.00001
+			Fire::AssignCentralElementFlag
+			WarnWinText "constraint ID = $Fire::constraint_ID\ncondition ID = $Fire::condition_ID"
+		}
+		GiD_IntervalData set $current_interval
 	}
 }
 # should be performed BEFORE meshing
@@ -33,7 +56,7 @@ proc PostMeshing { fail } {
 # because it establishes the condition ID which is the backbone of the entire 
 # framework here, and is performed purely over the geometry. 
 proc Fire::AssignConditionIds {} {
-	set ID 1
+	# variable condition_ID
 	set condition_name "Line_Gas_Temperatures Surface_Gas_Temperatures Line_Composite_Section_Slab Line_Composite_Section_Slab_AMBIENT"
 		foreach cond $condition_name {
 		        set geometric_entity_list [GiD_Info Conditions $cond geometry]
@@ -44,7 +67,7 @@ proc Fire::AssignConditionIds {} {
 		                # WarnWinText "condition $ID arguments are = $condition_args"
 		                set condition_args [lreplace $condition_args 0 0 $geometric_entity_id]
 		                # WarnWinText "condition $ID arguments are changed to = $condition_args"
-		                set condition_args [lreplace $condition_args 1 1 $ID]
+		                set condition_args [lreplace $condition_args 1 1 $Fire::condition_ID]
 		                # WarnWinText "condition $ID arguments are again changed to = $condition_args"
 		                
 		                if {$cond == "Surface_Gas_Temperatures"} {
@@ -52,13 +75,11 @@ proc Fire::AssignConditionIds {} {
 		                } else {
 		                        GiD_AssignData condition $cond lines $condition_args $geometric_entity_id
 		                }
-		                set ID [expr $ID + 1]
+		                set Fire::condition_ID [expr $Fire::condition_ID + 1]
 		        }
 		}
-	# Fire::AssignSurfaceCompositeSectionCond
-	# Fire::PairCompositeSections  Line_Composite_Section_Slab Line_Composite_Section_Beam
-	# Fire::PairCompositeSections Line_Composite_Section_Slab_AMBIENT Line_Composite_Section_Beam_AMBIENT
 }
+
 
 # Assigns the composite section surface condition to surfaces attached to the line with
 # with the condition Line_Composite_Section_Slab, which is the leader condition in this
@@ -330,6 +351,7 @@ proc Fire::GetCompositeSectionSurface { cond_id over} {
 proc Fire::AssignCompositeConnection { state xytolerance } {
 	WarnWinText "Entering function Fire::AssignCompositeConnection given state: $state"
 	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
+	set interval [lindex [GiD_Info intvdata num] 0]
 	
 	if {$state == "fire"} {
 		set leader_condition_name "Line_Composite_Section_Slab"
@@ -342,13 +364,13 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 		return -1
 	}   
 	WarnWinText "conditions are: $leader_condition_name and $follower_condition_name"
-	set current_interval [lindex [GiD_Info intvdata num] 0]
-	set num_of_intervals [lindex [GiD_Info intvdata num] 1]
+	# set current_interval [lindex [GiD_Info intvdata num] 0]
+	# set num_of_intervals [lindex [GiD_Info intvdata num] 1]
 	set nodes_to_collapse ""
-	WarnWinText "Current interval is: $current_interval"
-	for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
-		GiD_IntervalData set $interval
-		WarnWinText "Changed interval to $interval"
+	# WarnWinText "Current interval is: $current_interval"
+	# for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
+		# GiD_IntervalData set $interval
+		# WarnWinText "Changed interval to $interval"
 	
 		set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
 	
@@ -491,8 +513,8 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 			}
 			
 		}
-	}
-	GiD_IntervalData set $current_interval
+	# }
+	# GiD_IntervalData set $current_interval
 	if {[llength $nodes_to_collapse] == 0} {
 		WarnWinText "nodes_to_collapse: none"
 	} else {

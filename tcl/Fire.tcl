@@ -57,6 +57,9 @@ proc PostMeshing { fail } {
 # framework here, and is performed purely over the geometry. 
 proc Fire::AssignConditionIds {} {
 	# variable condition_ID
+	WarnWinText "\n------------------------------------------"
+	WarnWinText "Entering function Fire::AssignConditionIds"
+	WarnWinText "------------------------------------------\n"
 	set condition_name "Line_Gas_Temperatures Surface_Gas_Temperatures Line_Composite_Section_Slab Line_Composite_Section_Slab_AMBIENT"
 		foreach cond $condition_name {
 		        set geometric_entity_list [GiD_Info Conditions $cond geometry]
@@ -92,6 +95,9 @@ proc Fire::AssignConditionIds {} {
 # it gives the leader line the section information it needs, which we want to propagate throughout
 # to the follower lines.
 proc Fire::AssignSurfaceCompositeSectionCond {} {
+	WarnWinText "\n----------------------------------------------------------"
+	WarnWinText "Entering function: Fire::AssignSurfaceCompositeSectionCond"
+	WarnWinText "----------------------------------------------------------\n"
 	set condition_name "Line_Composite_Section_Slab"
 	set line_list [GiD_Info Conditions $condition_name geometry]
 	array unset line_id_list
@@ -160,10 +166,11 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 # other while still allowing slabs and beams offset from each other to interact. 
 # This command also takes place only over the geometry and so must be called before meshing.
 proc Fire::PairCompositeSections { state xytolerance ztolerance } {
+	WarnWinText "\n------------------------------------------------------------------------"
 	WarnWinText "Entering function Fire::PairCompositeSections given state: $state"
 	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
 	WarnWinText "The tolerance for the z direction is given as: $ztolerance"
-	
+	WarnWinText "------------------------------------------------------------------------\n"
 	if {$state == "fire"} {
 		set leader_condition_name "Line_Composite_Section_Slab"
 		set follower_condition_name "Line_Composite_Section_Beam"
@@ -332,8 +339,10 @@ proc Fire::GetCompositeSectionSurface { cond_id over} {
 # performed.  
 #
 proc Fire::AssignCompositeConnection { state xytolerance } {
+	WarnWinText "\n------------------------------------------------------------------------"
 	WarnWinText "Entering function Fire::AssignCompositeConnection given state: $state"
 	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
+	WarnWinText "------------------------------------------------------------------------\n"
 	set interval [lindex [GiD_Info intvdata num] 0]
 	
 	if {$state == "fire"} {
@@ -453,8 +462,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 					}
 				}
 			}
-			# WarnWinText "For condition id: $cond_id, created: $node_pairs($cond_id)"
-			WarnWinText "out of [llength $leader_node_ids] leader nodes and [llength $follower_node_ids] follower nodes created [llength [lrange $node_pairs($cond_id) 1 end]] pairs."
 			set condition_type [lindex $args 2]
 			
 			if {$condition_type == "rigid_link"} {
@@ -555,7 +562,11 @@ proc FindListCommonItems { list1 list2 } {
 # copy of one of the condition related to its HT analysis. The condition is used by 
 # the bas file to generate the HT data files.
 proc Fire::AssignCentralElementFlag {} {
+	WarnWinText "\n------------------------------------------------"
 	WarnWinText "Entering function Fire::AssignCentralElementFlag"
+	WarnWinText "------------------------------------------------\n"
+	
+	
 	set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam Surface_Gas_Temperatures"
 	foreach cond $condition_name {
 		array unset geometry_elements_mesh

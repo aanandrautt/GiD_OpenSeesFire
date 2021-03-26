@@ -57,7 +57,7 @@ VALUE:
 QUESTION: Enable_6_DOFs_for_truss_elements#CB#(0,1)
 VALUE: 0
 HELP: For 3D models, enable this option to use trusses with 6 DOF elements (e.g. shells).
-QUESTION: Exposure_type#CB#(standard_fire, Hydrocarbon,FDS)
+QUESTION: Exposure_type#CB#(standard_fire,Hydrocarbon,FDS)
 VALUE: standard_fire
 QUESTION: fire_duration#UNITS#
 VALUE: 7200 sec

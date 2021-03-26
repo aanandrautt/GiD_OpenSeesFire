@@ -593,8 +593,6 @@ proc Create_HT_dat_file { } {
 		tk_dialog .gid.errorMsg "Error" "Please save project before creating the HT.dat file." error 0 "  Ok  "
 
 	} else {
-		# Fire::AssignLineThermalCoupleCondition
-		Fire::AssignCentralElementFlag
 		file mkdir [file join [OpenSees::GetProjectPath] OpenSees]
 		GiD_Process Mescape Files WriteForBAS "[OpenSees::GetProblemTypePath]/../OpenSees.gid/HTData.bas" "[OpenSees::GetProjectPath]/Records/HT.dat"
 	}

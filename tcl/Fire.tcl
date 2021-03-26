@@ -64,11 +64,9 @@ proc Fire::AssignConditionIds {} {
 		                set geometric_entity_id [lindex $geometric_entity 1]
 		                
 		                set condition_args [lrange $geometric_entity 3 end]
-		                # WarnWinText "condition $ID arguments are = $condition_args"
 		                set condition_args [lreplace $condition_args 0 0 $geometric_entity_id]
-		                # WarnWinText "condition $ID arguments are changed to = $condition_args"
 		                set condition_args [lreplace $condition_args 1 1 $Fire::condition_ID]
-		                # WarnWinText "condition $ID arguments are again changed to = $condition_args"
+
 		                
 		                if {$cond == "Surface_Gas_Temperatures"} {
 		                        GiD_AssignData condition $cond surfaces $condition_args $geometric_entity_id
@@ -101,7 +99,6 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 	foreach line_instance $line_list {
 		set id [lindex $line_instance 1]
 		set args [lrange $line_instance 3 end]
-		WarnWinText "arguments: $args"
 		set line_id_list($id) $args
 	}
 
@@ -117,13 +114,10 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 		        set xyz_surf [GidUtils::GetEntityCenter surface $surf]
 		        set xyz_line [GidUtils::GetEntityCenter line $line_id]
 		        set distance_vect [math::linearalgebra::sub_vect  $xyz_line  $xyz_surf]
-		        WarnWinText "distance vector is: $distance_vect"
 		        set distance [expr 2*[math::linearalgebra::norm_two $distance_vect]]
-		        WarnWinText "Which has the distance: $distance"
 		        set width [expr $width + $distance]
 		}
 		set width "$width [GiD_Units get model_unit_length]"
-		WarnWinText "giving line $line_id a width of $width"
 		
 		set info [GiD_Info list_entities surface $associated_surf_ids]
 		set element_type_index [lsearch $info "material:"]
@@ -143,9 +137,7 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 		
 		set slab_protection_mat_index [lsearch $section_type_info "protection_material#CB#(1,2,3)"]
 		set slab_protection_mat [lindex $section_type_info [expr $slab_protection_mat_index + 1]]
-		WarnWinText "old arguments $line_id_list($line_id)"
 		set line_id_list($line_id) [lreplace $line_id_list($line_id) end-3 end $width $slab_thickness $slab_protection_thickness $slab_protection_mat]
-		WarnWinText "new arguments $line_id_list($line_id)"
 		
 		GiD_AssignData condition $condition_name lines $line_id_list($line_id)  $line_id
 		GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
@@ -185,7 +177,7 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 	WarnWinText "conditions are: $leader_condition_name and $follower_condition_name"
 
 	set line_list [GiD_Info Conditions $leader_condition_name geometry]
-	WarnWinText "leader lines are $line_list"
+	set num_of_leader_lines [llength $line_list]
 	array unset leader_line_data_list
 	foreach line_instance $line_list {
 		set line_id [lindex $line_instance 1]
@@ -200,11 +192,10 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 			set slab_props $state
 		}
 		lappend leader_line_data_list($line_id) $composite_id $slab_props $xyz_i $xyz_f
-		WarnWinText "line $line_id's data array is now: $leader_line_data_list($line_id)"
 	}
 	
 	set line_list [GiD_Info Conditions $follower_condition_name geometry]
-	WarnWinText "follower lines are $line_list"
+	set num_of_follower_lines [llength $line_list]
 	array unset follower_line_data_list
 	foreach line_instance $line_list {
 		set line_id [lindex $line_instance 1]
@@ -214,7 +205,6 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 		set xyz_i [lrange $pts_xyz 0 2]
 		set xyz_f [lrange $pts_xyz 3 5]
 		lappend follower_line_data_list($line_id) $args $xyz_i $xyz_f
-		WarnWinText "line $line_id's data array is now: $follower_line_data_list($line_id)"
 	}
 	
 	set line_pairs ""
@@ -264,24 +254,20 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 			}  		
 		}
 	}
-	WarnWinText "There are [llength $line_pairs] line pairs. They are:\n$line_pairs"
+	WarnWinText "There are $num_of_leader_lines leader lines, $num_of_follower_lines, and [llength $line_pairs] line pairs."
 	foreach pair $line_pairs {
 		set leader_line [lindex $pair 0]
 		set follower_line [lindex $pair 1]
 		
 		set ID [lindex $leader_line_data_list($leader_line) 0]
 		set follower_args [lindex $follower_line_data_list($follower_line) 0]
-		WarnWinText "Initially, follower $follower_line arguments are:\n$follower_args"
 		# replace the geometric parent and the ID of the follower line with the
 		# approporiate values.
 		set follower_args [lreplace $follower_args 0 1 $follower_line $ID]
-		WarnWinText "After replacing the geometric_parent and ID, they become:\n$follower_args"
 		if {$state == "fire"} {
 			set slab_properties [lindex $leader_line_data_list($leader_line) 1]
 			set follower_args [lreplace $follower_args end-3 end {*}$slab_props]
-			WarnWinText "Finally, we added the correct slab properties to the follower since state is $state. Arguments are:\n$follower_args"
 		} else {
-			WarnWinText "Since state is $state, there are no further changes to the arguments."
 		}
 		GiD_AssignData condition $follower_condition_name lines $follower_args $follower_line
 	}
@@ -316,10 +302,7 @@ proc Fire::GenerateThermoCouples {} {
 
 proc GetLineHigherEntities { line_ID } {
 	set line_info_list [split [GiD_Info list_entities -more line $line_ID] \n]
-	WarnWinText "line_info_list = $line_info_list"
 	set higher_entity_list [lindex  $line_info_list [expr [llength $line_info_list] - 3]]
-	WarnWinText "higher_entity_list = $higher_entity_list"
-	WarnWinText "returning = [lrange $higher_entity_list 3 end]"
 	return [lrange $higher_entity_list 3 end]
 }
 proc Fire::GetLineEndPoints { line_ID } {
@@ -373,11 +356,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 		# WarnWinText "Changed interval to $interval"
 	
 		set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
-	
-		
-	
-	
-		WarnWinText "Leader nodes list:\n$leader_node_list"
 		array unset leader_node_array
 		foreach leader_node $leader_node_list {
 			set node_id [lindex $leader_node 1] 
@@ -397,7 +375,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 		# the condition is applied by retrieving element information.
 		set follower_elem_list [GiD_Info Conditions $follower_condition_name mesh]
 		array unset follower_node_array
-		WarnWinText "Follower element list:\n$follower_elem_list"
 		foreach follower_elem $follower_elem_list {
 			set elem_id [lindex $follower_elem 1] 
 			set cond_id [lindex $follower_elem 4]
@@ -425,9 +402,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 			set uncommon_conds [lindex $conds_commons 2]
 			WarnWinText "The following conditions are uncommon:\n$uncommon_conds"
 			foreach bug $uncommon_conds {
-			WarnWinText "bug is condition: $bug"
-			WarnWinText "leader conditions are: $leader_conditions"
-			WarnWinText "Bug is in leader conditions: [expr {$bug in $leader_conditions}]"
 				if {$bug in $leader_conditions} {
 					set debug_args [lrange [lindex $leader_node_array($bug) 0] 0 1]
 					set nodes_to_debug [lrange $leader_node_array($bug) 1 end]
@@ -457,8 +431,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 			lappend node_pairs($cond_id) $args
 			foreach leader_node $leader_node_ids {
 				set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
-				WarnWinText "Leader node $leader_node x y z = $xyz_leader"
-				WarnWinText "follower nodes are: $follower_node_ids"
 				foreach follower_node $follower_node_ids {
 					
 					set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
@@ -468,7 +440,7 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 					set delta_y [lindex $distance_vect 1]
 					if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
 						if {$leader_node == $follower_node} {
-							WarnWinText "ERROR: leader and follower nodes have the same ID: $leader_node"
+							WarnWinText "Warning: leader and follower nodes have the same ID: $leader_node"
 							set debug_args [lrange $args 0 1]
 							lappend debug_args "identical leader and follower"
 							GiD_IntervalData set 1
@@ -508,7 +480,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 			} elseif {$condition_type == "common_nodes"} {
 					foreach pair [lrange $node_pairs($cond_id) 1 end] {
 							set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
-							# WarnWinText "condition $cond_id nodes_to_collapse: $nodes_to_collapse"
 					}
 			}
 			
@@ -584,11 +555,11 @@ proc FindListCommonItems { list1 list2 } {
 # copy of one of the condition related to its HT analysis. The condition is used by 
 # the bas file to generate the HT data files.
 proc Fire::AssignCentralElementFlag {} {
+	WarnWinText "Entering function Fire::AssignCentralElementFlag"
 	set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam Surface_Gas_Temperatures"
 	foreach cond $condition_name {
 		array unset geometry_elements_mesh
 		array unset geometry_elements_args
-		WarnWinText "condition = $cond"
 		set elem_list [GiD_Info Conditions $cond mesh]
 		foreach elem $elem_list {
 		
@@ -596,15 +567,11 @@ proc Fire::AssignCentralElementFlag {} {
 			set geometric_entity_id [lindex $elem 3]
 			set condition_id [lindex $elem 4]
 			set args [lrange $elem 3 end]
-			WarnWinText "elem_id = $elem_id\ngeometric_parent = $geometric_entity_id\ncond_id = $condition_id\n args = $args"
 			lappend geometry_elements_mesh($geometric_entity_id) $elem_id
 			set geometry_elements_args($geometric_entity_id) $args
 		}
 		
-		WarnWinText "geometric entities are: [array names geometry_elements_mesh]"
 		foreach geometric_entity [array names geometry_elements_mesh] {
-		WarnWinText "entity $geometric_entity mesh: $geometry_elements_mesh($geometric_entity)"
-		WarnWinText "entity $geometric_entity arguments: $geometry_elements_args($geometric_entity)"
 		
 			if {$cond == "Surface_Gas_Temperatures"} {
 							set xyz [GidUtils::GetEntityCenter surface $geometric_entity]

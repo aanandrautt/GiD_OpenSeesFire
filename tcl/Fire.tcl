@@ -7,20 +7,26 @@ proc Fire::ResetIDs { } {
 	set Fire::constraint_ID 10000
 }
 proc GiD_Event_BeforeMeshGeneration { element_size } {
+	WarnWinText ".....Starting pre-meshing commands.....\n\n"
 	Fire::ResetIDs
-	
 	set current_interval [lindex [GiD_Info intvdata num] 0]
 	set num_of_intervals [lindex [GiD_Info intvdata num] 1]
 	WarnWinText "Current interval is: $current_interval"
 	for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
 		GiD_IntervalData set $interval
 		WarnWinText "Changed interval to $interval"
+		WarnWinText "\n-----Interval: $interval-----"
 		Fire::AssignConditionIds
+		WarnWinText "\n-----Interval: $interval-----"
 		Fire::AssignSurfaceCompositeSectionCond
+		WarnWinText "\n-----Interval: $interval-----"
 		Fire::PairCompositeSections fire 0.00001 0.5
 		Fire::PairCompositeSections ambient 0.00001 0.5
+		WarnWinText "\n-----Ran all functions in interval: $interval-----"
 	}
 	GiD_IntervalData set $current_interval
+	WarnWinText "Returned to original interval: $current_interval"
+	WarnWinText "\n\n.....Finished all pre-meshing commands.....\n\n"
 }
 proc GiD_Event_AfterMeshGeneration { fail } { 
 	
@@ -31,19 +37,24 @@ proc AfterMeshGeneration { fail } {
 }
 proc PostMeshing { fail } {
 	if {!$fail} {
+		WarnWinText ".....Starting post-meshing commands.....\n\n"
 		set current_interval [lindex [GiD_Info intvdata num] 0]
 		set num_of_intervals [lindex [GiD_Info intvdata num] 1]
 		WarnWinText "Current interval is: $current_interval"
 		for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
 			GiD_IntervalData set $interval
 			WarnWinText "Changed interval to $interval"
-			WarnWinText "Assigning composite connections."
+			WarnWinText "\n-----Interval: $interval-----"
 			Fire::AssignCompositeConnection fire 0.00001
 			Fire::AssignCompositeConnection ambient 0.00001
+			WarnWinText "\n-----Interval: $interval-----"
 			Fire::AssignCentralElementFlag
 			WarnWinText "constraint ID = $Fire::constraint_ID\ncondition ID = $Fire::condition_ID"
+			WarnWinText "\n-----Ran all functions in interval: $interval-----"
 		}
 		GiD_IntervalData set $current_interval
+		WarnWinText "Returned to original interval: $current_interval"
+		WarnWinText "\n\n.....Finished all post-meshing commands....."
 	}
 }
 # should be performed BEFORE meshing
@@ -181,7 +192,6 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 		WarnWinText "ERROR: Unknown state used for Fire:PairCompositeSections.\n can be either 'fire' or 'ambient'."
 		return -1
 	}   
-	WarnWinText "conditions are: $leader_condition_name and $follower_condition_name"
 
 	set line_list [GiD_Info Conditions $leader_condition_name geometry]
 	set num_of_leader_lines [llength $line_list]
@@ -355,14 +365,7 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 		WarnWinText "ERROR: Unknown state used for Fire:PairCompositeSections.\n can be either 'fire' or 'amient'."
 		return -1
 	}   
-	WarnWinText "conditions are: $leader_condition_name and $follower_condition_name"
-	# set current_interval [lindex [GiD_Info intvdata num] 0]
-	# set num_of_intervals [lindex [GiD_Info intvdata num] 1]
 	set nodes_to_collapse ""
-	# WarnWinText "Current interval is: $current_interval"
-	# for {set interval 1} {$interval <= $num_of_intervals} {incr interval} {
-		# GiD_IntervalData set $interval
-		# WarnWinText "Changed interval to $interval"
 	
 		set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
 		array unset leader_node_array
@@ -491,8 +494,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 			}
 			
 		}
-	# }
-	# GiD_IntervalData set $current_interval
 	if {[llength $nodes_to_collapse] == 0} {
 		WarnWinText "nodes_to_collapse: none"
 	} else {

@@ -4,11 +4,6 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var override=GenData(override_default_h,int)
 *set var globalhfire=GenData(convective_h_fire,real)
 *set var globalhamb=GenData(convective_h_ambient,real)
-*HTtime
-*HTtimestep
-*override
-*globalhfire
-*globalhamb
 *if(strcmp(GenData(Exposure_type),"standard_fire")==0)
 *set var fire=1
 *elseif(strcmp(GenData(Exposure_type),"Hydrocarbon")==0)
@@ -16,7 +11,7 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *else
 *set var fire=3
 *endif
-*fire
+*loop intervals
 *#beams
 *set cond Line_Gas_Temperatures_Central *elems
 *loop elems *OnlyInCond
@@ -131,3 +126,4 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *cond(ID,int)	1	0	*pmat	*tf	*tw	*h	*b	*dp	*dps	*ts	*bs	*plt	*fire	*HTtime *HTtimestep *hf	*ha			
 *endif
 *end elems
+*end intervals

@@ -149,7 +149,7 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 		set slab_thickness_index [lsearch $section_type_info "Slab_thickness#UNITS#"]
 		set slab_thickness [lindex $section_type_info [expr $slab_thickness_index + 1]]
 		
-		set slab_protection_index [lsearch $section_type_info "Protection_thickness#UNITS#"]
+		set slab_protection_index [lsearch $section_type_info "protection_thickness#UNITS#"]
 		set slab_protection_thickness [lindex $section_type_info [expr $slab_protection_index + 1]]
 		
 		set slab_protection_mat_index [lsearch $section_type_info "protection_material#CB#(1,2,3)"]
@@ -283,7 +283,7 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 		set follower_args [lreplace $follower_args 0 1 $follower_line $ID]
 		if {$state == "fire"} {
 			set slab_properties [lindex $leader_line_data_list($leader_line) 1]
-			set follower_args [lreplace $follower_args end-3 end {*}$slab_props]
+			set follower_args [lreplace $follower_args end-3 end {*}$slab_properties]
 		} else {
 		}
 		GiD_AssignData condition $follower_condition_name lines $follower_args $follower_line

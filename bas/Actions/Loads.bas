@@ -231,7 +231,7 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(ndime==3)
 *set cond Surface_Gas_Temperatures *elems
 *loop elems *OnlyInCond
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0 || strcmp(ElemsMatProp(Element_type:),"ShellDKGQ"))
+*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0 || strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
 *loop materials *NotUsed
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
@@ -260,7 +260,7 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *if(ndime==3)
 *set cond Surface_Composite_Section *elems
 *loop elems *OnlyInCond
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0 || strcmp(ElemsMatProp(Element_type:),"ShellDKGQ"))
+*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0 || strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
 *loop materials *NotUsed
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)

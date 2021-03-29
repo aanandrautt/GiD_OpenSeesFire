@@ -312,7 +312,7 @@ proc Fire::GenerateThermoCouples {} {
 	foreach key $sorted_thermocouple_data_keys {
 		set xyz $thermocouple_data($key)
 		set x [lindex $xyz 0]; set y [lindex $xyz 1]; set z [lindex $xyz 2];
-		puts $fileHandle "&DEVC ID = '$key', QUANTITY='GAS TEMPERATURE', XYZ=$x,$y,$z/"
+		puts $fileHandle "&DEVC ID = '$key', QUANTITY='TEMPERATURE', XYZ=$x,$y,$z/"
 	}
 	close $fileHandle
 }

@@ -54,7 +54,7 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *#slabs
 *set cond Surface_Gas_Temperatures_central *elems
 *loop elems *OnlyInCond
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0 || strcmp(ElemsMatProp(Element_type:),"ShellDKGQ"))
+*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0 || strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *set var DomainNum=6
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Type) *DomainNum)
 *loop materials *NotUsed

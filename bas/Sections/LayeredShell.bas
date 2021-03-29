@@ -165,15 +165,17 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *#
 *#
 *if(offset==0)
-# section LayeredShellThermal $sectionTag $nLayers $matTag1 $thickness_1 ... $matTagn $thickness_n
+#section LayeredShellThermal $sectionTag $nLayers $matTag1 $thickness_1 ... $matTagn $thickness_n
 *format "%d%d"
 section LayeredShellThermal *LayeredShellTag *nlayers *\
 *else
-# section LayeredShellThermal $sectionTag $nLayers -offset $offset $matTag1 $thickness_1 ... $matTagn $thickness_n
-*format "%d%d"
-section LayeredShellThermal *LayeredShellTag *nlayers *\
+# section	LayeredShellThermal	$sectionTag	-offset $offset	$nLayers	$matTag1 $thickness_1 ... $matTagn $thickness_n
+*format "%d"
+section LayeredShellThermal *LayeredShellTag *\
 *format "%g"
 -offset *offset *\
+*format "%d"
+*nlayers *\
 *endif
 *if(deckingThick!=0)
 *format "%d%g"

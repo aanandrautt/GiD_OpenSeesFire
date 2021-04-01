@@ -914,10 +914,12 @@ HTPattern fire 1 model 1 {
 				HeatFluxBC -HTEntity 2 -face 1 -type -ConvecAndRad -HTConstants 1
 				HeatFluxBC -HTEntity 3 -face 1 3 4 -type -ConvecAndRad -HTConstants 1
 				HeatFluxBC -HTEntity 4 -face 2 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 5 -face 1 2 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 6 -face 4 -type -ConvecAndRad -HTConstants 1
+				HeatFluxBC -HTEntity 5 -face 1 2 -type -ConvecAndRad -HTConstants 1
+				HeatFluxBC -HTEntity 7 -face 1 3 -type -ConvecAndRad -HTConstants 1
 				if {$sidesHeated == 4 && !$composite} {
-					HeatFluxBC -HTEntity 7 -face 1 3 4 -type -ConvecAndRad -HTConstants 1
+					HeatFluxBC -HTEntity 5 -face 4 -type -ConvecAndRad -HTConstants 1
+					HeatFluxBC -HTEntity 6 -face 4 -type -ConvecAndRad -HTConstants 1
+					HeatFluxBC -HTEntity 7 -face 4 -type -ConvecAndRad -HTConstants 1
 				} elseif {$composite} {
 					HeatFluxBC -HTEntity 8 -face 1 -type -ConvecAndRad -HTConstants 1
 					HeatFluxBC -HTEntity 9 -face 1 -type -ConvecAndRad -HTConstants 1

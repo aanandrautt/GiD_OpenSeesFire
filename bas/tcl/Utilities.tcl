@@ -294,9 +294,11 @@ proc Run_existing_HT {} {
 		file copy $HTScriptPath $records_folder
 		
 		cd $records_folder
+		
+		set n [expr [Fire::GetNumOWorkers] + 1]
 
 		# run analysis
-		eval exec [auto_execok start] \"\" mpiexec -n 4 \"$OSPCRPath\" OpenSeesDEBUG3.2.1 HTScript.tcl \"$HT_data_file\"
+		eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" OpenSeesDEBUG3.2.1 HTScript.tcl \"$HT_data_file\"
 
 		if {[file exists "Report.txt"] } {
 

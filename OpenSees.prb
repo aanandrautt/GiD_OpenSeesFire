@@ -74,6 +74,9 @@ HELP: User defined h coefficient for thermally-exposed members
 QUESTION: convective_h_ambient
 VALUE: 10
 HELP: User defined h coefficient for unexposed side of slabs and composite beams
+QUESTION: num_of_workers
+VALUE: 3
+HELP: Number of workers assigned to heat transfer.\nMinimum is 1, maximum depends on your hardware.\n3 is an optimised number for the test CPU with 8 cores. 
 TITLE: Eigenvalue_Analysis
 QUESTION: _#CB#(_)
 VALUE:

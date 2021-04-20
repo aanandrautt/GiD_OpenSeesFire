@@ -602,6 +602,7 @@ proc Fire::AssignCentralElementFlag {} {
 	}
 }
 
+# lappends a list with only unique items from another list
 proc LappendUnique { a_list another_list } {
 	foreach item $another_list {
 		if {!($item in $a_list)} {
@@ -610,7 +611,8 @@ proc LappendUnique { a_list another_list } {
 	}
 	return $a_list
 }
-#method for generating string for the directory of the thermal loading files
+
+# method for generating string for the directory of the thermal loading files
 proc Fire::GetTempFileDir { ID a_string } {
 	if {$a_string == "slab"} {
 		return "\"../Records/Thermal_load/Slab$ID.dat\""
@@ -618,4 +620,16 @@ proc Fire::GetTempFileDir { ID a_string } {
 		return "\"../Records/Thermal_load/BeamColumn$ID.dat\""
 	}
 	
+}
+
+# method to get the number of workers
+proc Fire::GetNumOWorkers { } {
+	set all_gen_data [GiD_Info gendata]
+	set num_o_workers_index [expr [lsearch $all_gen_data num_of_workers] + 1]
+	return [lindex $all_gen_data $num_o_workers_index]
+} 
+
+#method to shorten the call to WarnWinText
+proc W {anything} {	
+	WarnWinText "$anything" 
 }

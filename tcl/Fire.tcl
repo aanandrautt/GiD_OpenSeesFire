@@ -1,9 +1,11 @@
 namespace eval Fire {
 	variable condition_ID 1
+	variable composite_ID 1
 	variable constraint_ID 10000
 }
 proc Fire::ResetIDs { } {
 	set Fire::condition_ID 1
+	set Fire::composite_ID 1
 	set Fire::constraint_ID 10000
 }
 proc GiD_Event_BeforeMeshGeneration { element_size } {
@@ -45,11 +47,11 @@ proc PostMeshing { fail } {
 			GiD_IntervalData set $interval
 			WarnWinText "Changed interval to $interval"
 			WarnWinText "\n-----Interval: $interval-----"
-			Fire::AssignCompositeConnection fire 0.00001
+			# Fire::AssignCompositeConnection fire 0.00001
 			Fire::AssignCompositeConnection ambient 0.00001
 			WarnWinText "\n-----Interval: $interval-----"
 			Fire::AssignCentralElementFlag
-			WarnWinText "constraint ID = $Fire::constraint_ID\ncondition ID = $Fire::condition_ID"
+			WarnWinText "constraint ID = [expr $Fire::constraint_ID - 1]\ncondition ID = [expr $Fire::condition_ID - 1]\ncomposite ID = [expr $Fire::composite_ID - 1]                                         "
 			WarnWinText "\n-----Ran all functions in interval: $interval-----"
 		}
 		GiD_IntervalData set $current_interval
@@ -79,15 +81,19 @@ proc Fire::AssignConditionIds {} {
 		                
 		                set condition_args [lrange $geometric_entity 3 end]
 		                set condition_args [lreplace $condition_args 0 0 $geometric_entity_id]
-		                set condition_args [lreplace $condition_args 1 1 $Fire::condition_ID]
-
-		                
-		                if {$cond == "Surface_Gas_Temperatures"} {
-		                        GiD_AssignData condition $cond surfaces $condition_args $geometric_entity_id
-		                } else {
-		                        GiD_AssignData condition $cond lines $condition_args $geometric_entity_id
-		                }
-		                set Fire::condition_ID [expr $Fire::condition_ID + 1]
+						if {$cond == "Line_Composite_Section_Slab_AMBIENT"} {
+							set condition_args [lreplace $condition_args 1 1 $Fire::composite_ID]
+							GiD_AssignData condition $cond lines $condition_args $geometric_entity_id
+							set Fire::composite_ID [expr $Fire::composite_ID + 1]
+						} else {
+							set condition_args [lreplace $condition_args 1 1 $Fire::condition_ID]
+							if {$cond == "Surface_Gas_Temperatures"} {
+								GiD_AssignData condition $cond surfaces $condition_args $geometric_entity_id
+							} else {
+								GiD_AssignData condition $cond lines $condition_args $geometric_entity_id
+							}
+							set Fire::condition_ID [expr $Fire::condition_ID + 1]
+						}
 		        }
 		}
 }

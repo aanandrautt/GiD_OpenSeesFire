@@ -90,24 +90,25 @@ ERROR: This version of GiD+OpenSees does not allow 2D models
 
 *set var VarCount=VarCount+1
 *endif
+*set var angle=ElemsMatProp(local_axis_rotation,real)
 *#--------------Z as vertical axis-------------
 *if(strcmp(GenData(Vertical_axis),"Z")==0)
 *#Vertical elements
 *if(fabs(NodesCoord(1,1)-NodesCoord(2,1))<=1e-8 && fabs(NodesCoord(1,2)-NodesCoord(2,2))<=1e-8)
 *if(strcmp(ElemsMatProp(Geometric_transformation),"Linear")==0)
-*set var TransfTag=TransfTag1
+*set var TransfTag=tcl(Transform::ReturnTransformTag *TransfTag1 *angle)
 *elseif(strcmp(ElemsMatProp(Geometric_transformation),"P-Delta")==0)
-*set var TransfTag=TransfTag3
+*set var TransfTag=tcl(Transform::ReturnTransformTag *TransfTag3 *angle)
 *else
-*set var TransfTag=TransfTag5
+*set var TransfTag=tcl(Transform::ReturnTransformTag *TransfTag5 *angle)
 *endif
 *else
 *if(strcmp(ElemsMatProp(Geometric_transformation),"Linear")==0)
-*set var TransfTag=TransfTag2
+*set var TransfTag=tcl(Transform::ReturnTransformTag *TransfTag2 *angle)
 *elseif(strcmp(ElemsMatProp(Geometric_transformation),"P-Delta")==0)
-*set var TransfTag=TransfTag4
+*set var TransfTag=tcl(Transform::ReturnTransformTag *TransfTag4 *angle)
 *else
-*set var TransfTag=TransfTag6
+*set var TransfTag=tcl(Transform::ReturnTransformTag *TransfTag6 *angle)
 *endif
 *endif
 *#--------------Y as vertical axis-------------

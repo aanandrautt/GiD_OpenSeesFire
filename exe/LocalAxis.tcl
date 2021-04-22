@@ -136,3 +136,6 @@ proc Transform::ReturnTransformSyntax { transform_tag } {
 	return $syntax
 }
 
+proc Transform::ReturnTransformTag { original_tag angle } {
+	return [lindex $Transform::transformation_tags($angle) [expr $original_tag - 1]]
+}

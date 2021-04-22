@@ -808,6 +808,7 @@ proc InitGIDProject { dir } {
 						SecAggregator.tcl \
 						UserMaterial.tcl \
 						Fire.tcl \
+						Transform.tcl \
 						Recorder.tcl} {
 
 		source [file join $dir tcl $filename]

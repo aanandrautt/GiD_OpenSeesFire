@@ -56,6 +56,9 @@ proc PostMeshing { fail } {
 		}
 		GiD_IntervalData set $current_interval
 		WarnWinText "Returned to original interval: $current_interval"
+		W "\nCreating geometric transforms."
+		Transform::PopulateTagsArray
+		W "\nFinished creating all geometric transforms\n"
 		WarnWinText "\n\n.....Finished all post-meshing commands....."
 	}
 }

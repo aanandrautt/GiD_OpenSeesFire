@@ -33,28 +33,20 @@
 *set var TransfTag5=5
 *set var TransfTag6=6
 # Geometric Transformation
-
 *# Z AXIS AS VERTICAL AXIS
 *if(strcmp(GenData(Vertical_axis),"Z")==0)
-geomTransf Linear       *TransfTag1 -1 0 0; # vertical
-geomTransf Linear       *TransfTag2  0 0 1; # non-vertical
-geomTransf PDelta       *TransfTag3 -1 0 0; # vertical
-geomTransf PDelta       *TransfTag4  0 0 1; # non-vertical
-geomTransf Corotational *TransfTag5 -1 0 0; # vertical
-geomTransf Corotational *TransfTag6  0 0 1; # non-vertical
-
+*set var numOfTransforms=tcl(Transform::GetNumOfTransforms)
+*for(i=1;i<=numOfTransforms;i=i+1)
+*tcl(Transform::ReturnTransformSyntax *i)
+*endfor
 *# Y AXIS AS VERTICAL AXIS
 *elseif(strcmp(GenData(Vertical_axis),"Y")==0)
-geomTransf Linear       *TransfTag1 -1 0 0; # vertical
-geomTransf Linear       *TransfTag2  0 1 0; # non-vertical
-geomTransf PDelta       *TransfTag3 -1 0 0; # vertical
-geomTransf PDelta       *TransfTag4  0 1 0; # non-vertical
-geomTransf Corotational *TransfTag5 -1 0 0; # vertical
-geomTransf Corotational *TransfTag6  0 1 0; # non-vertical
-
+ERROR: This version of GiD+OpenSees does not allow 2D models
 *endif
 *set var GeomTransfPrinted=1
 *endif
+
+
 # Sections Definition used by dispBeamColumn Elements
 # (if they have not already been defined on this model domain)
 
@@ -64,6 +56,7 @@ geomTransf Corotational *TransfTag6  0 1 0; # non-vertical
 *set var SelectedSection=tcl(FindMaterialNumber *MatProp(Section) *DomainNum)
 *set var MaterialExists=tcl(CheckUsedMaterials *SelectedSection)
 *# IF IT HAS NOT BEEN DEFINED YET
+# Section for element: *MatProp(0)
 *if(MaterialExists==-1)
 *loop materials *NotUsed
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)

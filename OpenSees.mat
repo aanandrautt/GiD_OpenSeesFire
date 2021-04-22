@@ -1983,6 +1983,9 @@ TKWIDGET: DBC::CheckSection
 TITLE: Element_Geometry
 QUESTION: Geometric_transformation#CB#(Linear,P-Delta,Corotational)
 VALUE: Corotational
+QUESTION: local_axis_rotation
+VALUE: 0
+HELP: rotation value in degrees.
 TITLE: Mass-Weight
 QUESTION: Mass_density#UNITS#
 VALUE: 7850 kg/m^3
@@ -2053,6 +2056,9 @@ VALUE: 1
 TITLE: Element_Geometry
 QUESTION: Geometric_transformation#CB#(Linear,P-Delta,Corotational)
 VALUE: Linear
+QUESTION: local_axis_rotation
+VALUE: 0
+HELP: rotation value in degrees.
 TITLE: Weight
 QUESTION: Weight_density#UNITS#
 VALUE: 25 kN/m^3
@@ -2128,6 +2134,9 @@ VALUE: 1
 TITLE: Element_Geometry
 QUESTION: Geometric_transformation#CB#(Linear,P-Delta,Corotational)
 VALUE: Linear
+QUESTION: local_axis_rotation
+VALUE: 0
+HELP: rotation value in degrees.
 TITLE: Weight
 QUESTION: Weight_density#UNITS#
 VALUE: 25 kN/m^3
@@ -2160,6 +2169,9 @@ TKWIDGET: FBC::CheckSection
 TITLE: Element_Geometry
 QUESTION: Geometric_transformation#CB#(Linear,P-Delta,Corotational)
 VALUE: Linear
+QUESTION: local_axis_rotation
+VALUE: 0
+HELP: rotation value in degrees.
 TITLE: Element_compatibillity
 QUESTION: Activate_iterative_scheme_for_satisfying_element_compatibility#CB#(1,0)
 VALUE: 1
@@ -2204,6 +2216,9 @@ VALUE: 0.4#WIDTH#(15)
 TITLE: Element_Geometry
 QUESTION: Geometric_transformation#CB#(LinearInt)
 VALUE: LinearInt
+STATE: DISABLED
+QUESTION: local_axis_rotation
+VALUE: 0
 STATE: DISABLED
 TITLE: Mass-Weight
 QUESTION: Mass_density#UNITS#

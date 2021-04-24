@@ -445,246 +445,428 @@ source "../Scripts/Recorders.tcl"; # user recorders
 *# Layer output
 *#
 *#
-*# ShellMITC4
+*# Both MITC4 and NLDKGQ
 *#
-*if(cntShell!=0)
+*if(cntShell!=0 || cntShellDKGQ!=0)
+set quad_elems "*tcl(Recorders::GetQuadElems)"
+*set var layer = GenData(layer_A,int)
+*if(layer >0)
+*if(GenData(layer_A_is_steel,int)==0)
 *if(GenData(Stresses_in_layer_A,int)==1)
-
-*set var layer = GenData(Stress_layer_A,int)
+#layer_A: *GenData(layer_A_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_stress_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer stresses
-*endfor
-*endif
-*if(GenData(Stresses_in_layer_B,int)==1)
-
-*set var layer = GenData(Stress_layer_B,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_stress_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer stresses
-*endfor
-*endif
-*if(GenData(Stresses_in_layer_C,int)==1)
-
-*set var layer = GenData(Stress_layer_C,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_stress_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer stresses
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
 *endfor
 *endif
 *if(GenData(Strains_in_layer_A,int)==1)
-
-*set var layer = GenData(Strain_layer_A,int)
+#layer_A: *GenData(layer_A_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_strain_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer strains
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
 *endfor
 *endif
-*if(GenData(Strains_in_layer_B,int)==1)
-
-*set var layer = GenData(Strain_layer_B,int)
+*if(GenData(Temp_damage_in_layer_A,int)==1)
+#layer_A: *GenData(layer_A_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_strain_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer strains
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
 *endfor
 *endif
-*if(GenData(Strains_in_layer_C,int)==1)
-
-*set var layer = GenData(Strain_layer_C,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_strain_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer strains
-*endfor
-*endif
-*if(GenData(Temp_and_KtKc_in_layer_A,int)==1)
-
-*set var layer = GenData(Temp_KtKc_layer_A,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_TempKtKc_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer TempAndElong
-*endfor
-*endif
-*if(GenData(Temp_and_KtKc_in_layer_B,int)==1)
-
-*set var layer = GenData(Temp_KtKc_layer_B,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_TempKtKc_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer TempAndElong
-*endfor
-*endif
-*if(GenData(Temp_and_KtKc_in_layer_C,int)==1)
-
-*set var layer = GenData(Temp_KtKc_layer_C,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellMITC4_TempKtKc_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer TempAndElong
-*endfor
-*endif
-*endif
-*#
-*# ShellDKGQ
-*#
-*if(cntShellDKGQ!=0)
+*else
 *if(GenData(Stresses_in_layer_A,int)==1)
-
-*set var layer = GenData(Stress_layer_A,int)
+#layer_A: *GenData(layer_A_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_stress_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer stresses
-*endfor
-*endif
-*if(GenData(Stresses_in_layer_B,int)==1)
-
-*set var layer = GenData(Stress_layer_B,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_stress_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer stresses
-*endfor
-*endif
-*if(GenData(Stresses_in_layer_C,int)==1)
-
-*set var layer = GenData(Stress_layer_C,int)
-*for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_stress_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer stresses
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
 *endfor
 *endif
 *if(GenData(Strains_in_layer_A,int)==1)
-
-*set var layer = GenData(Strain_layer_A,int)
+#layer_A: *GenData(layer_A_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_strain_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
 *endif
-*end elems
-material *i fiber *layer strains
+*if(GenData(Temp_damage_in_layer_A,int)==1)
+#layer_A: *GenData(layer_A_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_B,int)
+*if(layer >0)
+*if(GenData(layer_B_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_B,int)==1)
+#layer_B: *GenData(layer_B_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
 *endfor
 *endif
 *if(GenData(Strains_in_layer_B,int)==1)
-
-*set var layer = GenData(Strain_layer_B,int)
+#layer_B: *GenData(layer_B_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_strain_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
 *endif
-*end elems
-material *i fiber *layer strains
+*if(GenData(Temp_damage_in_layer_B,int)==1)
+#layer_B: *GenData(layer_B_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_B,int)==1)
+#layer_B: *GenData(layer_B_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_B,int)==1)
+#layer_B: *GenData(layer_B_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_B,int)==1)
+#layer_B: *GenData(layer_B_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_C,int)
+*if(layer >0)
+*if(GenData(layer_C_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_C,int)==1)
+#layer_C: *GenData(layer_C_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
 *endfor
 *endif
 *if(GenData(Strains_in_layer_C,int)==1)
-
-*set var layer = GenData(Strain_layer_C,int)
+#layer_C: *GenData(layer_C_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_strain_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer strains
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
 *endfor
 *endif
-*if(GenData(Temp_and_KtKc_in_layer_A,int)==1)
-
-*set var layer = GenData(Temp_KtKc_layer_A,int)
+*if(GenData(Temp_damage_in_layer_C,int)==1)
+#layer_C: *GenData(layer_C_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_TempKtKc_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer TempAndElong
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
 *endfor
 *endif
-*if(GenData(Temp_and_KtKc_in_layer_B,int)==1)
-
-*set var layer = GenData(Temp_KtKc_layer_B,int)
+*else
+*if(GenData(Stresses_in_layer_C,int)==1)
+#layer_C: *GenData(layer_C_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_TempKtKc_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer TempAndElong
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
 *endfor
 *endif
-*if(GenData(Temp_and_KtKc_in_layer_C,int)==1)
-
-*set var layer = GenData(Temp_KtKc_layer_C,int)
+*if(GenData(Strains_in_layer_C,int)==1)
+#layer_C: *GenData(layer_C_name)
 *for(i=1;i<=4;i=i+1)
-recorder Element -file ShellDKGQ_TempKtKc_Layer*layer_GP*i.out -time -ele *\
-*loop elems
-*if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
-*ElemsNum *\
-*endif
-*end elems
-material *i fiber *layer TempAndElong
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
 *endfor
+*endif
+*if(GenData(Temp_damage_in_layer_C,int)==1)
+#layer_C: *GenData(layer_C_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_D,int)
+*if(layer >0)
+*if(GenData(layer_D_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_D,int)==1)
+#layer_D: *GenData(layer_D_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_D,int)==1)
+#layer_D: *GenData(layer_D_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_D,int)==1)
+#layer_D: *GenData(layer_D_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_D,int)==1)
+#layer_D: *GenData(layer_D_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_D,int)==1)
+#layer_D: *GenData(layer_D_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_D,int)==1)
+#layer_D: *GenData(layer_D_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_E,int)
+*if(layer >0)
+*if(GenData(layer_E_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_E,int)==1)
+#layer_E: *GenData(layer_E_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_E,int)==1)
+#layer_E: *GenData(layer_E_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_E,int)==1)
+#layer_E: *GenData(layer_E_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_E,int)==1)
+#layer_E: *GenData(layer_E_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_E,int)==1)
+#layer_E: *GenData(layer_E_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_E,int)==1)
+#layer_E: *GenData(layer_E_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_F,int)
+*if(layer >0)
+*if(GenData(layer_F_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_F,int)==1)
+#layer_F: *GenData(layer_F_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_F,int)==1)
+#layer_F: *GenData(layer_F_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_F,int)==1)
+#layer_F: *GenData(layer_F_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_F,int)==1)
+#layer_F: *GenData(layer_F_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_F,int)==1)
+#layer_F: *GenData(layer_F_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_F,int)==1)
+#layer_F: *GenData(layer_F_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_G,int)
+*if(layer >0)
+*if(GenData(layer_G_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_G,int)==1)
+#layer_G: *GenData(layer_G_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_G,int)==1)
+#layer_G: *GenData(layer_G_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_G,int)==1)
+#layer_G: *GenData(layer_G_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_G,int)==1)
+#layer_G: *GenData(layer_G_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_G,int)==1)
+#layer_G: *GenData(layer_G_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_G,int)==1)
+#layer_G: *GenData(layer_G_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_H,int)
+*if(layer >0)
+*if(GenData(layer_H_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_H,int)==1)
+#layer_H: *GenData(layer_H_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_H,int)==1)
+#layer_H: *GenData(layer_H_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_H,int)==1)
+#layer_H: *GenData(layer_H_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_H,int)==1)
+#layer_H: *GenData(layer_H_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_H,int)==1)
+#layer_H: *GenData(layer_H_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_H,int)==1)
+#layer_H: *GenData(layer_H_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_I,int)
+*if(layer >0)
+*if(GenData(layer_I_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_I,int)==1)
+#layer_I: *GenData(layer_I_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_I,int)==1)
+#layer_I: *GenData(layer_I_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_I,int)==1)
+#layer_I: *GenData(layer_I_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_I,int)==1)
+#layer_I: *GenData(layer_I_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_I,int)==1)
+#layer_I: *GenData(layer_I_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_I,int)==1)
+#layer_I: *GenData(layer_I_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
+*endif
+*set var layer = GenData(layer_J,int)
+*if(layer >0)
+*if(GenData(layer_J_is_steel,int)==0)
+*if(GenData(Stresses_in_layer_J,int)==1)
+#layer_J: *GenData(layer_J_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_J,int)==1)
+#layer_J: *GenData(layer_J_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_J,int)==1)
+#layer_J: *GenData(layer_J_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_temp_damage_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*else
+*if(GenData(Stresses_in_layer_J,int)==1)
+#layer_J: *GenData(layer_J_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_stress_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer stress
+*endfor
+*endif
+*if(GenData(Strains_in_layer_J,int)==1)
+#layer_J: *GenData(layer_J_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_strain_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer strain
+*endfor
+*endif
+*if(GenData(Temp_damage_in_layer_J,int)==1)
+#layer_J: *GenData(layer_J_name)
+*for(i=1;i<=4;i=i+1)
+recorder Element -file *GenData(Shell_element_type)_steel_temp_Layer*layer_GP*i.out -time -ele {*tcl(Recorders::ReturnStar)}$quad_elems material *i fiber *layer TempAndElong
+*endfor
+*endif
+*endif
 *endif
 *endif

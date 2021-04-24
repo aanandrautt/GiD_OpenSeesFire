@@ -2892,21 +2892,31 @@ begin
                     MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Temperatures//Difference_bot_top" Scalar');
                     MSH.Writeline('Unit "C"');
 
-                    StrToArray(line,Str,5*n,true);  // read all values from current step (5 values per element)
+                    StrToArray(line,Str,5*n,true);  // read all values from current step (6 values per gauss point)
                 end;
 
                 MSH.Writeline('Values');
 
                 for j := 0 to n-1 do
                 begin
-
-                    if ndm = 3 then // end1                                     Bottom flange    Web                Top flange          Average           difference
+                    if ndm = 2 then // end1                                     Axial            Rotation
                     begin
-                        s := Tag[j] + StringOfChar(' ',INDENT-Length(Tag[j])) + Str[5*j] + ' ' + Str[5*j+1] + ' ' + Str[5*j+2] + ' ' + Str[5*j+3] + ' ' + Str[5*j+4];
+                        s := Tag[j] + StringOfChar(' ',INDENT-Length(Tag[j])) + Str[3*j] + ' ' + Str[3*j+1];
 
-                        MSH.Writeline(s); // end2        Bottom flange    Web                Top flange          Average           difference
+                        MSH.Writeline(s); // end2       Axial            Rotation
 
-                        s := StringOfChar(' ',INDENT) +  Str[5*j] + ' ' + Str[5*j+1] + ' ' + Str[5*j+2] + ' ' + Str[5*j+3] + ' ' + Str[5*j+4];
+                        s := StringOfChar(' ',INDENT) + Str[3*j] + ' ' + Inv(Str[3*j+2]);
+
+                        MSH.Writeline(s);
+                    end;
+
+                    if ndm = 3 then // end1                                     Axial            Rotation z              Rotation y              Torsional
+                    begin
+                        s := Tag[j] + StringOfChar(' ',INDENT-Length(Tag[j])) + Str[6*j] + ' ' + Inv(Str[6*j+1]) + ' ' + Inv(Str[6*j+3]) + ' ' + Str[6*j+5];
+
+                        MSH.Writeline(s); // end2        Axial            Rotation z         Rotation y         Torsional
+
+                        s := StringOfChar(' ',INDENT) +  Str[6*j] + ' ' + Str[6*j+2] + ' ' + Str[6*j+4] + ' ' + Str[6*j+5];
 
                         MSH.Writeline(s);
                     end;

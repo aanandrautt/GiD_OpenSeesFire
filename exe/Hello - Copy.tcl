@@ -63,6 +63,7 @@ proc PProcess::WriteHTOutput { } {
 	set file_handle [open $output_dir w+]
 	set common_time [lindex [FindListCommonItems $PProcess::time $PProcess::struct_time] 1]
 	set output_string ""
+	set last_time_offset 0
 	foreach time_step $PProcess::struct_time {
 		lappend output_string $time_step
 		foreach elem_cond $PProcess::elem_cond_list {
@@ -70,7 +71,9 @@ proc PProcess::WriteHTOutput { } {
 			set cond [lindex $elem_cond 1]
 			if {$cond > 0} {
 				if {$time_step in $common_time} {
-					lappend output_string {*}[PProcess::GetHTResults $cond $time_step]
+					set result [PProcess::GetHTResults $cond $time_step $last_time_offset]
+					set last_time_offset [lindex $result 5]
+					lappend output_string {*}[lrange $result 0 4]
 				} else {
 					lappend output_string {*}[lrepeat 5 0]
 				}
@@ -102,29 +105,41 @@ proc PProcess::GetStructTime { } {
 }
 
 
-proc PProcess::GetHTResults { ID time } {
+proc PProcess::GetHTResults { ID time offset } {
 	set HT_res_dir [file join [OpenSees::GetProjectPath] "Records" "Thermal_load" "BeamColumn$ID.dat"]
 	set file_handle [open $HT_res_dir r]
-	set result ""
-	while {[gets $file_handle line] >= 0} {
+	seek $file_handle $offset
+	# set result ""
+	while {[gets $file_handle line] >= 0 && [lindex $line 0] <= $time} {
 		W "HT file time is: [lindex $line 0], requiredtime is: $time"
 		if {[lindex $line 0] == $time} {
+		W "time is okay. line length is: [llength $line]"
 			if {[expr [llength $line] - 1] == 15} {
+			W "stepping into here"
 				set web [PProcess::Mean [lrange $line 1 5]]
 				set botFlange [PProcess::Mean [lrange $line 6 10]]
 				set topFlange [PProcess::Mean [lrange $line 11 15]]
 				set section_avg [PProcess::Mean [lrange $line 1 15]]
 				set bot_top_diff [expr $botFlange - $topFlange]
-				set result "$botFlange $web $topFlange $section_avg $bot_top_diff"
-				return "$result [tell $file_handle]"
+				W "file is telling us: [tell $file_handle]"
+				return "$botFlange $web $topFlange $section_avg $bot_top_diff [tell $file_handle]"
+				W "Current results is $result"
+				return $result
 			} elseif {[expr [llength $line] - 1] == 21} { 
-			
-				return
+			W "stepping into the wrong one"
+				return -1
+			} elseif {[lindex $line 0] > 100} {
+				return -1
+				continue
+			} else {
+			W "stepping into a worse one"
+				return -1
 			}
 		}
 	}
 	W "could not find time = $time"
-	return "[lrepeat 5 0] 0"
+	# return ERROR
+	# return "[lrepeat 5 0] 0"
 }
 proc PProcess::Mean { a_list } {
 	set length [llength $a_list]

@@ -1,4 +1,4 @@
-﻿program OpenSeesPost;
+﻿program HTPost;
 
 {$APPTYPE CONSOLE}
 
@@ -926,8 +926,8 @@ begin
 
     // initialize files
 
-    ResFileASCII := ModelPath+'\'+ModelName+'.post.res.ascii';
-    ResFileBin := ModelPath+'\'+ModelName+'.post.res';
+    ResFileASCII := ModelPath+'\'+ModelName+'HT.post.res.ascii';
+    ResFileBin := ModelPath+'\'+ModelName+'HT.post.res';
 
     if FileExists(ResFileASCII) then
         DeleteFile(PWideChar(ResFileASCII));
@@ -936,68 +936,11 @@ begin
 
     MSH := TStreamWriter.Create(ResFileASCII,false,TEncoding.ASCII);
 
-    MSH.Writeline('GiD Post Results File 1.0');
+    MSH.Writeline('GiD Post Results File HT 1.0');
 
     //
     // GAUSS POINT DEFINITIONS
     //
-
-    if FileExists(ModelPath+'\OpenSees\stdBrick_force.out') or
-       FileExists(ModelPath+'\OpenSees\stdBrick_stress.out') or
-       FileExists(ModelPath+'\OpenSees\stdBrick_strain.out') then
-    begin
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "stdBrick_GP" ElemType Hexahedra');
-        MSH.Writeline('Number Of Gauss Points: 8');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline('-0.577350269189626 -0.577350269189626 -0.577350269189626');
-        MSH.Writeline('-0.577350269189626 -0.577350269189626  0.577350269189626');
-        MSH.Writeline('-0.577350269189626  0.577350269189626 -0.577350269189626');
-        MSH.Writeline('-0.577350269189626  0.577350269189626  0.577350269189626');
-        MSH.Writeline('+0.577350269189626 -0.577350269189626 -0.577350269189626');
-        MSH.Writeline(' 0.577350269189626 -0.577350269189626  0.577350269189626');
-        MSH.Writeline(' 0.577350269189626  0.577350269189626 -0.577350269189626');
-        MSH.Writeline(' 0.577350269189626  0.577350269189626  0.577350269189626');
-        MSH.Writeline('end GaussPoints');
-
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "stdBrick_Node" ElemType Hexahedra');
-        MSH.Writeline('Number Of Gauss Points: 8');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline('-1 -1 -1');
-        MSH.Writeline(' 1 -1 -1');
-        MSH.Writeline(' 1  1 -1');
-        MSH.Writeline('-1  1 -1');
-        MSH.Writeline('-1 -1  1');
-        MSH.Writeline(' 1 -1  1');
-        MSH.Writeline(' 1  1  1');
-        MSH.Writeline('-1  1  1');
-        MSH.Writeline('end GaussPoints');
-    end;
-
-    if FileExists(ModelPath+'\OpenSees\ShellMITC4_force.out') or
-       FileExists(ModelPath+'\OpenSees\ShellMITC4_stress.out') then
-    begin
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "ShellMITC4_GP" ElemType Quadrilateral');
-        MSH.Writeline('Number Of Gauss Points: 4');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline('-0.577350269189626 -0.577350269189626');
-        MSH.Writeline(' 0.577350269189626 -0.577350269189626');
-        MSH.Writeline(' 0.577350269189626  0.577350269189626');
-        MSH.Writeline('-0.577350269189626  0.577350269189626');
-        MSH.Writeline('end GaussPoints');
-
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "ShellMITC4_Node" ElemType Quadrilateral');
-        MSH.Writeline('Number Of Gauss Points: 4');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline('-1 -1');
-        MSH.Writeline(' 1 -1');
-        MSH.Writeline(' 1  1');
-        MSH.Writeline('-1  1');
-        MSH.Writeline('end GaussPoints');
-    end;
 
     if FileExists(ModelPath+'\OpenSees\ShellDKGQ_force.out') or
        FileExists(ModelPath+'\OpenSees\ShellDKGQ_stress.out') then
@@ -1023,65 +966,8 @@ begin
         MSH.Writeline('end GaussPoints');
     end;
 
-    if FileExists(ModelPath+'\OpenSees\Quad_force.out') or
-       FileExists(ModelPath+'\OpenSees\Quad_stress.out') or
-       FileExists(ModelPath+'\OpenSees\Quad_strain.out') then
-    begin
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "Quad_GP" ElemType Quadrilateral');
-        MSH.Writeline('Number Of Gauss Points: 4');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline('-0.577350269189626 -0.577350269189626');
-        MSH.Writeline(' 0.577350269189626 -0.577350269189626');
-        MSH.Writeline(' 0.577350269189626  0.577350269189626');
-        MSH.Writeline('-0.577350269189626  0.577350269189626');
-        MSH.Writeline('end GaussPoints');
 
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "Quad_Node" ElemType Quadrilateral');
-        MSH.Writeline('Number Of Gauss Points: 4');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline('-1 -1');
-        MSH.Writeline(' 1 -1');
-        MSH.Writeline(' 1  1');
-        MSH.Writeline('-1  1');
-        MSH.Writeline('end GaussPoints');
-    end;
-
-    if FileExists(ModelPath+'\OpenSees\Tri31_force.out') or
-       FileExists(ModelPath+'\OpenSees\Tri31_stress.out') or
-       FileExists(ModelPath+'\OpenSees\Tri31_strain.out') then
-    begin
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "Tri31_GP" ElemType Triangle');
-        MSH.Writeline('Number Of Gauss Points: 1');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline(' 0.333333333333333  0.333333333333333');
-        MSH.Writeline('end GaussPoints');
-
-        MSH.Writeline('');
-        MSH.Writeline('GaussPoints "Tri31_Node" ElemType Triangle');
-        MSH.Writeline('Number Of Gauss Points: 3');
-        MSH.Writeline('Natural Coordinates: Given');
-        MSH.Writeline(' 1  0');
-        MSH.Writeline(' 1  1');
-        MSH.Writeline(' 0  1');
-        MSH.Writeline('end GaussPoints');
-    end;
-
-    if FileExists(ModelPath+'\OpenSees\Truss_axialForce.out') or
-       FileExists(ModelPath+'\OpenSees\Truss_deformations.out') or
-       FileExists(ModelPath+'\OpenSees\CorotTruss_axialForce.out') or
-       FileExists(ModelPath+'\OpenSees\CorotTruss_deformations.out') or
-       FileExists(ModelPath+'\OpenSees\ElasticBeamColumn_localForce.out')or
-       FileExists(ModelPath+'\OpenSees\ElasticTimoshenkoBeamColumn_localForce.out') or
-       FileExists(ModelPath+'\OpenSees\ForceBeamColumn_localForce.out') or
-       FileExists(ModelPath+'\OpenSees\ForceBeamColumn_basicDeformation.out') or
-       FileExists(ModelPath+'\OpenSees\ForceBeamColumn_plasticDeformation') or
-       FileExists(ModelPath+'\OpenSees\DispBeamColumn_localForce.out') or
-       FileExists(ModelPath+'\OpenSees\DispBeamColumn_basicDeformation.out') or
-       FileExists(ModelPath+'\OpenSees\DispBeamColumn_plasticDeformation.out') or
-       FileExists(ModelPath+'\OpenSees\DispBeamColumnInt_localForce.out') then
+    if FileExists(ModelPath+'\OpenSees\Beam_temps.out.out') then
 
     begin
         MSH.Writeline('');
@@ -1101,7 +987,7 @@ begin
 
     // buffer interval types and steps
 
-    OutFile := ModelPath+'\OpenSees\Node_displacements.out';
+    OutFile := ModelPath+'\OpenSees\Beam_temps.out';
 
     if FileExists(OutFile) then
     begin
@@ -1140,7 +1026,7 @@ begin
 
     n := TCL.IndexOf('# F R A M E   L O C A L   A X E S   O R I E N T A T I O N');
 
-    OutFile := ModelPath+'\OpenSees\Node_displacements.out';
+    OutFile := ModelPath+'\OpenSees\Beam_temps.out';
 
     if FileExists(OutFile) and (n <> -1) then
     begin
@@ -2743,6 +2629,99 @@ begin
     //
     // Displacement-based beam-column element
     //
+    // Temperature
+
+    OutFile := ModelPath+'\OpenSees\DispBeamColumn_localForce.out';
+
+    if FileExists(OutFile) then
+    begin
+        write('Reading displacement beam-column forces ');
+
+        n := StrToInt(Copy(TCL[TCL.IndexOf('# DispBeamColumn')+1],3,10));  // number of elastic beam-column elements
+
+        StrToArray(TCL[TCL.IndexOf('# DispBeamColumn')+2],Tag,n,true);  // read all tags
+
+        AssignFile(RES,OutFile);
+        Reset(RES);
+
+        i := 0;
+
+        repeat
+
+            Readln(RES,line);
+
+            if (i = 0) or EOF(RES) or (i mod Step = 0) then
+            begin
+
+                MSH.Writeline('');
+
+                if ndm = 3 then
+                begin
+                    MSH.Writeline('ResultGroup "'+Str_IntNames[i]+'" '+Str_Steps[i]+' OnGaussPoints "Line_Nodes"');
+                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Actions//N" Scalar');
+                    MSH.Writeline('Unit "kN"');
+                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Actions//Vy" Scalar');
+                    MSH.Writeline('Unit "kN"');
+                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Actions//Vz" Scalar');
+                    MSH.Writeline('Unit "kN"');
+                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Actions//T" Scalar');
+                    MSH.Writeline('Unit "kNm"');
+                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Actions//My" Scalar');
+                    MSH.Writeline('Unit "kNm"');
+                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Actions//Mz" Scalar');
+                    MSH.Writeline('Unit "kNm"');
+
+                    StrToArray(line,Str,2*6*n,true);  // read all values from current step (6 values per gauss point)
+                end;
+
+                MSH.Writeline('Values');
+
+                for j := 0 to n-1 do
+                begin
+                    if ndm = 2 then // end1                                     N                         V                     M
+                    begin
+                        s := Tag[j] + StringOfChar(' ',INDENT-Length(Tag[j])) + Inv(Str[3*(2*j)]) + ' ' + Str[3*(2*j)+1] + ' '+ Str[3*(2*j)+2];
+
+                        MSH.Writeline(s); // end2        N                      V                            M
+
+                        s := StringOfChar(' ',INDENT) +  Str[3*(2*j+1)] + ' ' + Inv(Str[3*(2*j+1)+1]) + ' '+ Inv(Str[3*(2*j+1)+2]);
+
+                        MSH.Writeline(s);
+                    end;
+
+                    if ndm = 3 then // end1                                     N                         Vy                     Vz                     T                      My                    Mz
+                    begin
+                        s := Tag[j] + StringOfChar(' ',INDENT-Length(Tag[j])) + Inv(Str[6*(2*j)]) + ' ' + Str[6*(2*j)+1] + ' ' + Str[6*(2*j)+2] + ' ' + Str[6*(2*j)+3] + ' ' + Str[6*(2*j)+4] + ' '+ Str[6*(2*j)+5];
+
+                        MSH.Writeline(s); // end2        �                      Vy                            Vz                            T                             My                           Mz
+
+                        s := StringOfChar(' ',INDENT) +  Str[6*(2*j+1)] + ' ' + Inv(Str[6*(2*j+1)+1]) + ' ' + Inv(Str[6*(2*j+1)+2]) + ' ' + Inv(Str[6*(2*j+1)+3]) + ' ' + Inv(Str[6*(2*j+1)+4]) + ' '+ Inv(Str[6*(2*j+1)+5]);
+
+                        MSH.Writeline(s);
+                    end;
+                end;
+
+                MSH.Writeline('End Values');
+
+                s := '('+IntToStr(i+1)+')';
+                TextColor(Yellow);
+                write(s);
+                TextColor(White);
+
+                if not EOF(RES) then
+                    for j := 1 to Length(s) do
+                        write(#8);
+            end;
+
+            Inc(i);
+
+        until EOF(RES);
+
+        CloseFile(RES);
+
+        writeln;
+
+    end;
 
     // force
 
@@ -2824,89 +2803,6 @@ begin
                         MSH.Writeline(s); // end2        �                      Vy                            Vz                            T                             My                           Mz
 
                         s := StringOfChar(' ',INDENT) +  Str[6*(2*j+1)] + ' ' + Inv(Str[6*(2*j+1)+1]) + ' ' + Inv(Str[6*(2*j+1)+2]) + ' ' + Inv(Str[6*(2*j+1)+3]) + ' ' + Inv(Str[6*(2*j+1)+4]) + ' '+ Inv(Str[6*(2*j+1)+5]);
-
-                        MSH.Writeline(s);
-                    end;
-                end;
-
-                MSH.Writeline('End Values');
-
-                s := '('+IntToStr(i+1)+')';
-                TextColor(Yellow);
-                write(s);
-                TextColor(White);
-
-                if not EOF(RES) then
-                    for j := 1 to Length(s) do
-                        write(#8);
-            end;
-
-            Inc(i);
-
-        until EOF(RES);
-
-        CloseFile(RES);
-
-        writeln;
-
-    end;
-
-
-    // Temperatures
-
-    OutFile := ModelPath+'\OpenSees\DispBeamColumn_temperatures.out';
-
-    if FileExists(OutFile) then
-    begin
-        write('Reading displacement beam-column total temperatures ');
-
-        n := StrToInt(Copy(TCL[TCL.IndexOf('# DispBeamColumn')+1],3,10));  // number of elastic beam-column elements
-
-        StrToArray(TCL[TCL.IndexOf('# DIspBeamColumn')+2],Tag,n,true);  // read all tags
-
-        AssignFile(RES,OutFile);
-        Reset(RES);
-
-        i := 0;
-
-        repeat
-
-            Readln(RES,line);
-
-            if (i = 0) or EOF(RES) or (i mod Step = 0) then
-            begin
-
-                MSH.Writeline('');
-
-                if ndm = 3 then
-                begin
-                    MSH.Writeline('ResultGroup "'+Str_IntNames[i]+'" '+Str_Steps[i]+' OnGaussPoints "Line_Nodes"');
-                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Temperatures//Bottom_flange" Scalar');
-                    MSH.Writeline('Unit "C"');
-                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Temperatures//Web" Scalar');
-                    MSH.Writeline('Unit "C"');
-                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Temperatures//Top_flange" Scalar');
-                    MSH.Writeline('Unit "C"');
-                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Temperatures//Average" Scalar');
-                    MSH.Writeline('Unit "C"');
-                    MSH.Writeline('ResultDescription "Elements//Displacement_Beam-Column//Temperatures//Difference_bot_top" Scalar');
-                    MSH.Writeline('Unit "C"');
-
-                    StrToArray(line,Str,5*n,true);  // read all values from current step (5 values per element)
-                end;
-
-                MSH.Writeline('Values');
-
-                for j := 0 to n-1 do
-                begin
-
-                    if ndm = 3 then // end1                                     Bottom flange    Web                Top flange          Average           difference
-                    begin
-                        s := Tag[j] + StringOfChar(' ',INDENT-Length(Tag[j])) + Str[5*j] + ' ' + Str[5*j+1] + ' ' + Str[5*j+2] + ' ' + Str[5*j+3] + ' ' + Str[5*j+4];
-
-                        MSH.Writeline(s); // end2        Bottom flange    Web                Top flange          Average           difference
-
-                        s := StringOfChar(' ',INDENT) +  Str[5*j] + ' ' + Str[5*j+1] + ' ' + Str[5*j+2] + ' ' + Str[5*j+3] + ' ' + Str[5*j+4];
 
                         MSH.Writeline(s);
                     end;

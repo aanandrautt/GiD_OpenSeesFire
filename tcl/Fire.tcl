@@ -101,6 +101,10 @@ proc Fire::AssignConditionIds {} {
 		}
 }
 
+proc Fire::GetConditionID { cond elem_id } {
+	
+	return [lindex [GiD_Info Conditions $cond mesh $elem_id] 5]
+} 
 
 # Assigns the composite section surface condition to surfaces attached to the line with
 # with the condition Line_Composite_Section_Slab, which is the leader condition in this

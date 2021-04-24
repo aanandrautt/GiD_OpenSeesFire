@@ -315,6 +315,7 @@ proc Run_existing_HT {} {
 	}
 	file delete $records_folder/HTScript.tcl
 	UpdateInfoBar
+	cd "[OpenSees::GetProblemTypePath]/exe"
 	return ""
 }
 

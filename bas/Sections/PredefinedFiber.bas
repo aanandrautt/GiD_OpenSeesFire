@@ -66,7 +66,6 @@ patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz 
 *set var Lz=tcl(GetWebLz *h *tw *tf *angle)
 *format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
 patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
-
 *if(strcmp(Matprop(Cross_section),"Stiffened_I_Section_1")==0 && MatProp(Plate_t,real) > 0)
 # Left stiffening plate
 *set var pt = MatProp(Plate_t,real)

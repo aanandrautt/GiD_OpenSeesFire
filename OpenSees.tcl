@@ -809,6 +809,7 @@ proc InitGIDProject { dir } {
 						UserMaterial.tcl \
 						Fire.tcl \
 						Transform.tcl \
+						RecordersNS.tcl \
 						Recorder.tcl} {
 
 		source [file join $dir tcl $filename]

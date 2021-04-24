@@ -224,58 +224,151 @@ VALUE:
 QUESTION: _#CB#(_)
 VALUE: Output in selected layers for ShellMITC4 and ShellDKGQ elements with LayeredShell sections
 QUESTION: _#CB#(_)
-VALUE: Select output and specify layer numbers for up to three layers (A,B,C)
+VALUE: Select output and specify layer numbers for up to ten layers (A,B,...,J)
+QUESTION: Shell_element_type#CB#(ShellDKGQ,ShellMITC4)
+VALUE: ShellDKGQ
 QUESTION: _#CB#(_)
 VALUE:
+QUESTION: layer_A_name
+VALUE: 
+QUESTION: layer_A_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_A#CB#(1,0)
+VALUE: 0
 QUESTION: Stresses_in_layer_A#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Stress_layer_A,#CURRENT#) (1,RESTORE,Stress_layer_A,#CURRENT#)
-QUESTION: Stress_layer_A
-VALUE: 1#WIDTH#(10)
-QUESTION: Stresses_in_layer_B#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (0,HIDE,Stress_layer_B,#CURRENT#) (1,RESTORE,Stress_layer_B,#CURRENT#)
-QUESTION: Stress_layer_B
-VALUE: 1#WIDTH#(10)
-QUESTION: Stresses_in_layer_C#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (0,HIDE,Stress_layer_C,#CURRENT#) (1,RESTORE,Stress_layer_C,#CURRENT#)
-QUESTION: Stress_layer_C
-VALUE: 1#WIDTH#(10)
-QUESTION: _#CB#(_)
-VALUE:
 QUESTION: Strains_in_layer_A#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Strain_layer_A,#CURRENT#) (1,RESTORE,Strain_layer_A,#CURRENT#)
-QUESTION: Strain_layer_A
-VALUE: 1#WIDTH#(10)
-QUESTION: Strains_in_layer_B#CB#(1,0)
+QUESTION: layer_A
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Strain_layer_B,#CURRENT#) (1,RESTORE,Strain_layer_B,#CURRENT#)
-QUESTION: Strain_layer_B
-VALUE: 1#WIDTH#(10)
-QUESTION: Strains_in_layer_C#CB#(1,0)
-VALUE: 0
-DEPENDENCIES: (0,HIDE,Strain_layer_C,#CURRENT#) (1,RESTORE,Strain_layer_C,#CURRENT#)
-QUESTION: Strain_layer_C
-VALUE: 1#WIDTH#(10)
 QUESTION: _#CB#(_)
 VALUE:
-QUESTION: Temp_and_KtKc_in_layer_A#CB#(1,0)
+QUESTION: layer_B_name
+VALUE: 
+QUESTION: layer_B_is_steel#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Temp_KtKc_layer_A,#CURRENT#) (1,RESTORE,Temp_KtKc_layer_A,#CURRENT#)
-QUESTION: Temp_KtKc_layer_A
-VALUE: 1#WIDTH#(10)
-QUESTION: Temp_and_KtKc_in_layer_B#CB#(1,0)
+QUESTION: Temp_damage_in_layer_B#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Temp_KtKc_layer_B,#CURRENT#) (1,RESTORE,Temp_KtKc_layer_B,#CURRENT#)
-QUESTION: Temp_KtKc_layer_B
-VALUE: 1#WIDTH#(10)
-QUESTION: Temp_and_KtKc_in_layer_C#CB#(1,0)
+QUESTION: Stresses_in_layer_B#CB#(1,0)
 VALUE: 0
-DEPENDENCIES: (0,HIDE,Temp_KtKc_layer_C,#CURRENT#) (1,RESTORE,Temp_KtKc_layer_C,#CURRENT#)
-QUESTION: Temp_KtKc_layer_C
-VALUE: 1#WIDTH#(10)
+QUESTION: Strains_in_layer_B#CB#(1,0)
+VALUE: 0
+QUESTION: layer_B
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_C_name
+VALUE: 
+QUESTION: layer_C_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_C#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_C#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_C#CB#(1,0)
+VALUE: 0
+QUESTION: layer_C
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_D_name
+VALUE: 
+QUESTION: layer_D_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_D#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_D#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_D#CB#(1,0)
+VALUE: 0
+QUESTION: layer_D
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_E_name
+VALUE: 
+QUESTION: layer_E_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_E#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_E#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_E#CB#(1,0)
+VALUE: 0
+QUESTION: layer_E
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_F_name
+VALUE: 
+QUESTION: layer_F_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_F#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_F#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_F#CB#(1,0)
+VALUE: 0
+QUESTION: layer_F
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_G_name
+VALUE: 
+QUESTION: layer_G_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_G#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_G#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_G#CB#(1,0)
+VALUE: 0
+QUESTION: layer_G
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_H_name
+VALUE: 
+QUESTION: layer_H_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_H#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_H#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_H#CB#(1,0)
+VALUE: 0
+QUESTION: layer_H
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_I_name
+VALUE: 
+QUESTION: layer_I_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_I#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_I#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_I#CB#(1,0)
+VALUE: 0
+QUESTION: layer_I
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: layer_J_name
+VALUE: 
+QUESTION: layer_J_is_steel#CB#(1,0)
+VALUE: 0
+QUESTION: Temp_damage_in_layer_J#CB#(1,0)
+VALUE: 0
+QUESTION: Stresses_in_layer_J#CB#(1,0)
+VALUE: 0
+QUESTION: Strains_in_layer_J#CB#(1,0)
+VALUE: 0
+QUESTION: layer_J
+VALUE: 0
+QUESTION: _#CB#(_)
+VALUE:
 TITLE: Custom Recorders
 QUESTION: _#CB#(_)
 VALUE:

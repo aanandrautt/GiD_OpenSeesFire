@@ -80,6 +80,7 @@ proc PProcess::GetHTTime { ID } {
 	while {[gets $file_handle line] >= 0} {
 		lappend PProcess::time [lindex $line 0]
 	}
+	close $file_handle
 }
 
 proc PProcess::GetStructTime { } {
@@ -88,6 +89,7 @@ proc PProcess::GetStructTime { } {
 	while {[gets $file_handle line] >= 0} {
 		lappend PProcess::struct_time [lindex $line 0]
 	}
+	close $file_handle
 }
 
 
@@ -102,6 +104,7 @@ proc PProcess::GetHTResults { ID time } {
 				set topFlange [PProcess::Mean [lrange $line 11 15]]
 				set section_avg [PProcess::Mean [lrange $line 1 15]]
 				set bot_top_diff [expr $botFlange - $topFlange]
+				close $file_handle
 				return "$botFlange $web $topFlange $section_avg $bot_top_diff"
 			} elseif {[expr [llength $line] - 1] == 21} { 
 			

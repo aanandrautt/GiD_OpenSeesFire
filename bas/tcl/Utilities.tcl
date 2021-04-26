@@ -815,6 +815,36 @@ proc run_HT_dialog { } {
 	return ""
 }
 
+proc run_HT_post { } { 
+	OpenSees::SetProjectNameAndPath
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set GiDProjectName [OpenSees::GetProjectName]
+	
+	set node_disp_file "$GiDProjectDir/OpenSees/Node_displacements.out"
+	set res_exists [file exist $node_disp_file]
+	set temp_file "$GiDProjectDir/OpenSees/DispBeamColumn_temperatures.out"
+	set fexists [file exist $node_disp_file]
+	
+	set w .gid.warn4
+	set false 0
+	if {$res_exists} {
+		if { $fexists == 1 } {
+			set response [tk_dialog $w "Warning" "Running the HT post will delete any existing DispBeamColumn_temperatures.out files.\n\nDo you want to continue ?" warning 0 "  Yes  " "  No  " ]
+			if { $response == 0 } {
+				PProcess::ListBeamConditionIDs
+				PProcess::WriteHTOutput
+			}
+		} else {
+			PProcess::ListBeamConditionIDs
+			PProcess::WriteHTOutput
+		}
+		return ""
+	} else { 
+		WarnWinText "You need the file Node_displacements.out to be able to process the HT results. Please run an analysis first." 
+		return ""
+	}
+}
+
 proc Opt4_dialog { } {
 
 	OpenSees::SetProjectNameAndPath
@@ -1119,6 +1149,7 @@ proc OpenSees_Menu { dir } {
 	[= "Create and view .tcl only"] \
 	[= "Run analysis only"] \
 	[= "Run Heat Transfer"] \
+	[= "Postprocess Heat Transfer beam-columns"] \
 	[= "Postprocess only"] \
 	[= "Run analysis and postprocess"] \
 	"---" \
@@ -1153,6 +1184,7 @@ proc OpenSees_Menu { dir } {
 	{Opt3_dialog} \
 	{Opt4_dialog} \
 	{run_HT_dialog}\
+	{run_HT_post}\
 	{Opt5_dialog} \
 	{Opt6_dialog} \
 	{} \
@@ -1187,6 +1219,7 @@ proc OpenSees_Menu { dir } {
 	mnu_TCL.png \
 	mnu_TCL_Analysis.png \
 	mnu_HT_Analysis.png  \
+	mnu_ht_out.png \
 	mnu_TCL_Analysis.png \
 	mnu_TCL_Analysis.png \
 	"" \

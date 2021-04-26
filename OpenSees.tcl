@@ -809,6 +809,7 @@ proc InitGIDProject { dir } {
 						UserMaterial.tcl \
 						Fire.tcl \
 						Transform.tcl \
+						PProcess.tcl \
 						RecordersNS.tcl \
 						Recorder.tcl} {
 

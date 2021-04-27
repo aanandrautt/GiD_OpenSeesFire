@@ -15,6 +15,12 @@ if {$mode == "auto"} {
 file mkdir log
 file mkdir Thermal_load
 logFile "log/log$ID.log"
+set phaseChangeCoeff 0
+if {$protection_material == 5} {
+	set phaseChangeCoeff 1
+}
+
+
 puts "This is job number $ID"
 foreach arg $variables {
 	puts "$arg = [subst $$arg]"
@@ -449,46 +455,46 @@ if {$slab} {
 	}
 	if {$protected} {  
 		if {!$stiffened} {
-			HTMesh 12 		  12 		 2 -phaseChange 0 -NumCtrl $p_elem  $f_elemy
-			HTMesh 14 		  14 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
-			HTMesh 33 		  33 		 2 -phaseChange 0 -NumCtrl $p_elem  $f_elemy
-			HTMesh 34 		  34 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
+			HTMesh 12 		  12 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
+			HTMesh 14 		  14 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
+			HTMesh 33 		  33 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
+			HTMesh 34 		  34 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
 			
 			#web
-			HTMesh 42 		  42 		 2 -phaseChange 0 -NumCtrl $p_elem $w_elemy 
-			HTMesh 43 		  43 		 2 -phaseChange 0 -NumCtrl $p_elem $w_elemy
+			HTMesh 42 		  42 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy 
+			HTMesh 43 		  43 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy
 			
 			#top flange
-			HTMesh 51 		  51 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
-			HTMesh 52 		  52 		 2 -phaseChange 0 -NumCtrl $p_elem  $f_elemy
-			HTMesh 71 		  71 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
-			HTMesh 73 		  73 		 2 -phaseChange 0 -NumCtrl $p_elem  $f_elemy
+			HTMesh 51 		  51 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
+			HTMesh 52 		  52 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
+			HTMesh 71 		  71 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
+			HTMesh 73 		  73 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
 		} elseif {$stiffened} {
-			HTMesh 1001 		  1001 		 2 -phaseChange 0 -NumCtrl $w_elemx $p_elem
-			HTMesh 1002 		  1002 		 2 -phaseChange 0 -NumCtrl $p_elem $f_elemy
-			HTMesh 1102 		  1102 		 2 -phaseChange 0 -NumCtrl $p_elem $w_elemy
-			HTMesh 1202 		  1202 		 2 -phaseChange 0 -NumCtrl $p_elem $f_elemy	
-			HTMesh 1204 		  1204 		 2 -phaseChange 0 -NumCtrl $w_elemx $p_elem
+			HTMesh 1001 		  1001 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
+			HTMesh 1002 		  1002 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy
+			HTMesh 1102 		  1102 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy
+			HTMesh 1202 		  1202 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy	
+			HTMesh 1204 		  1204 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
 
-			HTMesh 1301 		  1301 		 2 -phaseChange 0 -NumCtrl $w_elemx $p_elem
-			HTMesh 1303 		  1303 		 2 -phaseChange 0 -NumCtrl $p_elem $f_elemy
-			HTMesh 1403 		  1403 		 2 -phaseChange 0 -NumCtrl $p_elem $w_elemy
-			HTMesh 1503 		  1503 		 2 -phaseChange 0 -NumCtrl $p_elem $f_elemy	
-			HTMesh 1504 		  1504 		 2 -phaseChange 0 -NumCtrl $w_elemx $p_elem
+			HTMesh 1301 		  1301 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
+			HTMesh 1303 		  1303 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy
+			HTMesh 1403 		  1403 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy
+			HTMesh 1503 		  1503 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy	
+			HTMesh 1504 		  1504 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
 		}
 		#bottom flange
-		HTMesh 11 		  11 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
-		HTMesh 21 		  21 		 2 -phaseChange 0 -NumCtrl $w_elemx $p_elem
-		HTMesh 31 		  31 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
+		HTMesh 11 		  11 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
+		HTMesh 21 		  21 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
+		HTMesh 31 		  31 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
 
 		if {!$composite} {
-			HTMesh 54 		  54 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
-			HTMesh 64 		  64 		 2 -phaseChange 0 -NumCtrl $w_elemx $p_elem
-			HTMesh 74 		  74 		 2 -phaseChange 0 -NumCtrl $f_elemx $p_elem
+			HTMesh 54 		  54 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
+			HTMesh 64 		  64 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
+			HTMesh 74 		  74 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
 		} elseif {$composite} {
 			if {$dps > 1e-8} {
-				HTMesh 81 		  81 		 2 -phaseChange 0 -NumCtrl $s_elemx $p_elem
-				HTMesh 91 		  91 		 2 -phaseChange 0 -NumCtrl $s_elemx $p_elem
+				HTMesh 81 		  81 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $s_elemx $p_elem
+				HTMesh 91 		  91 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $s_elemx $p_elem
 			}
 		}	
 	}
@@ -1061,7 +1067,7 @@ if {$slab} {
 	if {$stiffened} {
 		#left plate
 		set lplT1 301
-		HTNodeSet $lplT1 -Entity 110 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr -0.5*$w_y]
+		HTNodeSet $lplT1 -Entity 100 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr -0.5*$w_y - 0.5*$tf]
 		set lplT2 302
 		HTNodeSet $lplT2 -Entity 110 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr -0.25*$w_y]
 		set lplT3 303
@@ -1069,10 +1075,11 @@ if {$slab} {
 		set lplT4 304
 		HTNodeSet $lplT4 -Entity 110 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr 0.25*$w_y]
 		set lplT5 305
-		HTNodeSet $lplT5 -Entity 110 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr 0.5*$w_y]
+		HTNodeSet $lplT5 -Entity 120 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr 0.5*$w_y + 0.5*$tf]
 		
+		#right plate
 		set rplT1 306
-		HTNodeSet $rplT1 -Entity 140 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr -0.5*$w_y]
+		HTNodeSet $rplT1 -Entity 130 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr -0.5*$w_y - 0.5*$tf]
 		set rplT2 307
 		HTNodeSet $rplT2 -Entity 140 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr -0.25*$w_y]
 		set rplT3 308
@@ -1080,7 +1087,7 @@ if {$slab} {
 		set rplT4 309
 		HTNodeSet $rplT4 -Entity 140 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr 0.25*$w_y]
 		set rplT5 310
-		HTNodeSet $rplT5 -Entity 140 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr 0.5*$w_y]
+		HTNodeSet $rplT5 -Entity 150 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr 0.5*$w_y + 0.5*$tf]
 		
 		set StiffenedBeamTemp 311
 		HTNodeSet $StiffenedBeamTemp -NodeSet $beamTemp $lplT1 $lplT2 $lplT3 $lplT4 $lplT5 $rplT1 $rplT2 $rplT3 $rplT4 $rplT5

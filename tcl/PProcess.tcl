@@ -106,9 +106,14 @@ proc PProcess::GetHTResults { ID time } {
 				set bot_top_diff [expr $botFlange - $topFlange]
 				close $file_handle
 				return "$botFlange $web $topFlange $section_avg $bot_top_diff"
-			} elseif {[expr [llength $line] - 1] == 21} { 
-			
-				return
+			} elseif {[expr [llength $line] - 1] == 25} { 
+				set web [PProcess::Mean [lrange $line 1 5]]
+				set botFlange [PProcess::Mean [lrange $line 6 10]]
+				set topFlange [PProcess::Mean [lrange $line 11 15]]
+				set section_avg [PProcess::Mean [lrange $line 1 25]]
+				set bot_top_diff [expr $botFlange - $topFlange]
+				close $file_handle
+				return "$botFlange $web $topFlange $section_avg $bot_top_diff"
 			}
 		}
 	}

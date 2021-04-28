@@ -76,7 +76,7 @@ if {$AnalOk != 0} {; # if analysis fails, alternative algorithms and substepping
     set SkipFirstLoopForTolRelaxFlag 1
 *endif
     while {$LoadCounter < $Nsteps && $AnalOk == 0} {
-        if {($Nk==2 && $AnalOk==0) || ($Nk==1 && $AnalOk==0)} {
+        if {($Nk==2.0 && $AnalOk==0) || ($Nk==1 && $AnalOk==0)} {
             set Nk 1
             if {$returnToInitStepFlag} {
                 puts "\nBack to initial step\n"
@@ -168,8 +168,8 @@ if {$AnalOk != 0} {; # if analysis fails, alternative algorithms and substepping
             }
         }; # end if Nk=1
         # substepping /2
-        if {($AnalOk !=0 && $Nk==1) || ($AnalOk==0 && $Nk==4)} {
-            set Nk 2; # reduce step size
+        if {($AnalOk !=0 && $Nk==1) || ($AnalOk==0 && $Nk==4.0)} {
+            set Nk 2.0; # reduce step size
             set continueFlag 1
             puts "\nInitial step is divided by 2\n"
             set LincrReduced [expr $Lincr/$Nk]
@@ -193,7 +193,7 @@ if {$AnalOk != 0} {; # if analysis fails, alternative algorithms and substepping
             if {$AnalOk == 0} {
                 set returnToInitStepFlag 1
             }
-        }; # end if Nk=2
+        }; # end if Nk=2.0
 *if(IntvData(Tolerance_relaxation,int)==1)
 *if(strcmp(IntvData(Tolerance_relaxation_after_failed_substepping_of),"/2")==0)
         if {$AnalOk != 0 } {
@@ -213,8 +213,8 @@ if {$AnalOk != 0} {; # if analysis fails, alternative algorithms and substepping
 *endif
 *endif
         # substepping /4
-        if {($AnalOk !=0 && $Nk==2) || ($AnalOk==0 && $Nk==8)} {
-            set Nk 4; # reduce step size
+        if {($AnalOk !=0 && $Nk==2.0) || ($AnalOk==0 && $Nk==8.0)} {
+            set Nk 4.0; # reduce step size
             set continueFlag 1
             puts "\nInitial step is divided by 4\n"
             set LincrReduced [expr $Lincr/$Nk]
@@ -258,8 +258,8 @@ if {$AnalOk != 0} {; # if analysis fails, alternative algorithms and substepping
 *endif
 *endif
         # substepping /8
-        if {$AnalOk !=0 && $Nk==4 || ($Nk == 16 && $AnalOk == 0)} {
-            set Nk 8; # reduce step size
+        if {$AnalOk !=0 && $Nk==4.0 || ($Nk == 16.0 && $AnalOk == 0)} {
+            set Nk 8.0; # reduce step size
             set continueFlag 1
             puts "\nInitial step is divided by 8\n"
             set LincrReduced [expr $Lincr/$Nk]
@@ -304,7 +304,7 @@ if {$AnalOk != 0} {; # if analysis fails, alternative algorithms and substepping
 *endif
         # substepping /16
         if {($Nk == 8 && $AnalOk!=0)} {
-            set Nk 16; # reduce step size
+            set Nk 16.0; # reduce step size
             set continueFlag 1
             puts "\nInitial step is divided by 16\n"
             set LincrReduced [expr $Lincr/$Nk]

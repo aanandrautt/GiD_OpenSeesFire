@@ -160,20 +160,76 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *set var fiberZ2=MatProp(Z2,real)
 *set var fiberY1=MatProp(Y1,real)
 *set var fiberY2=MatProp(Y2,real)
-*set var area=MatProp(Cross_section_area,real)
+*set var angle=MatProp(Rotation_angle,real)
+*if(strcmp(MatProp(Cross_section),"Stiffened_I_Section")==0)
+*set var isStiffened=1
+*else
+*set var isStiffened=0
+*endif
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
 *endif
 *break
 *endif
 *end materials
+*if(isStiffened==1)
+*format "%6d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal -source *cond(1) -genInterpolation *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*else
+*if(angle == 90 || angle == 270)
+*format "%6d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal -source *cond(1) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*else 
 *format "%6d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -beamThermal -z -source *cond(1) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*endif
+*endif
 *endif
 *end elems
 *endif
 *if(ndime==3)
 *set cond Line_Gas_Temperatures *elems
+*loop elems *OnlyInCond
+*if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
+*set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
+*loop materials *NotUsed
+*set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
+*if(SelectedSection==SectionID)
+*set var dummy=tcl(AddUsedMaterials *SelectedSection)
+*if(strcmp(MatProp(Section:),"Fiber")==0)
+*set var fiberZ1=MatProp(Z1,real)
+*set var fiberZ2=MatProp(Z2,real)
+*set var fiberY1=MatProp(Y1,real)
+*set var fiberY2=MatProp(Y2,real)
+*set var angle=MatProp(Rotation_angle,real)
+*if(strcmp(MatProp(Cross_section),"Stiffened_I_Section")==0)
+*set var isStiffened=1
+*else
+*set var isStiffened=0
+*endif
+*else
+*MessageBox Error: Cannot grab section properties from anything other than a Fiber section
+*endif
+*break
+*endif
+*end materials
+*if(isStiffened==1)
+*format "%d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) -genInterpolation *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*else
+*if(angle == 90 || angle == 270)
+*format "%d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*else
+*format "%d%8g%8g%8g%8g"
+    eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*endif
+*endif
+*endif
+*end elems
+*endif
+*if(ndime==3)
+*set cond Line_Composite_Section_Beam *elems
 *loop elems *OnlyInCond
 *if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
 *set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
@@ -193,41 +249,9 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *break
 *endif
 *end materials
-*#set var tempFileDir=tcl(GetTempFileDir *cond(1))
-*#cannot assign a string to a variable in .bas, thus invoke function directly in load command.
-*if(angle == 90 || angle == 270)
-*format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
-*else
-*format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+*if(angle != 0)
+WARNING: Section has an angle of *angle but the composite section fire load assumes it has angle of 0. 
 *endif
-*endif
-*end elems
-*endif
-
-*if(ndime==3)
-*set cond Line_Composite_Section_Beam *elems
-*loop elems *OnlyInCond
-*if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
-*set var SelectedSection=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
-*loop materials *NotUsed
-*set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)
-*if(SelectedSection==SectionID)
-*set var dummy=tcl(AddUsedMaterials *SelectedSection)
-*if(strcmp(MatProp(Section:),"Fiber")==0)
-*set var fiberZ1=MatProp(Z1,real)
-*set var fiberZ2=MatProp(Z2,real)
-*set var fiberY1=MatProp(Y1,real)
-*set var fiberY2=MatProp(Y2,real)
-*else
-*MessageBox Error: Cannot grab section properties from anything other than a Fiber section
-*endif
-*break
-*endif
-*end materials
-*#set var tempFileDir=tcl(GetTempFileDir *cond(1))
-*#cannot assign a string to a variable in .bas, thus invoke function directly in load command.
 *format "%d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *endif

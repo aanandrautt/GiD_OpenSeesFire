@@ -811,6 +811,7 @@ proc InitGIDProject { dir } {
 						Transform.tcl \
 						PProcess.tcl \
 						RecordersNS.tcl \
+						MeshRepair.tcl \
 						Recorder.tcl} {
 
 		source [file join $dir tcl $filename]

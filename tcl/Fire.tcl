@@ -30,15 +30,14 @@ proc GiD_Event_BeforeMeshGeneration { element_size } {
 	WarnWinText "Returned to original interval: $current_interval"
 	WarnWinText "\n\n.....Finished all pre-meshing commands.....\n\n"
 }
-proc GiD_Event_AfterMeshGeneration { fail } { 
-	
+proc GiD_Event_AfterMeshGeneration { fail } { 	
 	PostMeshing $fail
 }
-proc AfterMeshGeneration { fail } { 
-	PostMeshing $fail
-}
+# proc AfterMeshGeneration is the legacy name of the post meshing function
+
 proc PostMeshing { fail } {
 	if {!$fail} {
+		set pairs ""
 		WarnWinText ".....Starting post-meshing commands.....\n\n"
 		set current_interval [lindex [GiD_Info intvdata num] 0]
 		set num_of_intervals [lindex [GiD_Info intvdata num] 1]
@@ -47,7 +46,7 @@ proc PostMeshing { fail } {
 			GiD_IntervalData set $interval
 			WarnWinText "Changed interval to $interval"
 			WarnWinText "\n-----Interval: $interval-----"
-			# Fire::AssignCompositeConnection fire 0.00001
+			set pairs [MeshRepair::MatchMesh] 
 			Fire::AssignCompositeConnection ambient 0.00001
 			WarnWinText "\n-----Interval: $interval-----"
 			Fire::AssignCentralElementFlag
@@ -60,6 +59,7 @@ proc PostMeshing { fail } {
 		Transform::PopulateTagsArray
 		W "\nFinished creating all geometric transforms\n"
 		WarnWinText "\n\n.....Finished all post-meshing commands....."
+		MeshRepair::ReassignMeshDivisions $pairs
 	}
 }
 # should be performed BEFORE meshing
@@ -229,7 +229,7 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 	array unset follower_line_data_list
 	foreach line_instance $line_list {
 		set line_id [lindex $line_instance 1]
-		# set composite_id [lindex $line_instance 3]
+		# set composite_id [lindex $line_instance 4]
 		set args [lrange $line_instance 3 end]
 		set pts_xyz [OS_Geom::GetPointCoords $line_id]
 		set xyz_i [lrange $pts_xyz 0 2]
@@ -284,7 +284,7 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 			}  		
 		}
 	}
-	WarnWinText "There are $num_of_leader_lines leader lines, $num_of_follower_lines, and [llength $line_pairs] line pairs."
+	WarnWinText "There are $num_of_leader_lines leader lines, $num_of_follower_lines follower lines, and [llength $line_pairs] line pairs."
 	foreach pair $line_pairs {
 		set leader_line [lindex $pair 0]
 		set follower_line [lindex $pair 1]
@@ -646,3 +646,8 @@ proc Fire::GetNumOWorkers { } {
 proc W {anything} {	
 	WarnWinText "$anything" 
 }
+
+proc SourceHello { } {
+	source "C:\\Program Files\\GiD\\GiD 15.0.2\\problemtypes\\OpenSees.gid\\exe\\hello.tcl"
+}
+

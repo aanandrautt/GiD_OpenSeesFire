@@ -57,9 +57,10 @@ proc PostMeshing { fail } {
 		WarnWinText "Returned to original interval: $current_interval"
 		W "\nCreating geometric transforms."
 		Transform::PopulateTagsArray
-		W "\nFinished creating all geometric transforms\n"
-		WarnWinText "\n\n.....Finished all post-meshing commands....."
+		W "\nFinished creating transforms and populting the corresponding array.\n"
 		MeshRepair::ReassignMeshDivisions $pairs
+		W "\nFinished reassigning mesh divisions to beam-column elements.\n"
+		WarnWinText "\n\n.....Finished all post-meshing commands....."
 	}
 }
 # should be performed BEFORE meshing
@@ -275,9 +276,10 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 				set delta_z_f [lindex $distance_f_i 2]
 				set err [expr abs($delta_x_i)  + abs($delta_y_i) + abs($delta_x_f)  + abs($delta_y_f)]
 			}
+			set z_err [expr abs($delta_z_i) + abs($delta_z_f)]
 			# if the error is still large, or if the z difference is over a present tolerance then 
 			# this can only mean that the two lines are NOT a pair so we do nothing for now. 
-			if {$err < $xytolerance && $delta_z_f < $ztolerance} {
+			if {$err < $xytolerance && $z_err < $ztolerance} {
 				# if the error and z difference is less than the tolerance then the two lines are
 				# a pair and will be added to the list of pairs.
 				lappend line_pairs "$leader_line $follower_line"
@@ -494,7 +496,6 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 							GiD_IntervalData set 1
 							set cond_args_follower "$constraint_ID [lrange $args 4 9]"
 							GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$constraint_ID 0 0" [lindex $pair 0]
-							WarnWinText "arguments are: $cond_args_follower"
 							GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1]
 							GiD_IntervalData set $interval							
 							set constraint_ID [expr $constraint_ID + 1]

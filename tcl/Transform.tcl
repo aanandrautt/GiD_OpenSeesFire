@@ -13,22 +13,22 @@ namespace eval Transform {
 }
 
 proc Transform::PopulateTagsArray { } { 
+	WarnWinText "\n----------------------------------------------------------"
+	WarnWinText "Entering function: Transform::PopulateTagsArray"
+	WarnWinText "----------------------------------------------------------\n"
+	
 	ResetArray
 	Transform::PrintTransformTags
 	set lineElemsMats [GiD_Info materials(Beam-Column_Elements)]
 	foreach elem $lineElemsMats { 
 		set elem_rotation [GiD_AccessValue get material $elem local_axis_rotation]
 		set elem_transform [GiD_AccessValue get material $elem Geometric_transformation#CB#(Linear,P-Delta,Corotational)]
-		W "$elem"
-		W "local axis rotation: $elem_rotation "
-		W  "transformation: $elem_transform"
 		
 		if {[info exists Transform::transformation_tags($elem_rotation)]} {
 			set tag_list $Transform::transformation_tags($elem_rotation)
 		} else {
 			set tag_list "-1 -1 -1 -1 -1 -1"
 		}
-		W "Initial tag list for $elem: $tag_list"
 		if {$elem_transform == "Linear"} {
 			set start_index 0
 			if {[lindex $tag_list $start_index] < 0} {
@@ -51,10 +51,8 @@ proc Transform::PopulateTagsArray { } {
 			W "ERROR: transformation type unknown for material $elem"
 		}
 		set Transform::transformation_tags($elem_rotation) $tag_list
-		W "Modified tag list for $elem: $tag_list\n"
 	}
 	Transform::CalcTransforms
-	Transform::PrintTransformTags
 	Transform::FlattenTransforms
 	set num [Transform::GetNumOfTransforms]
 	W $num
@@ -83,7 +81,6 @@ proc Transform::CalcTransforms { } {
 		set sine [expr sin($angle_rad)]
 		set vertical "[Transform::round [expr -1*$cosine]] [Transform::round [expr -1*$sine]] 0"
 		set nonvertical "0 0 1"
-		W "vertical = $vertical"
 		lappend Transform::transformation_tags($transform_angle) $vertical $nonvertical
 	}
 }

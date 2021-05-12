@@ -16,6 +16,7 @@ proc Shell::CheckFieldValues { event args } {
 			PlateFiber \
 			ElasticMembranePlate \
 			LayeredShell \
+			LayeredShellSteel \
 			UserMaterial \
 			"
 

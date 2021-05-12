@@ -430,6 +430,10 @@ WARNING: Section has an angle of *angle but the composite section fire load assu
 *set var thickness=MatProp(Slab_thickness,real)
 *set var deckingThickness=MatProp(Decking_thickness,real)
 *set var offset=MatProp(Offset,real)
+*elseif(strcmp(MatProp(Section:),"LayeredShellSteel")==0)
+*set var thickness=MatProp(Thickness,real)
+*set var offset=0.0
+*set var deckingThick=0.0
 *elseif(strcmp(MatProp(Section:),"UserMaterial")==0)
 *set var thickness=MatProp(Width,real)
 *set var offset=0.0
@@ -468,6 +472,10 @@ WARNING: Section has an angle of *angle but the composite section fire load assu
 *set var thickness=MatProp(Slab_thickness,real)
 *set var deckingThickness=MatProp(Decking_thickness,real)
 *set var offset=MatProp(Offset,real)
+*elseif(strcmp(MatProp(Section:),"LayeredShellSteel")==0)
+*set var thickness=MatProp(Thickness,real)
+*set var offset=0.0
+*set var deckingThick=0.0
 *elseif(strcmp(MatProp(Section:),"UserMaterial")==0)
 *set var thickness=MatProp(Width,real)
 *set var offset=0.0

@@ -1029,23 +1029,25 @@ VALUE: 0.0ton/m^3
 TKWIDGET: TK_MaterialWikiInfo
 END MATERIAL
 
-MATERIAL: J2Plasticity
+MATERIAL: J2PlaneStressThermal
 COMMENT: \n
 QUESTION: Material:#CB#(J2Plasticity)
 VALUE: J2Plasticity
 TKWIDGET: TK_UpdateInfoBar
-QUESTION: Bulk_modulus#UNITS#
-VALUE: 300MPa
-QUESTION: Shear_modulus#UNITS#
-VALUE: 60MPa
-QUESTION: Initial_yield_stress#UNITS#
-VALUE: 0.0kPa
-QUESTION: Final_saturation_yield_stress#UNITS#
-VALUE: 10kPa
-QUESTION: Exp._hardening_parameter_delta
-VALUE: 1.0#WIDTH#(10)
-QUESTION: Linear_hardening_parameter
-VALUE: 1.0#WIDTH#(10)
+QUESTION: Type#CB#(EC3-Structural,EC2-Hot-Rolled,EC2-Cold-Formed)
+VALUE: EC3-Structural
+QUESTION: Poisson_ratio
+VALUE: 0.3
+QUESTION: Young_Modulus#UNITS#
+VALUE: 200GPa
+QUESTION: Yield_stress#UNITS#
+VALUE: 350MPa
+QUESTION: Ultimate_stress#UNITS#
+VALUE: 500MPa
+QUESTION: Kinematic_hardening_parameter_delta
+VALUE: 10#WIDTH#(10)
+QUESTION: Isotropic_hardening_parameter
+VALUE: 2e10#WIDTH#(10)
 TKWIDGET: TK_MaterialWikiInfo
 END MATERIAL
 
@@ -1369,7 +1371,6 @@ COMMENT: \n\tThere is no check on this material. Make sure tcl is written correc
 TITLE: General
 QUESTION: Section:#CB#(LayeredShell)
 VALUE: LayeredShell
-TKWIDGET: TK_SectionWikiInfo
 TITLE: Section_properties
 QUESTION: Slab_thickness#UNITS#
 VALUE: 125 mm
@@ -1437,6 +1438,23 @@ QUESTION: Angle
 VALUE: 0
 END MATERIAL
 
+MATERIAL: LayeredShellThermal-Steel
+COMMENT: \n\tThere is no check on this material. Make sure tcl is written correctly.\n
+TITLE: General
+QUESTION: Section:#CB#(LayeredShellSteel)
+VALUE: LayeredShellSteel
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Compatible_materials:#CB#(nD_Materials)
+VALUE: nD Materials
+TKWIDGET: TK_SectionWikiInfo
+QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
+VALUE: J2PlaneStressThermal
+HELP: All nD materials are listed here
+QUESTION: Thickness#UNITS#
+VALUE: 2in
+QUESTION: n_layers
+VALUE: 6
+END MATERIAL
 
 MATERIAL: Elastic_Section
 COMMENT: \n

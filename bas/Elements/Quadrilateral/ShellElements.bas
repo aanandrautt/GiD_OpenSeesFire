@@ -41,6 +41,8 @@
 *include ..\..\Sections\ElasticMembranePlate.bas
 *elseif(strcmp(MatProp(Section:),"LayeredShell")==0)
 *include ..\..\Sections\LayeredShell.bas
+*elseif(strcmp(MatProp(Section:),"LayeredShellSteel")==0)
+*include ..\..\Sections\LayeredShellSteel.bas
 *elseif(strcmp(MatProp(Material:),"UserMaterial")==0)
 set MatTag *SelectedSection; # *tcl(UserMaterial::GetMaterialName *MatProp(0))
 *include ..\..\Materials\User\UserMaterial.bas

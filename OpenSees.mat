@@ -1330,17 +1330,32 @@ QUESTION: Plate_Y_fibers
 VALUE: 3
 QUESTION: Plate_Z_fibers
 VALUE: 6
+QUESTION: Web_plate_stiffened#CB#(0,1)
+VALUE:0
+DEPENDENCIES: (0,HIDE,Web_plate_l,#CURRENT#,HIDE,Web_plate_t,#CURRENT#,HIDE,Web_plate_Y_fibers,#CURRENT#,HIDE,Web_plate_Z_fibers,#CURRENT#,HIDE,Web_plate_Steel_material,#CURRENT#)
+DEPENDENCIES: (1,RESTORE,Web_plate_l,#CURRENT#,RESTORE,Web_plate_t,#CURRENT#,RESTORE,Web_plate_Y_fibers,#CURRENT#,RESTORE,Web_plate_Z_fibers,#CURRENT#,RESTORE,Web_plate_Steel_material,#CURRENT#)
+QUESTION: Web_plate_Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
+VALUE: Steel01
+QUESTION: Web_plate_l#UNITS#
+VALUE: 12.5 in
+QUESTION: Web_plate_t#UNITS#
+VALUE: 8 in
+QUESTION: Web_plate_Y_fibers
+VALUE: 3
+QUESTION: Web_plate_Z_fibers
+VALUE: 6
 QUESTION: protection_material#CB#(1,2,3,4,5)
 VALUE: 1
 HELP: 1. Material 1\n2. Material 2\n3. Material 3
 QUESTION: protection_thickness#UNITS#
 VALUE: 0 mm
 HELP: Set thickness to 0 to indicate no protection
-HELP:Specify if the heat transfer is to be performed for the section as a composite section with slab
 QUESTION: Young_modulus#UNITS#
 VALUE: 206 GPa
+STATE: HIDDEN
 QUESTION: Poisson_ratio
 VALUE: 0.3
+STATE: HIDDEN
 QUESTION: Cross_section_area#UNITS#
 VALUE: 0.25 m^2
 STATE: HIDDEN

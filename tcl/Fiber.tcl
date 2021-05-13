@@ -255,7 +255,10 @@ proc Fiber::CalcTorsionalStiffness { event args } {
 								set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
 								set FlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Flange_width_b]
 								set FlangeThickUnit [DWLocalGetValue $GDN $STRUCT Flange_thickness_tf]
-								set Angle [DWLocalGetValue $GDN $STRUCT Rotation_angle]								
+								set WebPlateThicknessUnit [DWLocalGetValue $GDN $STRUCT Web_plate_t]
+								set Angle [DWLocalGetValue $GDN $STRUCT Rotation_angle]	
+								set webStiffened [DWLocalGetValue $GDN $STRUCT Web_plate_stiffened]
+
 								
 								set temp [GidConvertValueUnit $heightUnit]
 								set temp [ParserNumberUnit $temp h HUnit]
@@ -265,6 +268,13 @@ proc Fiber::CalcTorsionalStiffness { event args } {
 								set temp [ParserNumberUnit $temp b bUnit]
 								set temp [GidConvertValueUnit $FlangeThickUnit]
 								set temp [ParserNumberUnit $temp tf tfUnit]
+								
+								set temp [GidConvertValueUnit $WebPlateThicknessUnit]
+								set temp [ParserNumberUnit $temp wplt wpltUnit]
+								
+								if {$webStiffened} {
+									set tw [expr $tw + $wplt]
+								}
 								
 								set J [expr (2*$b*pow($tf,3.0) + ($h - $tf)*pow($tw,3.0))/3.0]
 								set GJ [format "%1.0f" [expr $G*$J]]
@@ -450,6 +460,9 @@ proc Fiber::CalcArea { event args } {
 						set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
 						set FlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Flange_width_b]
 						set FlangeThickUnit [DWLocalGetValue $GDN $STRUCT Flange_thickness_tf]
+						set webStiffened [DWLocalGetValue $GDN $STRUCT Web_plate_stiffened]
+						set WebPlateThicknessUnit [DWLocalGetValue $GDN $STRUCT Web_plate_t]
+						set WebPlateLengthUnit [DWLocalGetValue $GDN $STRUCT Web_plate_l]
 						
 						set temp [GidConvertValueUnit $heightUnit]
 						set temp [ParserNumberUnit $temp h HUnit]
@@ -459,10 +472,21 @@ proc Fiber::CalcArea { event args } {
 						set temp [ParserNumberUnit $temp b bUnit]
 						set temp [GidConvertValueUnit $FlangeThickUnit]
 						set temp [ParserNumberUnit $temp tf tfUnit]
+						
+						set temp [GidConvertValueUnit $WebPlateThicknessUnit]
+						set temp [ParserNumberUnit $temp wplt wpltUnit]
+						set temp [GidConvertValueUnit $WebPlateLengthUnit]
+						set temp [ParserNumberUnit $temp wpll wpllUnit]
 											
 						set Areaunit $HUnit^2
+						
+						if {$webStiffened} {
+							set A_web [expr 2*$wplt*$wpll]
+						} else {
+							set A_web 0
+						}
 
-						set AreaSize [expr ($h - $tf*2)*$tw + $b*$tf*2]
+						set AreaSize [expr ($h - $tf*2)*$tw + $b*$tf*2 + $A_web]
 						set Area $AreaSize$Areaunit
 						set ok [DWLocalSetValue $GDN $STRUCT "Cross_section_area" $Area]
 						
@@ -473,6 +497,9 @@ proc Fiber::CalcArea { event args } {
 						set FlangeThickUnit [DWLocalGetValue $GDN $STRUCT Flange_thickness_tf]
 						set PlateLengthUnit [DWLocalGetValue $GDN $STRUCT Plate_l]
 						set PlateThickUnit [DWLocalGetValue $GDN $STRUCT Plate_t]						
+						set webStiffened [DWLocalGetValue $GDN $STRUCT Web_plate_stiffened]
+						set WebPlateThicknessUnit [DWLocalGetValue $GDN $STRUCT Web_plate_t]
+						set WebPlateLengthUnit [DWLocalGetValue $GDN $STRUCT Web_plate_l]
 						
 						set temp [GidConvertValueUnit $heightUnit]
 						set temp [ParserNumberUnit $temp h HUnit]
@@ -487,10 +514,21 @@ proc Fiber::CalcArea { event args } {
 						set temp [ParserNumberUnit $temp pl plUnit]
 						set temp [GidConvertValueUnit $PlateThickUnit]
 						set temp [ParserNumberUnit $temp pt ptUnit]
+						
+						set temp [GidConvertValueUnit $WebPlateThicknessUnit]
+						set temp [ParserNumberUnit $temp wplt wpltUnit]
+						set temp [GidConvertValueUnit $WebPlateLengthUnit]
+						set temp [ParserNumberUnit $temp wpll wpllUnit]
 											
 						set Areaunit $HUnit^2
+						
+						if {$webStiffened} {
+							set A_web [expr 2*$wplt*$wpll]
+						} else {
+							set A_web 0
+						}
 
-						set AreaSize [expr ($h - $tf*2)*$tw + $b*$tf*2 + $pt*$pl*2]
+						set AreaSize [expr ($h - $tf*2)*$tw + $b*$tf*2 + $pt*$pl*2 + $A_web]
 						set Area $AreaSize$Areaunit
 						set ok [DWLocalSetValue $GDN $STRUCT "Cross_section_area" $Area]
 						
@@ -523,6 +561,8 @@ proc Fiber::CalcJG { event args } {
 					set FlangeThickUnit [DWLocalGetValue $GDN $STRUCT Flange_thickness_tf]
 					set YoungModUnit [DWLocalGetValue $GDN $STRUCT Young_modulus]
 					set PoissonRat [DWLocalGetValue $GDN $STRUCT Poisson_ratio]
+					set webStiffened [DWLocalGetValue $GDN $STRUCT Web_plate_stiffened]
+					set WebPlateThicknessUnit [DWLocalGetValue $GDN $STRUCT Web_plate_t]
 					
 					set temp [GidConvertValueUnit $heightUnit]
 					set temp [ParserNumberUnit $temp h HUnit]
@@ -534,6 +574,13 @@ proc Fiber::CalcJG { event args } {
 					set temp [ParserNumberUnit $temp tf tfUnit]
 					set temp [GidConvertValueUnit $YoungModUnit]
 					set temp [ParserNumberUnit $temp E EUnit]
+					
+					set temp [GidConvertValueUnit $WebPlateThicknessUnit]
+					set temp [ParserNumberUnit $temp wplt wpltUnit]
+					
+					if {$webStiffened} {
+						set tw [expr $tw + $wplt*2]
+					}			
 					
 					set G [expr $E/(2*(1+$PoissonRat))]
 					

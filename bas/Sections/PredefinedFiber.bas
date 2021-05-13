@@ -25,6 +25,66 @@
 *endif
 *end materials
 *endif
+*#------start: Stiffened section material-------------------------------
+*if(strcmp(Matprop(Cross_section),"Stiffened_I_Section")==0 && MatProp(Plate_t,real) > 0)
+*set var SelectedPlateSteelMaterial=tcl(FindMaterialNumber *MatProp(Plate_Steel_material) *DomainNum)
+*set var MaterialExists=tcl(CheckUsedMaterials *SelectedPlateSteelMaterial)
+*if(MaterialExists==-1)
+*loop materials *NotUsed
+*set var MaterialID=tcl(FindMaterialNumber *Matprop(0) *DomainNum)
+*if(SelectedPlateSteelMaterial==MaterialID)
+*if(strcmp(MatProp(Material:),"Steel01")==0)
+*include ..\Materials\Uniaxial\Steel01.bas
+*elseif(strcmp(MatProp(Material:),"Steel02")==0)
+*include ..\Materials\Uniaxial\Steel02.bas
+*elseif(strcmp(MatProp(Material:),"ReinforcingSteel")==0)
+*include ..\Materials\Uniaxial\ReinforcingSteel.bas
+*elseif(strcmp(MatProp(Material:),"RambergOsgoodSteel")==0)
+*include ..\Materials\Uniaxial\RambergOsgoodSteel.bas
+*elseif(strcmp(MatProp(Material:),"Hysteretic")==0)
+*include ..\Materials\Uniaxial\Hysteretic.bas
+*elseif(strcmp(MatProp(Material:),"MinMax")==0)
+*include ..\Materials\Uniaxial\MinMax.bas
+*else
+*MessageBox Error: Unsupported Rebar material for Fiber Section
+*endif
+*set var dummy=tcl(AddUsedMaterials *SelectedPlateSteelMaterial)
+*break
+*endif
+*end materials
+*endif
+*endif
+*#------end: Stiffened section material-------------------------------
+*#------start: Web Stiffened section material-------------------------------
+*if(Matprop(Web_plate_stiffened,int)==1)
+*set var SelectedWebPlateSteelMaterial=tcl(FindMaterialNumber *MatProp(Web_plate_Steel_material) *DomainNum)
+*set var MaterialExists=tcl(CheckUsedMaterials *SelectedWebPlateSteelMaterial)
+*if(MaterialExists==-1)
+*loop materials *NotUsed
+*set var MaterialID=tcl(FindMaterialNumber *Matprop(0) *DomainNum)
+*if(SelectedWebPlateSteelMaterial==MaterialID)
+*if(strcmp(MatProp(Material:),"Steel01")==0)
+*include ..\Materials\Uniaxial\Steel01.bas
+*elseif(strcmp(MatProp(Material:),"Steel02")==0)
+*include ..\Materials\Uniaxial\Steel02.bas
+*elseif(strcmp(MatProp(Material:),"ReinforcingSteel")==0)
+*include ..\Materials\Uniaxial\ReinforcingSteel.bas
+*elseif(strcmp(MatProp(Material:),"RambergOsgoodSteel")==0)
+*include ..\Materials\Uniaxial\RambergOsgoodSteel.bas
+*elseif(strcmp(MatProp(Material:),"Hysteretic")==0)
+*include ..\Materials\Uniaxial\Hysteretic.bas
+*elseif(strcmp(MatProp(Material:),"MinMax")==0)
+*include ..\Materials\Uniaxial\MinMax.bas
+*else
+*MessageBox Error: Unsupported Rebar material for Fiber Section
+*endif
+*set var dummy=tcl(AddUsedMaterials *SelectedWebPlateSteelMaterial)
+*break
+*endif
+*end materials
+*endif
+*endif
+*#------end: Web Stiffened section material-------------------------------
 *# ------------------------FIBER definition--------------------
 *set var h=MatProp(Height_h,real)
 *set var tw=MatProp(Web_thickness_tw,real)
@@ -81,7 +141,7 @@ patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz 
 *set var Ly=tcl(GetLeftPlateLy *pl *b *pt *angle)
 *set var Lz=tcl(GetLeftPlateLz *pl *b *pt *angle)
 *format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
-patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+patch quad *SelectedPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
 # Right stiffening plate
 *set var Iy=tcl(GetRightPlateIy *pl *b *pt *angle)
 *set var Iz=tcl(GetRightPlateIz *pl *b *pt *angle)
@@ -92,7 +152,7 @@ patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz 
 *set var Ly=tcl(GetRightPlateLy *pl *b *pt *angle)
 *set var Lz=tcl(GetRightPlateLz *pl *b *pt *angle)
 *format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
-patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+patch quad *SelectedPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
 *endif 
 # Bottom flange
 *set var zdivision=MatProp(Flange_Z_fibers,int)
@@ -107,4 +167,37 @@ patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz 
 *set var Lz=tcl(GetBotFlangeLz *h *b *tf *angle)
 *format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
 patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*#-------web stiffeners--------
+*if(Matprop(Web_plate_stiffened,int)==1)
+*set var wpt = MatProp(Web_plate_t,real)
+*set var wpl = MatProp(Web_plate_l,real)
+*set var zdivision=MatProp(Web_plate_Z_fibers,int)
+*set var ydivision=MatProp(Web_plate_Y_fibers,int)
+*if(angle==0)
+#right web stiffening plate
+*set var Iy=operation(0.5*tw)
+*set var Iz=operation(-0.5*wpl)
+*set var Jy=operation(Iy+wpt)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(0.5*wpl)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedWebPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+#left web stiffening plate
+*set var Iy=operation(-0.5*tw)
+*set var Iz=operation(-0.5*wpl)
+*set var Jy=operation(Iy-wpt)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(0.5*wpl)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedWebPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*else
+*MessageBox Error: Unsupported angle for web-stiffened section
+*endif
+*endif
 }

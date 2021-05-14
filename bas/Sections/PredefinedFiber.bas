@@ -186,9 +186,9 @@ patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz 
 *format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
 patch quad *SelectedWebPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
 #left web stiffening plate
-*set var Iy=operation(-0.5*tw)
+*set var Iy=operation(-0.5*tw-wpt)
 *set var Iz=operation(-0.5*wpl)
-*set var Jy=operation(Iy-wpt)
+*set var Jy=operation(-0.5*tw)
 *set var Jz=operation(Iz)
 *set var Ky=operation(Jy)
 *set var Kz=operation(0.5*wpl)

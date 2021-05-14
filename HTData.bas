@@ -12,7 +12,7 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var fire=3
 *endif
 *loop intervals
-*#beams
+*#beam-column elements
 *set cond Line_Gas_Temperatures_Central *elems
 *loop elems *OnlyInCond
 *if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
@@ -34,6 +34,13 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var b=MatProp(Flange_width_b,real)
 *set var pmat=MatProp(protection_material,int)
 *set var dp=MatProp(protection_thickness,real)
+*if(Matprop(Web_plate_stiffened,int)==1)
+*set var wpt = MatProp(Web_plate_t,real)
+*set var tw=operation(tw+wpt*2)
+*if(tw>b)
+*set var tw=b
+*endif
+*endif
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
 *endif

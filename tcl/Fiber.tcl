@@ -463,6 +463,8 @@ proc Fiber::CalcArea { event args } {
 						set webStiffened [DWLocalGetValue $GDN $STRUCT Web_plate_stiffened]
 						set WebPlateThicknessUnit [DWLocalGetValue $GDN $STRUCT Web_plate_t]
 						set WebPlateLengthUnit [DWLocalGetValue $GDN $STRUCT Web_plate_l]
+						set TSection [DWLocalGetValue $GDN $STRUCT T_section]
+						
 						
 						set temp [GidConvertValueUnit $heightUnit]
 						set temp [ParserNumberUnit $temp h HUnit]
@@ -485,8 +487,22 @@ proc Fiber::CalcArea { event args } {
 						} else {
 							set A_web 0
 						}
-
-						set AreaSize [expr ($h - $tf*2)*$tw + $b*$tf*2 + $A_web]
+						
+						if {$TSection} {
+							set n_flanges 1
+							set dblSections [DWLocalGetValue $GDN $STRUCT Two_back_to_back_sections]
+							if {$dblSections} {
+								set n_sections 2
+							} else {
+								set n_sections 1
+							}
+						} else {
+							set n_flanges 2
+							set n_sections 1
+						}
+						
+						
+						set AreaSize [expr (($h - $tf*$n_flanges)*$tw + $b*$tf*$n_flanges + $A_web)*$n_sections]
 						set Area $AreaSize$Areaunit
 						set ok [DWLocalSetValue $GDN $STRUCT "Cross_section_area" $Area]
 						
@@ -563,6 +579,8 @@ proc Fiber::CalcJG { event args } {
 					set PoissonRat [DWLocalGetValue $GDN $STRUCT Poisson_ratio]
 					set webStiffened [DWLocalGetValue $GDN $STRUCT Web_plate_stiffened]
 					set WebPlateThicknessUnit [DWLocalGetValue $GDN $STRUCT Web_plate_t]
+					set TSection [DWLocalGetValue $GDN $STRUCT T_section]
+					
 					
 					set temp [GidConvertValueUnit $heightUnit]
 					set temp [ParserNumberUnit $temp h HUnit]
@@ -587,14 +605,25 @@ proc Fiber::CalcJG { event args } {
 					set CrossSectionType [DWLocalGetValue $GDN $STRUCT Cross_section]
 				
 					if {$CrossSectionType == "I_Section"} {
-					
-						set J [expr (2*$b*pow($tf,3.0) + ($h - $tf)*pow($tw,3.0))/3.0]
+						
+						set J 0
+						if {$TSection} {
+							set J [expr ($b*pow($tf,3.0) + ($h - $tf)*pow($tw,3.0))/3.0]
+							set dblSections [DWLocalGetValue $GDN $STRUCT Two_back_to_back_sections]
+							if {$dblSections} {
+								set J [expr 2*$J]
+							}
+						} else {
+							set J [expr (2*$b*pow($tf,3.0) + ($h - $tf)*pow($tw,3.0))/3.0]
+						}
+						
 						set GJ [format "%1.0f" [expr $G*$J]]
+						
 						set GJ $GJ$GJunit
 
 						set ok [DWLocalSetValue $GDN $STRUCT Torsional_stiffness $GJ]
 							
-					} elseif {$CrossSectionType == "Stiffened_I_Section_1"} {
+					} elseif {$CrossSectionType == "Stiffened_I_Section"} {
 						set PlateThickUnit [DWLocalGetValue $GDN $STRUCT Plate_t]
 						set temp [GidConvertValueUnit $PlateThickUnit]
 						set temp [ParserNumberUnit $temp pt ptUnit]						

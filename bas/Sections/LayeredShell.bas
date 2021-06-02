@@ -139,22 +139,22 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *set var nlayersCore=MatProp(Core_layers,int)
 *#
 *set var nlayersSteel=5
-*if(topLongThick==0)
+*if(topLongThick<=1e-8)
 *set var nlayersSteel=operation(nlayersSteel-1)
 *endif
-*if(topTransThick==0)
+*if(topTransThick<=1e-8)
 *set var nlayersSteel=operation(nlayersSteel-1)
 *endif
-*if(botLongThick==0)
+*if(botLongThick<=1e-8)
 *set var nlayersSteel=operation(nlayersSteel-1)
 *endif
-*if(botTransThick==0)
+*if(botTransThick<=1e-8)
 *set var nlayersSteel=operation(nlayersSteel-1)
 *endif
-*if(deckingThick==0)
+*if(deckingThick<=1e-8)
 *set var nlayersSteel=operation(nlayersSteel-1)
 *endif
-*set var nlayers=operation(nlayersTopCover+nlayersBotCover+nlayersCore+nlayersSteel)
+*set var nlayersTot=operation(nlayersTopCover+nlayersBotCover+nlayersCore+nlayersSteel)
 *#
 *#
 *#
@@ -167,7 +167,7 @@ nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneSt
 *if(offset==0)
 #section LayeredShellThermal $sectionTag $nLayers $matTag1 $thickness_1 ... $matTagn $thickness_n
 *format "%d%d"
-section LayeredShellThermal *LayeredShellTag *nlayers *\
+section LayeredShellThermal *LayeredShellTag *nlayersTot *\
 *else
 # section	LayeredShellThermal	$sectionTag	-offset $offset	$nLayers	$matTag1 $thickness_1 ... $matTagn $thickness_n
 *format "%d"
@@ -175,7 +175,7 @@ section LayeredShellThermal *LayeredShellTag *\
 *format "%g"
 -offset *offset *\
 *format "%d"
-*nlayers *\
+*nlayersTot *\
 *endif
 *if(deckingThick!=0)
 *format "%d%g"

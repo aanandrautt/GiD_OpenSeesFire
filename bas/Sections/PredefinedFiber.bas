@@ -93,12 +93,188 @@
 *set var angle=MatProp(Rotation_angle,real)
 *set var E=MatProp(Young_modulus,real)
 *set var JG=MatProp(Torsional_stiffness,real)
-*# Area of the section is *MatProp(Cross_section_area,real)
+*set var TSect=MatProp(T_section,int)
+*set var dblSect=MatProp(Two_back_to_back_sections,int)
+*set var separation=MatProp(Separation,real)
 *format "%d"
 section fiberSecThermal *FiberTag *\
 *format "%g"
 -GJ *JG *\
  {
+*if(TSect==1)
+*if(dblSect==1)
+*if(angle==0)
+*# double T sections with an angle of 0
+# Bottom Section Flange
+# patch rect $matTag $numSubdivIJ $numSubdivJK $yI $zI $yJ $zJ $yK $zK $yL $zL
+*set var zdivision=MatProp(Flange_Z_fibers,int)
+*set var ydivision=MatProp(Flange_Y_fibers,int)
+*set var Iy=operation(-0.5*b)
+*set var Iz=operation(-0.5*separation-tf)
+*set var Jy=operation(0.5*b)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+tf)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Bottom Section Web
+*set var zdivision=MatProp(Web_Z_fibers,int)
+*set var ydivision=MatProp(Web_Y_fibers,int)
+*set var Iy=operation(-0.5*tw)
+*set var Iz=operation(-0.5*separation-h)
+*set var Jy=operation(0.5*tw)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+h-tf)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*#
+# Top Section Flange
+*set var zdivision=MatProp(Flange_Z_fibers,int)
+*set var ydivision=MatProp(Flange_Y_fibers,int)
+*set var Iy=operation(-0.5*b)
+*set var Iz=operation(0.5*separation)
+*set var Jy=operation(0.5*b)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+tf)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Top Section Web
+*set var zdivision=MatProp(Web_Z_fibers,int)
+*set var ydivision=MatProp(Web_Y_fibers,int)
+*set var Iy=operation(-0.5*tw)
+*set var Iz=operation(0.5*separation+tf)
+*set var Jy=operation(0.5*tw)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+h-tf)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*else
+*# double T sections with an angle of 90
+# Right Section Flange
+# patch rect $matTag $numSubdivIJ $numSubdivJK $yI $zI $yJ $zJ $yK $zK $yL $zL
+*set var zdivision=MatProp(Flange_Z_fibers,int)
+*set var ydivision=MatProp(Flange_Y_fibers,int)
+*set var Iy=operation(0.5*separation)
+*set var Iz=operation(-0.5*b)
+*set var Jy=operation(Iy+tf)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+b)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Right Section Web
+*set var zdivision=MatProp(Web_Z_fibers,int)
+*set var ydivision=MatProp(Web_Y_fibers,int)
+*set var Iy=operation(0.5*separation+tf)
+*set var Iz=operation(-0.5*tw)
+*set var Jy=operation(Iy+h-tf)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+tw)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Left Section Flange
+*set var zdivision=MatProp(Flange_Z_fibers,int)
+*set var ydivision=MatProp(Flange_Y_fibers,int)
+*set var Iy=operation(-0.5*separation-tf)
+*set var Iz=operation(-0.5*b)
+*set var Jy=operation(Iy+tf)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+b)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Left Section Web
+*set var zdivision=MatProp(Web_Z_fibers,int)
+*set var ydivision=MatProp(Web_Y_fibers,int)
+*set var Iy=operation(-0.5*separation-h)
+*set var Iz=operation(-0.5*tw)
+*set var Jy=operation(Iy+h-tf)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+tw)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*endif
+*else
+*if(angle==0)
+# Flange
+# patch rect $matTag $numSubdivIJ $numSubdivJK $yI $zI $yJ $zJ $yK $zK $yL $zL
+*set var zdivision=MatProp(Flange_Z_fibers,int)
+*set var ydivision=MatProp(Flange_Y_fibers,int)
+*set var Iy=operation(-0.5*b)
+*set var Iz=operation(0.5*h-tf)
+*set var Jy=operation(0.5*b)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+tf)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Web
+*set var zdivision=MatProp(Web_Z_fibers,int)
+*set var ydivision=MatProp(Web_Y_fibers,int)
+*set var Iy=operation(-0.5*tw)
+*set var Iz=operation(-0.5*h)
+*set var Jy=operation(0.5*tw)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+h-tf)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*else
+# Flange (90 Degree)
+# patch rect $matTag $numSubdivIJ $numSubdivJK $yI $zI $yJ $zJ $yK $zK $yL $zL
+*set var zdivision=MatProp(Flange_Z_fibers,int)
+*set var ydivision=MatProp(Flange_Y_fibers,int)
+*set var Iy=operation(-0.5*h)
+*set var Iz=operation(-0.5*b)
+*set var Jy=operation(Iy+tf)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+b)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+# Web (90 Degree)
+*set var zdivision=MatProp(Web_Z_fibers,int)
+*set var ydivision=MatProp(Web_Y_fibers,int)
+*set var Iy=operation(-0.5*h+tf)
+*set var Iz=operation(-0.5*tw)
+*set var Jy=operation(Iy+h-tf)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Iz+tw)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*endif
+*endif
+*else
 # Top flange
 # patch rect $matTag $numSubdivIJ $numSubdivJK $yI $zI $yJ $zJ $yK $zK $yL $zL
 *set var zdivision=MatProp(Flange_Z_fibers,int)
@@ -197,7 +373,29 @@ patch quad *SelectedWebPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz 
 *format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
 patch quad *SelectedWebPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
 *else
-*MessageBox Error: Unsupported angle for web-stiffened section
+#right (top) web stiffening plate
+*set var Iy=operation(-0.5*wpl)
+*set var Iz=operation(0.5*tw)
+*set var Jy=operation(0.5*wpl)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Jz+wpt)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedWebPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+#left (bottom) web stiffening plate
+*set var Iy=operation(-0.5*wpl)
+*set var Iz=operation(-0.5*tw-wpt)
+*set var Jy=operation(0.5*wpl)
+*set var Jz=operation(Iz)
+*set var Ky=operation(Jy)
+*set var Kz=operation(Jz+wpt)
+*set var Ly=operation(Iy)
+*set var Lz=operation(Kz)
+*format "%6d%6d%6d%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f%10.6f"
+patch quad *SelectedWebPlateSteelMaterial *ydivision *zdivision *Iy *Iz *Jy *Jz *Ky *Kz *Ly *Lz
+*endif
 *endif
 *endif
 }

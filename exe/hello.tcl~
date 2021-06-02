@@ -1,3 +1,0 @@
-set leader_condition_name "Line_Composite_Section_Slab_AMBIENT"
-set follower_condition_name "Line_Composite_Section_Beam_AMBIENT"
-

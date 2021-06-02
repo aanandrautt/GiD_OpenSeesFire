@@ -1293,13 +1293,23 @@ IMAGE: img/Sections/I-section.jpg
 TITLE: Section properties
 QUESTION: Cross_section#CB#(I_Section,Stiffened_I_Section)
 VALUE: I_Section
-DEPENDENCIES: (I_Section,HIDE,Plate_l,#CURRENT#,HIDE,Plate_t,#CURRENT#,HIDE,Plate_Y_fibers,#CURRENT#,HIDE,Plate_Z_fibers,#CURRENT#,HIDE,Plate_Steel_material,#CURRENT#)
-DEPENDENCIES: (Stiffened_I_Section,RESTORE,Plate_l,#CURRENT#,RESTORE,Plate_t,#CURRENT#,RESTORE,Plate_Y_fibers,#CURRENT#,RESTORE,Plate_Z_fibers,#CURRENT#,RESTORE,Plate_Steel_material,#CURRENT#)
+DEPENDENCIES: (I_Section,RESTORE,T_section,#CURRENT#,HIDE,Plate_l,#CURRENT#,HIDE,Plate_t,#CURRENT#,HIDE,Plate_Y_fibers,#CURRENT#,HIDE,Plate_Z_fibers,#CURRENT#,HIDE,Plate_Steel_material,#CURRENT#)
+DEPENDENCIES: (Stiffened_I_Section,HIDE,T_section,#CURRENT#,HIDE,Two_back_to_back_sections,#CURRENT#,HIDE,Separation,#CURRENT#,RESTORE,Plate_l,#CURRENT#,RESTORE,Plate_t,#CURRENT#,RESTORE,Plate_Y_fibers,#CURRENT#,RESTORE,Plate_Z_fibers,#CURRENT#,RESTORE,Plate_Steel_material,#CURRENT#)
 QUESTION: Section:#CB#(Fiber)
 VALUE: Fiber
 STATE: HIDDEN
 QUESTION: Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
 VALUE: Steel01
+QUESTION: T_section#CB#(0,1)
+VALUE:0
+DEPENDENCIES: (0,HIDE,Two_back_to_back_sections,#CURRENT#)
+DEPENDENCIES: (1,RESTORE,Two_back_to_back_sections,#CURRENT#)
+QUESTION: Two_back_to_back_sections#CB#(0,1)
+VALUE:0
+DEPENDENCIES: (0,HIDE,Separation,#CURRENT#)
+DEPENDENCIES: (1,RESTORE,Separation,#CURRENT#)
+QUESTION: Separation#UNITS#
+VALUE: 15 mm
 QUESTION: Height_h#UNITS#
 VALUE: 250 mm
 QUESTION: Web_thickness_tw#UNITS#
@@ -1316,7 +1326,7 @@ QUESTION: Flange_Y_fibers
 VALUE: 5
 QUESTION: Flange_Z_fibers
 VALUE: 3
-QUESTION: Rotation_angle
+QUESTION: Rotation_angle#CB#(0,90)
 VALUE: 0
 HELP: Enter angle in degrees
 HELP: For finding torsional stiffness JG
@@ -1345,7 +1355,7 @@ VALUE: 3
 QUESTION: Web_plate_Z_fibers
 VALUE: 6
 QUESTION: protection_material#CB#(1,2,3,4,5)
-VALUE: 1
+VALUE: 5
 HELP: 1. Material 1\n2. Material 2\n3. Material 3
 QUESTION: protection_thickness#UNITS#
 VALUE: 0 mm
@@ -1461,7 +1471,6 @@ VALUE: LayeredShellSteel
 TKWIDGET: TK_UpdateInfoBar
 QUESTION: Compatible_materials:#CB#(nD_Materials)
 VALUE: nD Materials
-TKWIDGET: TK_SectionWikiInfo
 QUESTION: Material#MAT#(Multidimensional_(nD)_Materials)
 VALUE: J2PlaneStressThermal
 HELP: All nD materials are listed here

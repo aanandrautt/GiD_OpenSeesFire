@@ -29,12 +29,6 @@ foreach arg $variables {
 
 # set sidesHeated [lindex $argv 1]
 set sidesHeated 4
-if {$composite} {
-	set sidesHeated 3
-	set composite 0
-	set bs [expr $b*1.25]
-	puts "Performed following modifications:\n1.changed sides heated to 3 in stead of 4.\n2.set composite to 0.\n3.set bs to 1.25*width of beam."
-}
 if {$sidesHeated != 3 && $sidesHeated != 4} {
 	puts "sidesHeated got a value of $sidesHeated; can only be 3 or 4."
 	return -1

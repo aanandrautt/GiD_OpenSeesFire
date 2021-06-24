@@ -570,7 +570,10 @@ proc Fiber::CalcJG { event args } {
 
 				set SectionType [DWLocalGetValue $GDN $STRUCT Section]
 				if {$SectionType == "Fiber"} {
-					set GJunit "kNm^2"
+				
+					set torsionalStiff [DWLocalGetValue $GDN $STRUCT Torsional_stiffness]
+					set temp [GidConvertValueUnit $torsionalStiff]
+					set temp [ParserNumberUnit $temp JG GJUnit]
 					set heightUnit [DWLocalGetValue $GDN $STRUCT Height_h]
 					set WebThickUnit [DWLocalGetValue $GDN $STRUCT Web_thickness_tw]
 					set FlangeWidthUnit [DWLocalGetValue $GDN $STRUCT Flange_width_b]
@@ -579,6 +582,7 @@ proc Fiber::CalcJG { event args } {
 					set PoissonRat [DWLocalGetValue $GDN $STRUCT Poisson_ratio]
 					set webStiffened [DWLocalGetValue $GDN $STRUCT Web_plate_stiffened]
 					set WebPlateThicknessUnit [DWLocalGetValue $GDN $STRUCT Web_plate_t]
+					set WebPlateLengthUnit [DWLocalGetValue $GDN $STRUCT Web_plate_l]
 					set TSection [DWLocalGetValue $GDN $STRUCT T_section]
 					
 					
@@ -594,11 +598,9 @@ proc Fiber::CalcJG { event args } {
 					set temp [ParserNumberUnit $temp E EUnit]
 					
 					set temp [GidConvertValueUnit $WebPlateThicknessUnit]
-					set temp [ParserNumberUnit $temp wplt wpltUnit]
-					
-					if {$webStiffened} {
-						set tw [expr $tw + $wplt*2]
-					}			
+					set temp [ParserNumberUnit $temp wplt wpltUnit]					
+					set temp [GidConvertValueUnit $WebPlateLengthUnit]
+					set temp [ParserNumberUnit $temp wpll wpllUnit]
 					
 					set G [expr $E/(2*(1+$PoissonRat))]
 					
@@ -608,18 +610,31 @@ proc Fiber::CalcJG { event args } {
 						
 						set J 0
 						if {$TSection} {
-							set J [expr ($b*pow($tf,3.0) + ($h - $tf)*pow($tw,3.0))/3.0]
+							set J_web  Fiber::SectionTorsionalContribution [[expr $h-$tf] $tw]
+							set J_flange  Fiber::SectionTorsionalContribution [$b $tf]
+							set J [expr $J_web + $J_flange]
 							set dblSections [DWLocalGetValue $GDN $STRUCT Two_back_to_back_sections]
 							if {$dblSections} {
 								set J [expr 2*$J]
 							}
+						} elseif {$webStiffened} { 
+							
+							set close_l [expr $wpll]
+							set close_w [expr $tw + 2*$wplt]
+							set J_stiff_web [Fiber::SectionTorsionalContribution $close_l $close_w]
+							set J_web_remainder [Fiber::SectionTorsionalContribution [expr $h - 2*$tf - $wpll] $tw]
+							set J_flange  [Fiber::SectionTorsionalContribution $b $tf]
+							
+							set J [expr $J_stiff_web + $J_web_remainder + 2*$J_flange]
 						} else {
-							set J [expr (2*$b*pow($tf,3.0) + ($h - $tf)*pow($tw,3.0))/3.0]
+							set J_web [Fiber::SectionTorsionalContribution [expr $h-$tf] $tw]
+							set J_flange  [Fiber::SectionTorsionalContribution $b $tf]
+							set J [expr $J_web + 2*$J_flange]
 						}
 						
 						set GJ [format "%1.0f" [expr $G*$J]]
 						
-						set GJ $GJ$GJunit
+						set GJ $GJ$GJUnit
 
 						set ok [DWLocalSetValue $GDN $STRUCT Torsional_stiffness $GJ]
 							
@@ -631,7 +646,7 @@ proc Fiber::CalcJG { event args } {
 						set Ac [expr $h*($b+2*$pt)]
 						set J [expr (4*pow($Ac,2.0))/((2*($b+2*$pt)/$tf)+(2*($h-2*$tf)/$pt))]
 						set GJ [format "%1.0f" [expr $G*$J]]
-						set GJ $GJ$GJunit
+						set GJ $GJ$GJUnit
 
 						set ok [DWLocalSetValue $GDN $STRUCT Torsional_stiffness $GJ]
 					
@@ -647,8 +662,35 @@ proc Fiber::CalcJG { event args } {
 
 	return ""
 }
+proc Fiber::SectionTorsionalContribution { x y } {
+	if {$x > 0 && $y > 0} {
+	set a [expr min($x,$y)]; #short side
+	set b [expr max($x,$y)]; #long side
+	set ba [expr $b/$a]
+	set multiplier [expr 1/3.0]
+		if {$ba < 1} {
+			W "b/a cannot be less than 1."
+		} elseif {$ba >= 1 && $ba <= 2.5} {
+			set multiplier [Fiber::LinearlyInterpolate 1 2.5 0.141 0.249 $ba]
+		} elseif {$ba > 2.5 && $ba <= 6} {
+			set multiplier [Fiber::LinearlyInterpolate 2.5 6 0.249 0.299 $ba]
+		} elseif {$ba > 6 && $ba <= 10} {
+			set multiplier [Fiber::LinearlyInterpolate 6 10 0.299 0.312 $ba]
+		} elseif {$ba > 10 && $ba <=1e6} {
+			set multiplier [Fiber::LinearlyInterpolate 10 1e6 0.312 [expr 1/3.0] $ba]
+		}
+	return [expr $multiplier*$b*pow($a,3)]
+	} else {
+		return 0
+	}
 
+}
 
+proc Fiber::LinearlyInterpolate {xi xf yi yf x} {
+	set a [expr ($yf - $yi)/($xf - $xi)]
+	set b [expr $yf - $a*$xf]
+	return [expr $a*$x + $b]
+}
 proc Fiber::CalcCorners { event args } {
 	switch $event {
 

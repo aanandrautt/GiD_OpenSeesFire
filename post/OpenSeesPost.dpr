@@ -3430,6 +3430,11 @@ begin
                            's11','s22','s12','','','','kPa',4,5,true,0,1,2,-1,-1,-1);
 
         WriteResults(false,
+                     false,'Reading ShellMITC4 stresses (Von Mises) for layer '+IntToStr(i)+' ',
+                           'ShellMITC4_VM_stress_Layer'+IntToStr(i),'ShellMITC4','Stresses-Von-Mises (L'+IntToStr(i)+')',
+                           'q','','','','','','kPa',4,1,true,0,-1,-1,-1,-1,-1);
+
+        WriteResults(false,
                      false,'Reading ShellMITC4 stresses (shear) for layer '+IntToStr(i)+' ',
                            'ShellMITC4_stress_Layer'+IntToStr(i),'ShellMITC4','Stresses-Shear (L'+IntToStr(i)+')',
                            't1','t2','N/A','','','','kPa',4,5,true,3,4,-1,-1,-1,-1);
@@ -3489,6 +3494,11 @@ begin
                      false,'Reading ShellDKGQ stresses (membrane) for layer '+IntToStr(i)+' ',
                            'ShellDKGQ_stress_Layer'+IntToStr(i),'ShellDKGQ','Stresses-Membrane (L'+IntToStr(i)+')',
                            's11','s22','s12','','','','kPa',4,5,true,0,1,2,-1,-1,-1);
+
+        WriteResults(false,
+                     false,'Reading ShellDKGQ stresses (Von Mises) for layer '+IntToStr(i)+' ',
+                           'ShellDKGQ_VM_stress_Layer'+IntToStr(i),'ShellDKGQ','Stresses-Von-Mises (L'+IntToStr(i)+')',
+                           'q','','','','','','kPa',4,1,true,0,-1,-1,-1,-1,-1);
 
         WriteResults(false,
                      false,'Reading ShellDKGQ stresses (shear) for layer '+IntToStr(i)+' ',

@@ -610,8 +610,8 @@ proc Fiber::CalcJG { event args } {
 						
 						set J 0
 						if {$TSection} {
-							set J_web  Fiber::SectionTorsionalContribution [[expr $h-$tf] $tw]
-							set J_flange  Fiber::SectionTorsionalContribution [$b $tf]
+							set J_web  [Fiber::SectionTorsionalContribution [expr $h-$tf] $tw]
+							set J_flange  [Fiber::SectionTorsionalContribution $b $tf]
 							set J [expr $J_web + $J_flange]
 							set dblSections [DWLocalGetValue $GDN $STRUCT Two_back_to_back_sections]
 							if {$dblSections} {

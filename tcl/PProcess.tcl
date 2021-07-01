@@ -145,3 +145,23 @@ proc PProcess::WriteFakeNodalDispFile { } {
 	}
 	close $file_handle
 }
+
+proc PProcess::FactorFireTime { factor {addition 0} } {
+	set initial_dir [pwd]
+	set HT_res_dir [file join [OpenSees::GetProjectPath] "Records" "Thermal_load" ]
+	cd $HT_res_dir
+	set all_files [glob *.dat]
+	foreach fileName $all_files {
+		set file_handle [open $fileName r]
+		set temp_file_handle [open $fileName.temp w+]
+		while {[gets $file_handle line] >= 0} {
+			set new_time [expr [lindex $line 0]*$factor + $addition]
+			set new_line [lreplace #$line 0 0 $new_time]
+			puts $temp_file_handle $new_line
+		}
+		close $file_handle
+		close $temp_file_handle
+		file rename -force $fileName.temp $fileName
+	}
+	cd $initial_dir
+}

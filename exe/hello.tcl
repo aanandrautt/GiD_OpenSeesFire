@@ -1,5 +1,5 @@
 proc commands {} {
- W "getMat, fixQuadConnectivity, calcVonMises"
+ W "getMat, fixQuadConnectivity, calcVonMises, PProcess::FactorFireTime {factor {addition 0}}, Transform::PopulateTagsArray"
 }
 proc getMat { entity_ID {entity_type Lines} } {
 	set entity_info [GiD_Info list_entities $entity_type $entity_ID]

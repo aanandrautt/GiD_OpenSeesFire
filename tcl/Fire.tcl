@@ -46,7 +46,7 @@ proc PostMeshing { fail } {
 			GiD_IntervalData set $interval
 			WarnWinText "Changed interval to $interval"
 			WarnWinText "\n-----Interval: $interval-----"
-			set pairs [MeshRepair::MatchMesh] 
+			append pairs [MeshRepair::MatchMesh] 
 			Fire::AssignCompositeConnection ambient 0.00001
 			WarnWinText "\n-----Interval: $interval-----"
 			Fire::AssignCentralElementFlag

@@ -1,3 +1,7 @@
+*if(strcmp(MatProp(Formulation),"ECSteel")==0)
+*format "%d%s%g%g"
+uniaxialMaterial SteelECThermal *MaterialID *MatProp(Type) *MatProp(Yield_Stress_Fy,real) *MatProp(Initial_elastic_tangent_E0,real) 
+*else
 *format "%d%g%g%g"
 *if(strcmp(MatProp(Formulation),"Stress-Strain")==0)
 uniaxialMaterial Steel01Thermal *MaterialID *MatProp(Yield_Stress_Fy,real) *MatProp(Initial_elastic_tangent_E0,real) *MatProp(Strain-hardening_ratio_b,real) *\
@@ -7,8 +11,9 @@ uniaxialMaterial Steel01Thermal *MaterialID *MatProp(Yield_Stress_Fy,real) *MatP
 uniaxialMaterial Steel01Thermal *MaterialID *MatProp(Force_Fy,real) *MatProp(Initial_stiffness_K,real) *MatProp(Strain-hardening_ratio_b,real) *\
 *format "%g%g%g%g"
 *MatProp(Isotropic_hardening_parameter_a1,real) *MatProp(Isotropic_hardening_parameter_a2,real) *MatProp(Isotropic_hardening_parameter_a3,real) *MatProp(Isotropic_hardening_parameter_a4,real)
-*else
+*elseif(strcmp(MatProp(Formulation),"Moment-Rotation")==0)
 uniaxialMaterial Steel01Thermal *MaterialID *MatProp(Moment_My,real) *MatProp(Moment_per_rotation_unit,real) *MatProp(Strain-hardening_ratio_b,real) *\
 *format "%g%g%g%g"
 *MatProp(Isotropic_hardening_parameter_a1,real) *MatProp(Isotropic_hardening_parameter_a2,real) *MatProp(Isotropic_hardening_parameter_a3,real) *MatProp(Isotropic_hardening_parameter_a4,real)
 *endif 
+*endif

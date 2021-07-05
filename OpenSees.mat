@@ -352,6 +352,24 @@ VALUE: 1#WIDTH#(10)
 TKWIDGET: TK_MaterialWikiInfo
 END MATERIAL
 
+MATERIAL: SteelECThermal
+COMMENT: \n\tEurocode thermmomechanical properties.\n
+QUESTION: Material:#CB#(Steel01)
+VALUE: Steel01
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Formulation#CB#(ECSteel)
+VALUE: ECSteel
+STATE: HIDDEN
+QUESTION: Type#CB#(EC2NH,EC2NC,EC3)
+VALUE: EC2NH
+HELP: EC2NH:Hot rolled EC2 reinforcing steel.\nCold formed EC2 reinforcing steel.\nEC3 reinforcing steel.
+QUESTION: Yield_Stress_Fy#UNITS#
+VALUE: 500 MPa
+QUESTION: Initial_elastic_tangent_E0#UNITS#
+VALUE: 200 GPa
+TKWIDGET: TK_MaterialWikiInfo
+END MATERIAL
+
 MATERIAL: Steel02
 COMMENT: \n\tUpdate material window to assign selected Grade.\n\tSelect 'Custom' to enter user values.\n\tSelect Force-Deformation/Moment-Rotation formulation\n\tin order to use this material for zeroLength elements.\n
 QUESTION: Material:#CB#(Steel02)

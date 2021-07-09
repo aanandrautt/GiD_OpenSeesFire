@@ -810,6 +810,7 @@ proc InitGIDProject { dir } {
 						Fire.tcl \
 						Transform.tcl \
 						PProcess.tcl \
+						Dynamics.tcl \
 						RecordersNS.tcl \
 						MeshRepair.tcl \
 						Recorder.tcl} {

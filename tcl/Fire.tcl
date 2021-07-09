@@ -53,6 +53,11 @@ proc PostMeshing { fail } {
 			WarnWinText "constraint ID = [expr $Fire::constraint_ID - 1]\ncondition ID = [expr $Fire::condition_ID - 1]\ncomposite ID = [expr $Fire::composite_ID - 1]                                         "
 			WarnWinText "\n-----Ran all functions in interval: $interval-----"
 		}
+		GiD_IntervalData set 1
+		W "\n-----Interval: 1-----"
+		W "Assigning nodal masses corresponding to quad element if Automass is turned on in Gen. data."
+		Dynamics::AutoMass
+		W "Finished assigning mass information to nodes."
 		GiD_IntervalData set $current_interval
 		WarnWinText "Returned to original interval: $current_interval"
 		W "\nCreating geometric transforms."

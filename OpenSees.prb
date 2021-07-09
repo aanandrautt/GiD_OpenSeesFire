@@ -87,6 +87,9 @@ QUESTION: Number_of_eigenvalues
 VALUE: 3#WIDTH#(10)
 QUESTION: Solver#CB#(genBandArpack,fullGenLapack,symmBandLapack)
 VALUE: fullGenLapack
+QUESTION: Activate_auto_mass#CB#(0,1)
+VALUE: 0
+HELP: Mass will be based on specified density values and applied over the nodes
 TITLE: Rayleigh_Damping
 QUESTION: _#CB#(_)
 VALUE:

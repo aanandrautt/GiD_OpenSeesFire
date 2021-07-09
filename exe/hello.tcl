@@ -1,14 +1,38 @@
 proc commands {} {
  W "getMat, fixQuadConnectivity, calcVonMises, PProcess::FactorFireTime {factor {addition 0}}, Transform::PopulateTagsArray"
 }
-proc getMat { entity_ID {entity_type Lines} } {
+proc getMat { entity_ID {entity_type Lines} { display 1 }} {
 	set entity_info [GiD_Info list_entities $entity_type $entity_ID]
 	set material_ID_index [expr [lsearch $entity_info "material:"] + 1]
 	set material_ID [lindex $entity_info $material_ID_index]
 	set index [expr $material_ID - 1]
-	W [lindex [GiD_Info materials] $index]
-
+	set Mat [lindex [GiD_Info materials] $index]
+	if {$display} {
+		W $Mat
+	}
+	return $Mat
 }
+proc getSec { entity_ID {entity_type Lines} { display 1 }} {
+	set section [GiD_AccessValue get material [getMat $entity_ID $entity_type 0] Type]
+	if {$display} {
+		W $section
+	}
+	return $section
+}
+
+proc getProp { entity_ID prop {entity_type Lines} { display 1 }} {
+	set property [GiD_AccessValue get material [getMat $entity_ID $entity_type 0] $prop]
+		
+	set temp [GidConvertValueUnit $property]
+	set temp [ParserNumberUnit $temp theProperty PropertyUnit]
+	
+	
+	if {$display} {
+		W "the property is: $theProperty, and its unit is: $PropertyUnit"
+	}
+	return "$theProperty$PropertyUnit $theProperty $PropertyUnit"
+}
+
 
 proc fixQuadConnectivity {} {
 	set list_of_quad_elems [GiD_Mesh list -element_type Quadrilateral element]
@@ -109,4 +133,35 @@ proc calcVonMises { layer } {
 		close $out_file_handle
 	}
 	W "Finished calculating VM stresses for layer $layer.\n"
+}
+
+
+proc getElemNodalAreas { elem_ID } {
+	set connectivity [GiD_Mesh get element $elem_ID connectivities]
+	set xyz "";
+	foreach node $connectivity {
+		lappend xyz [GiD_Mesh get node $node coordinates]
+	}
+	set vec12 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 1] [lindex $xyz 0]]]
+	set vec14 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 3] [lindex $xyz 0]]]
+	
+	set vec21 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 0] [lindex $xyz 1]]]
+	set vec23 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 2] [lindex $xyz 1]]]
+	
+	set vec32 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 1] [lindex $xyz 2]]]
+	set vec34 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 3] [lindex $xyz 2]]]
+	
+	set vec41 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 0] [lindex $xyz 3]]]
+	set vec43 [ScaleVector 0.5 [math::linearalgebra::sub_vect [lindex $xyz 2] [lindex $xyz 3]]]
+	
+	set node1A [math::linearalgebra::norm_two [math::linearalgebra::crossproduct $vec12 $vec14]]
+	set node2A [math::linearalgebra::norm_two [math::linearalgebra::crossproduct $vec23 $vec21]]
+	set node3A [math::linearalgebra::norm_two [math::linearalgebra::crossproduct $vec34 $vec32]]
+	set node4A [math::linearalgebra::norm_two [math::linearalgebra::crossproduct $vec41 $vec43]]
+	
+	return "$node1A $node2A $node3A $node4A"
+}
+
+proc ScaleVector { scale vect } {
+ return [math::linearalgebra::scale_vect $scale $vect]
 }

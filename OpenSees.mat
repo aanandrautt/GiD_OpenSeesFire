@@ -2460,6 +2460,8 @@ QUESTION: Type#MAT#(Section_Force-Deformation,User_Materials)
 VALUE: LayeredShellThermal
 TKWIDGET: Shell::CheckFieldValues
 TITLE: Weight
+QUESTION: Mass_density#UNITS#
+VALUE: 2400 kg/m^3
 QUESTION: Weight_density#UNITS#
 VALUE: 23.55 kN/m^3
 END MATERIAL
@@ -2479,8 +2481,11 @@ QUESTION: Type#MAT#(Section_Force-Deformation,User_Materials)
 VALUE: LayeredShellThermal
 TKWIDGET: Shell::CheckFieldValues
 TITLE: Weight
+QUESTION: Mass_density#UNITS#
+VALUE: 2400 kg/m^3
 QUESTION: Weight_density#UNITS#
 VALUE: 23.55 kN/m^3
+TKWIDGET: Shell::CalcArea
 END MATERIAL
 
 MATERIAL: Tri31

@@ -34,9 +34,9 @@ proc Dynamics::AssignNodalMass {} {
 			}
 		}
 	}
-	
+	set mass_factor [GiD_AccessValue get gendata Mass_factor]
 	foreach node [array names node_list] {
-		set mass $node_list($node)$mass_Unit
+		set mass [expr $node_list($node)*$mass_factor]$mass_Unit
 		set arguments [list ":" $mass $mass $mass 0$mass_Unit 0$mass_Unit 0$mass_Unit]
 		GiD_AssignData condition Point_Mass nodes $arguments $node
 	}

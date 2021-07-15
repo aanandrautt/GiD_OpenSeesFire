@@ -1,5 +1,5 @@
 proc commands {} {
- W "getMat, fixQuadConnectivity, calcVonMises, PProcess::FactorFireTime {factor {addition 0}}, Transform::PopulateTagsArray"
+ W "getMat, getSec, getProp fixQuadConnectivity, calcVonMises, PProcess::FactorFireTime {factor {addition 0}}, Transform::PopulateTagsArray, FactorResultsTime { dT }"
 }
 proc getMat { entity_ID {entity_type Lines} { display 1 }} {
 	set entity_info [GiD_Info list_entities $entity_type $entity_ID]
@@ -136,6 +136,24 @@ proc calcVonMises { layer } {
 }
 
 
+proc getElemArea { elem_ID } {
+	set connectivity [GiD_Mesh get element $elem_ID connectivities]
+	set xyz "";
+	foreach node $connectivity {
+		lappend xyz [GiD_Mesh get node $node coordinates]
+	}
+	set vec1 [math::linearalgebra::sub_vect [lindex $xyz 1] [lindex $xyz 0]]
+	set vec2 [math::linearalgebra::sub_vect [lindex $xyz 2] [lindex $xyz 1]]
+	set vec3 [math::linearalgebra::sub_vect [lindex $xyz 3] [lindex $xyz 0]]
+	set vec4 [math::linearalgebra::sub_vect [lindex $xyz 2] [lindex $xyz 3]]
+	
+	set triangle1 [math::linearalgebra::scale_vect 0.5 [math::linearalgebra::crossproduct $vec1 $vec2]]
+	set triangle2 [math::linearalgebra::scale_vect 0.5 [math::linearalgebra::crossproduct $vec4 $vec3]]
+	set rectangle [math::linearalgebra::add_vect $triangle1 $triangle2]
+	
+	return [math::linearalgebra::norm_two $rectangle]
+}
+
 proc getElemNodalAreas { elem_ID } {
 	set connectivity [GiD_Mesh get element $elem_ID connectivities]
 	set xyz "";
@@ -164,4 +182,40 @@ proc getElemNodalAreas { elem_ID } {
 
 proc ScaleVector { scale vect } {
  return [math::linearalgebra::scale_vect $scale $vect]
+}
+
+proc FactorResultsTime { dT } {
+	set initial_dir [pwd]
+	set res_dir [file join [OpenSees::GetProjectPath] "OpenSees" ]
+	cd $res_dir
+	set all_files [glob *.out]
+	foreach fileName $all_files {
+		set file_handle [open $fileName r]
+		W "Working on $fileName"
+		set temp_file_handle [open $fileName.temp w+]
+		set prev_time 0
+		while {[gets $file_handle line] >= 0} {
+			set current_time [lindex $line 0]
+			# W "previous time is: $prev_time\nprevious time + timestep: [expr $prev_time + $dT - 1e-15]\ncurrent time is: $current_time"
+			if {[expr $current_time] >= [expr $prev_time + $dT - 1e-15] || $current_time == 0 || $current_time == 1} {
+				# W "\nFound that current time is larger than previous time + timestep."
+				# W "Writing line for time: $current_time"
+				set new_line $line
+				puts $temp_file_handle $new_line
+				set prev_time $current_time
+				# W "set previous time to: $prev_time"
+			}
+
+			# W "\n\n"
+		}
+		close $file_handle
+		close $temp_file_handle
+		file rename -force $fileName.temp $fileName
+		W "Finished working on $fileName"
+	}
+	W "All .out files have been modified to conform to a time step of $dT."
+	cd $initial_dir
+}
+proc closeAll {} {
+	foreach chan [file channels] {close $chan}
 }

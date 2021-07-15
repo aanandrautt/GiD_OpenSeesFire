@@ -90,6 +90,8 @@ VALUE: fullGenLapack
 QUESTION: Activate_auto_mass#CB#(0,1)
 VALUE: 0
 HELP: Mass will be based on specified density values and applied over the nodes
+QUESTION: Mass_factor
+VALUE: 1
 TITLE: Rayleigh_Damping
 QUESTION: _#CB#(_)
 VALUE:

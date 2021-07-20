@@ -510,6 +510,17 @@ proc Fire::AssignCompositeConnection { state xytolerance } {
 					foreach pair [lrange $node_pairs($cond_id) 1 end] {
 							set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
 					}
+			} elseif {$condition_type == "finite"} {
+			W  "condition type is finite!!!"
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							GiD_IntervalData set 1
+						
+							GiD_Mesh create element append Line 2 "[lindex $pair 1] [lindex $pair 0]" [lindex $args 10]
+							
+							GiD_IntervalData set $interval							
+							set constraint_ID [expr $constraint_ID + 1]
+					}
+			
 			}
 			
 		}

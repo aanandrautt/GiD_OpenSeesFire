@@ -410,11 +410,12 @@ STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED
-QUESTION: connection_type#CB#(rigid_link,equal_DOF,common_nodes)
+QUESTION: connection_type#CB#(rigid_link,equal_DOF,common_nodes,finite)
 VALUE: rigid_link
-DEPENDENCIES: (rigid_link,RESTORE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#)
-DEPENDENCIES: (equal_DOF,HIDE,Rigid_link_type,#CURRENT#,RESTORE,X-Translation,#CURRENT#,RESTORE,Y-Translation,#CURRENT#,RESTORE,Z-Translation,#CURRENT#,RESTORE,X-Rotation,#CURRENT#,RESTORE,Y-Rotation,#CURRENT#,RESTORE,Z-Rotation,#CURRENT#)
-DEPENDENCIES: (common_nodes,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#)
+DEPENDENCIES: (rigid_link,RESTORE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,HIDE,Shear_stud,#CURRENT#)
+DEPENDENCIES: (equal_DOF,HIDE,Rigid_link_type,#CURRENT#,RESTORE,X-Translation,#CURRENT#,RESTORE,Y-Translation,#CURRENT#,RESTORE,Z-Translation,#CURRENT#,RESTORE,X-Rotation,#CURRENT#,RESTORE,Y-Rotation,#CURRENT#,RESTORE,Z-Rotation,#CURRENT#,HIDE,Shear_stud,#CURRENT#)
+DEPENDENCIES: (common_nodes,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,HIDE,Shear_stud,#CURRENT#)
+DEPENDENCIES: (finite,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,RESTORE,Shear_stud,#CURRENT#)
 QUESTION: Rigid_link_type#CB#(Bar,Beam)
 VALUE: Beam
 QUESTION: X-Translation#CB#(1,0)
@@ -429,6 +430,8 @@ QUESTION: Y-Rotation#CB#(1,0)
 VALUE: 1
 QUESTION: Z-Rotation#CB#(1,0)
 VALUE: 1
+QUESTION: Shear_stud#MAT#(Beam-Column_Elements)
+VALUE: Beam-Column_Elements
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 

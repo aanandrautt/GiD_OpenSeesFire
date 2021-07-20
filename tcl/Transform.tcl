@@ -21,36 +21,38 @@ proc Transform::PopulateTagsArray { } {
 	Transform::PrintTransformTags
 	set lineElemsMats [GiD_Info materials(Beam-Column_Elements)]
 	foreach elem $lineElemsMats { 
-		set elem_rotation [GiD_AccessValue get material $elem local_axis_rotation]
-		set elem_transform [GiD_AccessValue get material $elem Geometric_transformation#CB#(Linear,P-Delta,Corotational)]
-		
-		if {[info exists Transform::transformation_tags($elem_rotation)]} {
-			set tag_list $Transform::transformation_tags($elem_rotation)
-		} else {
-			set tag_list "-1 -1 -1 -1 -1 -1"
+		if {[GiD_AccessValue get material $elem Element_type] == "dispBeamColumn"} {
+			set elem_rotation [GiD_AccessValue get material $elem local_axis_rotation]
+			set elem_transform [GiD_AccessValue get material $elem Geometric_transformation#CB#(Linear,P-Delta,Corotational)]
+			
+			if {[info exists Transform::transformation_tags($elem_rotation)]} {
+				set tag_list $Transform::transformation_tags($elem_rotation)
+			} else {
+				set tag_list "-1 -1 -1 -1 -1 -1"
+			}
+			if {$elem_transform == "Linear"} {
+				set start_index 0
+				if {[lindex $tag_list $start_index] < 0} {
+					set tag_list [lreplace $tag_list $start_index [expr $start_index + 1] $Transform::current_transform_tag [expr $Transform::current_transform_tag + 1]]
+					set Transform::current_transform_tag [expr $Transform::current_transform_tag + 2]
+				} 
+			} elseif {$elem_transform == "P-Delta"} {
+				set start_index 2
+				if {[lindex $tag_list $start_index] < 0} {
+					set tag_list [lreplace $tag_list $start_index [expr $start_index + 1] $Transform::current_transform_tag [expr $Transform::current_transform_tag + 1]]
+					set Transform::current_transform_tag [expr $Transform::current_transform_tag + 2]
+				} 
+			} elseif {$elem_transform == "Corotational"} {
+				set start_index 4
+				if {[lindex $tag_list $start_index] < 0} {
+					set tag_list [lreplace $tag_list $start_index [expr $start_index + 1] $Transform::current_transform_tag [expr $Transform::current_transform_tag + 1]]
+					set Transform::current_transform_tag [expr $Transform::current_transform_tag + 2]
+				} 
+			} else {
+				W "ERROR: transformation type unknown for material $elem"
+			}
+			set Transform::transformation_tags($elem_rotation) $tag_list
 		}
-		if {$elem_transform == "Linear"} {
-			set start_index 0
-			if {[lindex $tag_list $start_index] < 0} {
-				set tag_list [lreplace $tag_list $start_index [expr $start_index + 1] $Transform::current_transform_tag [expr $Transform::current_transform_tag + 1]]
-				set Transform::current_transform_tag [expr $Transform::current_transform_tag + 2]
-			} 
-		} elseif {$elem_transform == "P-Delta"} {
-			set start_index 2
-			if {[lindex $tag_list $start_index] < 0} {
-				set tag_list [lreplace $tag_list $start_index [expr $start_index + 1] $Transform::current_transform_tag [expr $Transform::current_transform_tag + 1]]
-				set Transform::current_transform_tag [expr $Transform::current_transform_tag + 2]
-			} 
-		} elseif {$elem_transform == "Corotational"} {
-			set start_index 4
-			if {[lindex $tag_list $start_index] < 0} {
-				set tag_list [lreplace $tag_list $start_index [expr $start_index + 1] $Transform::current_transform_tag [expr $Transform::current_transform_tag + 1]]
-				set Transform::current_transform_tag [expr $Transform::current_transform_tag + 2]
-			} 
-		} else {
-			W "ERROR: transformation type unknown for material $elem"
-		}
-		set Transform::transformation_tags($elem_rotation) $tag_list
 	}
 	Transform::CalcTransforms
 	Transform::FlattenTransforms

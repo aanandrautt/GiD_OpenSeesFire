@@ -2052,7 +2052,95 @@ VALUE: 7850 kg/m^3
 QUESTION: Weight_density#UNITS#
 VALUE: 77 kN/m^3
 END MATERIAL
-
+MATERIAL: TwoNodeLink
+COMMENT: \n
+TITLE: General
+QUESTION: Element_type:#CB#(NodeLink)
+VALUE: NodeLink
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Activate_Ux#CB#(0,1)
+VALUE: 1
+DEPENDENCIES: (0,SET,Ux_material,#CURRENT#) (1,RESTORE,Ux_material,#CURRENT#)
+QUESTION: Ux_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials,User_Materials)
+VALUE: Elastic
+QUESTION: Activate_Uy#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Uy_material,#CURRENT#) (1,RESTORE,Uy_material,#CURRENT#)
+QUESTION: Uy_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials,User_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Uz#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Uz_material,#CURRENT#) (1,RESTORE,Uz_material,#CURRENT#)
+QUESTION: Uz_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials,User_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Rx#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Rx_material,#CURRENT#) (1,RESTORE,Rx_material,#CURRENT#)
+QUESTION: Rx_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials,User_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Ry#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Ry_material,#CURRENT#) (1,RESTORE,Ry_material,#CURRENT#)
+QUESTION: Ry_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials,User_Materials)
+VALUE: Elastic
+STATE: DISABLED
+QUESTION: Activate_Rz#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,SET,Rz_material,#CURRENT#) (1,RESTORE,Rz_material,#CURRENT#)
+QUESTION: Rz_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,Combined_Materials,User_Materials)
+VALUE: Elastic
+STATE: DISABLED
+TITLE: Options
+QUESTION: local_x#CB#(0,1)
+VALUE:0
+DEPENDENCIES: (0,HIDE,x1,#CURRENT#,HIDE,x2,#CURRENT#,HIDE,x3,#CURRENT#)
+DEPENDENCIES: (1,RESTORE,x1,#CURRENT#,RESTORE,x2,#CURRENT#,RESTORE,x3,#CURRENT#)
+QUESTION: x1
+VALUE: 1.0
+QUESTION: x2
+VALUE: 0.0
+QUESTION: x3
+VALUE: 0.0
+QUESTION: local_y#CB#(0,1)
+VALUE:0
+DEPENDENCIES: (0,HIDE,y1,#CURRENT#,HIDE,y2,#CURRENT#,HIDE,y3,#CURRENT#)
+DEPENDENCIES: (1,RESTORE,y1,#CURRENT#,RESTORE,y2,#CURRENT#,RESTORE,y3,#CURRENT#)
+QUESTION: y1
+VALUE: 0.0
+QUESTION: y2
+VALUE: 1.0
+QUESTION: y3
+VALUE: 0.0
+QUESTION: custom_PDelta#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,HIDE,PDelta_i_y,#CURRENT#,HIDE,PDelta_j_y,#CURRENT#,HIDE,PDelta_i_z,#CURRENT#,HIDE,PDelta_j_z,#CURRENT#)
+DEPENDENCIES: (1,RESTORE,PDelta_i_y,#CURRENT#,RESTORE,PDelta_j_y,#CURRENT#,RESTORE,PDelta_i_z,#CURRENT#,RESTORE,PDelta_j_z,#CURRENT#)
+QUESTION: PDelta_i_y
+VALUE: 0.5
+QUESTION: PDelta_j_y
+VALUE: 0.5
+QUESTION: PDelta_i_z
+VALUE: 0.5
+QUESTION: PDelta_j_z
+VALUE: 0.5
+QUESTION: custom_shear_distance#CB#(0,1)
+VALUE: 0
+DEPENDENCIES: (0,HIDE,shear_distance_y,#CURRENT#,HIDE,shear_distance_z,#CURRENT#)
+DEPENDENCIES: (1,RESTORE,shear_distance_y,#CURRENT#,RESTORE,shear_distance_z,#CURRENT#)
+QUESTION: shear_distance_y
+VALUE: 0.5
+HELP: distance from node i at which shear occurs
+QUESTION: shear_distance_z
+VALUE: 0.5
+HELP: distance from node i at which shear occurs
+QUESTION: do_rayleigh#CB#(0,1)
+VALUE: 0
+QUESTION: Mass#UNITS#
+VALUE: 1 kg
+END MATERIAL
 MATERIAL: Elastic_Beam-Column
 COMMENT: \n
 TITLE: General

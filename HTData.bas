@@ -8,8 +8,10 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var fire=1
 *elseif(strcmp(GenData(Exposure_type),"Hydrocarbon")==0)
 *set var fire=2
-*else
+*elseif(strcmp(GenData(Exposure_type),"FDS")==0)
 *set var fire=3
+*else
+*set var fire=4
 *endif
 *loop intervals
 *#beam-column elements

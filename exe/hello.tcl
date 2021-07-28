@@ -1,5 +1,6 @@
 proc commands {} {
- W "getMat, getSec, getProp fixQuadConnectivity, calcVonMises, PProcess::FactorFireTime {factor {addition 0}}, Transform::PopulateTagsArray, FactorResultsTime { dT }"
+ W "getMat, getSec, getProp fixQuadConnectivity, calcVonMises, PProcess::FactorFireTime {factor {addition 0}}\n, Transform::PopulateTagsArray, FactorResultsTime { dT }"
+ W "FindElementWOMat, FindElem { ID }"
 }
 proc getMat { entity_ID {entity_type Lines} { display 1 }} {
 	set entity_info [GiD_Info list_entities $entity_type $entity_ID]
@@ -8,7 +9,11 @@ proc getMat { entity_ID {entity_type Lines} { display 1 }} {
 	set index [expr $material_ID - 1]
 	set Mat [lindex [GiD_Info materials] $index]
 	if {$display} {
-		W $Mat
+		if {$Mat != ""} {
+			W $Mat
+		} else {
+			W "$entity_type $entity_ID does not have a material assigned to it."
+		}
 	}
 	return $Mat
 }
@@ -218,4 +223,41 @@ proc FactorResultsTime { dT } {
 }
 proc closeAll {} {
 	foreach chan [file channels] {close $chan}
+}
+proc FindElementWOMat { } {
+	foreach elem [lsort -integer [GiD_Mesh list -element_type Line element]] {
+		if {[getMat $elem element 0] == ""} {
+			W "Line $elem does not have a material."
+		}
+	} 
+	foreach elem [lsort -integer [GiD_Mesh list -element_type Quadrilateral element]] {
+		if {[getMat $elem element 0] == ""} {
+			W "Quad $elem does not have a material."
+		}
+	}
+	W "Checked all line and quad elements." 
+}
+
+proc FindElem { ID } {
+	
+	set info [GiD_Mesh get element $ID]
+	if {$info != ""} {
+		set layer [lindex $info 0]
+		set type [lindex $info 1]
+		set n_nodes [lindex $info 2]
+		set nodes [lrange $info 3 end]
+		set xyz ""
+		foreach node $nodes {
+			lappend xyz [GiD_Mesh get node $node coordinates]
+		}
+		W "Element $ID is located in layer: $layer"
+		W "it is a $type element, and has $n_nodes nodes"
+		W "these nodes are: $nodes"
+		W "And they have the following coorindates:"
+		foreach coord $xyz {
+			W $coord
+		} 
+	} else { 
+		W "element $ID info could not be ertrieved.\nDouble-check that element exists."
+	}
 }

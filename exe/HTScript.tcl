@@ -115,7 +115,7 @@ if {$slab && [expr $composite || $stiffened]} {
 }
 
 # meshing parameters
-set f_elemx [expr max(4,int(($b - $tw)/0.025))]
+set f_elemx [expr max(4,int(0.5*($b - $tw)/0.025))]
 if {fmod($f_elemx,2)} {
 	set f_elemx [expr int($f_elemx+1)]
 }
@@ -790,6 +790,10 @@ if {$FireExposure == 1} {
 	FireModel	UserDefined	1	-file	$fileName -type 1
 	puts "User-defined fire exposure."
 	
+} elseif {$FireExposure == 4} {
+	set fileName "Arup800.dat"
+	FireModel	UserDefined	1	-file	$fileName -type 1
+	puts "User-defined fire exposure."
 } else {
 	puts "unknown fire exposure type. Aborting analysis." 
 	return -1
@@ -1012,7 +1016,28 @@ if {$slab} {
 	# gets stdin randomString
 	# Bottom flange
 	set ix [expr round($f_elemx*(0.5*$f_x - 0.25*$tw)/$f_x)]
-	set f_quarter [expr 0.5*$tw + $ix*$f_x/$f_elemx]
+	if { [expr 0.25*$b - 0.5*$tw] < 0} {
+		set exact_quarter [expr 0.25*$b]
+		set web_x_size [expr $tw/$w_elemx]
+		set num_to_quarter [expr round($exact_quarter/$web_x_size)]
+		puts "exact_quarter: $exact_quarter\nweb_x_size: $web_x_size\nnum_to_quarter: $num_to_quarter"
+		set f_quarter [expr $num_to_quarter*$web_x_size]
+		set T7_entity 2
+		set T9_entity 2
+		set T12_entity 6
+		set T14_entity 6
+		
+	} else {
+		set f_quarter [expr 0.5*$tw + $ix*$f_x/$f_elemx]
+		set T7_entity 1
+		set T9_entity 3
+		set T12_entity 5
+		set T14_entity 7
+	}
+	puts "f_elemx: $f_elemx"
+	puts "ix: $ix"
+	puts "f_quarter: $f_quarter"
+	
 	set err [expr $f_quarter - 0.25*$b]
 	puts "The selected point is [expr $err*1000] mm farther from the web than the actual quarter point. \n"
 	set T6 106

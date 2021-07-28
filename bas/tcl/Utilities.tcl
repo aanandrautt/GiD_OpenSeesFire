@@ -203,9 +203,12 @@ proc Create_tcl_file { } {
 
 		GiD_Process Mescape Files Save; # save project before creating .tcl file
 		file mkdir [file join [OpenSees::GetProjectPath] OpenSees]
+		set time_start [clock seconds]	
 		GiD_Process Mescape Files WriteForBAS "[OpenSees::GetProblemTypePath]/../OpenSees.gid/OpenSees.bas" "[OpenSees::GetProjectPath]/OpenSees/[OpenSees::GetProjectName].tcl"
 	}
-
+	set time_end [clock seconds]
+	set analysisTime [expr $time_end-$time_start]
+	W "Writing tcl:\n Started at : [clock format $time_start -format %H:%M:%S].\nFinished at: [clock format $time_end -format %H:%M:%S].\n\nTotal time: $analysisTime seconds."
 	UpdateInfoBar
 	return ""
 }
@@ -735,13 +738,14 @@ proc Opt2_dialog { } {
 
 		        }
 		} else {
-
+				
 		        Create_tcl_file
 
+				
 		        set fexists [file exist $file]
 		        if { $fexists == 1 } {
 
-		                tk_dialog $w "Success" "The .tcl file was created" info 0 "  Ok  "
+		                tk_dialog $w "Success" "The .tcl file was created." info 0 "  Ok  "
 		        }
 
 		}

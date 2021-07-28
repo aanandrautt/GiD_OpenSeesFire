@@ -123,6 +123,11 @@ proc Dynamics::getThickness { section } {
 		set temp [GidConvertValueUnit $t]
 		set temp [ParserNumberUnit $temp thickness dummy]
 		return $thickness
+	} elseif {$section_type == "ElasticMembranePlate"} {
+		set t [GiD_AccessValue get material $section Section_depth_h]
+		set temp [GidConvertValueUnit $t]
+		set temp [ParserNumberUnit $temp thickness dummy]
+		return $thickness
 	} else {
 		W "cannot get the thickness of section $section because it is of type $section_type."
 	}

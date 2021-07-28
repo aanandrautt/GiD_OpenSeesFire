@@ -9,7 +9,8 @@ proc Fire::ResetIDs { } {
 	set Fire::constraint_ID 10000
 }
 proc GiD_Event_BeforeMeshGeneration { element_size } {
-	WarnWinText ".....Starting pre-meshing commands.....\n\n"
+	set time_start [clock seconds]	
+	WarnWinText ".....Starting pre-meshing commands at [clock format $time_start -format %H:%M:%S].....\n\n"
 	Fire::ResetIDs
 	set current_interval [lindex [GiD_Info intvdata num] 0]
 	set num_of_intervals [lindex [GiD_Info intvdata num] 1]
@@ -28,7 +29,10 @@ proc GiD_Event_BeforeMeshGeneration { element_size } {
 	}
 	GiD_IntervalData set $current_interval
 	WarnWinText "Returned to original interval: $current_interval"
-	WarnWinText "\n\n.....Finished all pre-meshing commands.....\n\n"
+	set time_end [clock seconds]
+	set PreMeshTime [expr $time_end-$time_start]
+	WarnWinText "\n\n.....Finished all pre-meshing commands at [clock format $time_end -format %H:%M:%S]....."
+	W ".....Premeshing commands took $PreMeshTime seconds.....\n\n"
 }
 proc GiD_Event_AfterMeshGeneration { fail } { 	
 	PostMeshing $fail
@@ -37,8 +41,9 @@ proc GiD_Event_AfterMeshGeneration { fail } {
 
 proc PostMeshing { fail } {
 	if {!$fail} {
+		set time_start [clock seconds]
 		set pairs ""
-		WarnWinText ".....Starting post-meshing commands.....\n\n"
+		WarnWinText ".....Starting post-meshing commands at [clock format $time_start -format %H:%M:%S].....\n\n"
 		set current_interval [lindex [GiD_Info intvdata num] 0]
 		set num_of_intervals [lindex [GiD_Info intvdata num] 1]
 		WarnWinText "Current interval is: $current_interval"
@@ -55,17 +60,20 @@ proc PostMeshing { fail } {
 		}
 		GiD_IntervalData set 1
 		W "\n-----Interval: 1-----"
-		W "Assigning nodal masses corresponding to quad element if Automass is turned on in Gen. data."
+		W "Assigning nodal masses corresponding to quad element\n if Automass is turned on in gen data starting at [clock format [clock seconds] -format %H:%M:%S]"
 		Dynamics::AutoMass
-		W "Finished assigning mass information to nodes."
+		W "Finished assigning mass information to nodes at [clock format [clock seconds] -format %H:%M:%S]."
 		GiD_IntervalData set $current_interval
 		WarnWinText "Returned to original interval: $current_interval"
-		W "\nCreating geometric transforms."
+		W "\nCreating geometric transforms at [clock format [clock seconds] -format %H:%M:%S]."
 		Transform::PopulateTagsArray
-		W "\nFinished creating transforms and populting the corresponding array.\n"
+		W "\nFinished creating transforms and populting the corresponding array at [clock format [clock seconds] -format %H:%M:%S].\n"
 		MeshRepair::ReassignMeshDivisions $pairs
-		W "\nFinished reassigning mesh divisions to beam-column elements.\n"
-		WarnWinText "\n\n.....Finished all post-meshing commands....."
+		W "\nFinished reassigning mesh divisions to beam-column elements at [clock format [clock seconds] -format %H:%M:%S].\n"
+		set time_end [clock seconds]
+		set PostMeshTime [expr $time_end-$time_start]
+		WarnWinText "\n\n.....Finished all post-meshing commands at [clock format $time_end -format %H:%M:%S]....."
+		W ".....Post-meshing commands took $PostMeshTime seconds.....\n\n"
 	}
 }
 # should be performed BEFORE meshing
@@ -80,7 +88,7 @@ proc PostMeshing { fail } {
 proc Fire::AssignConditionIds {} {
 	# variable condition_ID
 	WarnWinText "\n------------------------------------------"
-	WarnWinText "Entering function Fire::AssignConditionIds"
+	WarnWinText "Entering function Fire::AssignConditionIds at [clock format [clock seconds] -format %H:%M:%S]"
 	WarnWinText "------------------------------------------\n"
 	set condition_name "Line_Gas_Temperatures Surface_Gas_Temperatures Line_Composite_Section_Slab Line_Composite_Section_Slab_AMBIENT"
 		foreach cond $condition_name {
@@ -126,7 +134,7 @@ proc Fire::GetConditionID { cond elem_id } {
 # to the follower lines.
 proc Fire::AssignSurfaceCompositeSectionCond {} {
 	WarnWinText "\n----------------------------------------------------------"
-	WarnWinText "Entering function: Fire::AssignSurfaceCompositeSectionCond"
+	WarnWinText "Entering function: Fire::AssignSurfaceCompositeSectionCond at [clock format [clock seconds] -format %H:%M:%S]"
 	WarnWinText "----------------------------------------------------------\n"
 	set condition_name "Line_Composite_Section_Slab"
 	set line_list [GiD_Info Conditions $condition_name geometry]
@@ -198,6 +206,7 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 	WarnWinText "\n------------------------------------------------------------------------"
 	WarnWinText "Entering function Fire::PairCompositeSections given state: $state"
+	W "Current time is: [clock format [clock seconds] -format %H:%M:%S]"
 	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
 	WarnWinText "The tolerance for the z direction is given as: $ztolerance"
 	WarnWinText "------------------------------------------------------------------------\n"
@@ -370,7 +379,8 @@ proc Fire::GetCompositeSectionSurface { cond_id over} {
 #
 proc Fire::AssignCompositeConnection { state xytolerance } {
 	WarnWinText "\n------------------------------------------------------------------------"
-	WarnWinText "Entering function Fire::AssignCompositeConnection given state: $state"
+	WarnWinText "Entering function Fire::AssignCompositeConnection given state: $state" 
+	W "Current time is: [clock format [clock seconds] -format %H:%M:%S]"
 	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
 	WarnWinText "------------------------------------------------------------------------\n"
 	set interval [lindex [GiD_Info intvdata num] 0]
@@ -594,7 +604,7 @@ proc FindListCommonItems { list1 list2 } {
 # the bas file to generate the HT data files.
 proc Fire::AssignCentralElementFlag {} {
 	WarnWinText "\n------------------------------------------------"
-	WarnWinText "Entering function Fire::AssignCentralElementFlag"
+	WarnWinText "Entering function Fire::AssignCentralElementFlag at [clock format [clock seconds] -format %H:%M:%S]"
 	WarnWinText "------------------------------------------------\n"
 	
 	

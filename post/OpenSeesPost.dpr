@@ -1667,6 +1667,74 @@ begin
 
     end;
 
+    OutFile := ModelPath+'\OpenSees\Node_temperatures.out';
+
+    if FileExists(OutFile) then
+    begin
+        write('Reading nodal temperatures ');
+
+        n := StrToInt(Copy(TCL[TCL.IndexOf('# Number of nodes')+1],3,10));  // number of nodes
+
+        AssignFile(RES,OutFile);
+        Reset(RES);
+
+        i := 0;
+
+        repeat
+
+            Readln(RES,line);
+
+            if (i = 0) or EOF(RES) or (i mod Step = 0) then
+            begin
+
+                MSH.Writeline('');
+                MSH.Writeline('Result "Nodes//Temperatures" "'+Str_IntNames[i]+'" '+Str_Steps[i]+' Vector OnNodes');
+
+                if ndm = 3 then
+                    s := 'ComponentNames "_" "_" "T"'
+                else
+                    s := 'ComponentNames "Ux" "Uy" "Uz (zero)"';
+
+                MSH.Writeline(s);
+
+                MSH.Writeline('Unit "C"');
+                MSH.Writeline('Values');
+
+                StrToArray(line,Str,n+1,true);  // read all values from current step
+
+                for j := 0 to n-1 do
+                begin
+
+                    if ndm = 3 then
+                        s := IntToStr(j+1) + StringOfChar(' ',INDENT-Length(IntToStr(j+1))) + IntToStr(0)+' '+IntToStr(0)+' '+Str[j]
+                    else
+                        s := IntToStr(j+1) + StringOfChar(' ',INDENT-Length(IntToStr(j+1))) + Str[ndm*j]+' '+Str[ndm*j+1]+' 0';
+
+                    MSH.Writeline(s);
+                end;
+
+                MSH.Writeline('End Values');
+
+                s := '('+IntToStr(i+1)+')';
+                TextColor(Yellow);
+                write(s);
+                TextColor(White);
+
+                if not EOF(RES) then
+                    for j := 1 to Length(s) do
+                        write(#8);
+            end;
+
+            Inc(i);
+
+        until EOF(RES);
+
+        CloseFile(RES);
+
+        writeln;
+
+    end;
+
     // accelerations
 
     OutFile := ModelPath+'\OpenSees\Node_accelerations.out';

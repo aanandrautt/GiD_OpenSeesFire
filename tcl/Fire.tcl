@@ -134,7 +134,8 @@ proc Fire::GetConditionID { cond elem_id } {
 # to the follower lines.
 proc Fire::AssignSurfaceCompositeSectionCond {} {
 	WarnWinText "\n----------------------------------------------------------"
-	WarnWinText "Entering function: Fire::AssignSurfaceCompositeSectionCond at [clock format [clock seconds] -format %H:%M:%S]"
+	WarnWinText "Entering function: Fire::AssignSurfaceCompositeSectionCond"
+	W "at [clock format [clock seconds] -format %H:%M:%S]"
 	WarnWinText "----------------------------------------------------------\n"
 	set condition_name "Line_Composite_Section_Slab"
 	set line_list [GiD_Info Conditions $condition_name geometry]
@@ -149,43 +150,53 @@ proc Fire::AssignSurfaceCompositeSectionCond {} {
 	set surf_condition_name "Surface_Composite_Section"
 	set material_list [GiD_Info material]
 	GiD_UnAssignData condition $surf_condition_name surfaces all
-
+	GiD_UnAssignData condition Line_composite_section_slab_error lines all
 	foreach line_id [array names line_id_list] {
 		# set associated_surf_ids [GetLineHigherEntities $line_id]
 		set associated_surf_ids [GidUtils::GetEntityHigherEntities line $line_id] 
-		set width 0
-		foreach surf $associated_surf_ids {
-		        set xyz_surf [GidUtils::GetEntityCenter surface $surf]
-		        set xyz_line [GidUtils::GetEntityCenter line $line_id]
-		        set distance_vect [math::linearalgebra::sub_vect  $xyz_line  $xyz_surf]
-		        set distance [expr 2*[math::linearalgebra::norm_two $distance_vect]]
-		        set width [expr $width + $distance]
+		if {[llength $associated_surf_ids] <= 0} {
+			GiD_AssignData condition Line_composite_section_slab_error lines {"No associated surfaces"} $line_id   
+			
+		} else {
+		
+			set width 0
+			foreach surf $associated_surf_ids {
+					set xyz_surf [GidUtils::GetEntityCenter surface $surf]
+					set xyz_line [GidUtils::GetEntityCenter line $line_id]
+					set distance_vect [math::linearalgebra::sub_vect  $xyz_line  $xyz_surf]
+					set distance [expr [math::linearalgebra::norm_two $distance_vect]]
+					set width [expr $width + $distance]
+			}
+			set width "$width [GiD_Units get model_unit_length]"
+			
+			# set info [GiD_Info list_entities surface $associated_surf_ids]
+			# set element_type_index [lsearch $info "material:"]
+			# set element_type_num [lindex $info [expr $element_type_index +1]]
+			# set element_type_name [lindex [.central.s info materials] [expr $element_type_num-1]]
+			# set element_type_info [GiD_Info materials $element_type_name]
+			
+			# set section_type_num [lsearch $element_type_info "Type#MAT#(Section_Force-Deformation,User_Materials)"]
+			# set section_type_name [lindex $element_type_info  [expr $section_type_num+1]]
+			# set section_type_info [GiD_Info materials $section_type_name]
+		
+			# set slab_thickness_index [lsearch $section_type_info "Slab_thickness#UNITS#"]
+			# set slab_thickness [lindex $section_type_info [expr $slab_thickness_index + 1]]
+			W "for line: $line_id"
+			W "current surface is: [lindex $associated_surf_ids 0]"
+			set slab_thickness [lindex [getSecProp [lindex $associated_surf_ids 0] Slab_thickness surface 0] 0]
+			set slab_protection_thickness [lindex [getSecProp [lindex $associated_surf_ids 0] protection_thickness surface 0] 0]
+			set slab_protection_mat [lindex [getSecProp [lindex $associated_surf_ids 0] protection_material surface 0] 0]
+			
+			# set slab_protection_index [lsearch $section_type_info "protection_thickness#UNITS#"]
+			# set slab_protection_thickness [lindex $section_type_info [expr $slab_protection_index + 1]]
+			
+			# set slab_protection_mat_index [lsearch $section_type_info "protection_material#CB#(1,2,3,4,5)"]
+			# set slab_protection_mat [lindex $section_type_info [expr $slab_protection_mat_index + 1]]
+			set line_id_list($line_id) [lreplace $line_id_list($line_id) end-3 end $width $slab_thickness $slab_protection_thickness $slab_protection_mat]
+			
+			GiD_AssignData condition $condition_name lines $line_id_list($line_id)  $line_id
+			GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
 		}
-		set width "$width [GiD_Units get model_unit_length]"
-		
-		set info [GiD_Info list_entities surface $associated_surf_ids]
-		set element_type_index [lsearch $info "material:"]
-		set element_type_num [lindex $info [expr $element_type_index +1]]
-		set element_type_name [lindex [.central.s info materials] [expr $element_type_num-1]]
-		set element_type_info [GiD_Info materials $element_type_name]
-		
-		set section_type_num [lsearch $element_type_info "Type#MAT#(Section_Force-Deformation,User_Materials)"]
-		set section_type_name [lindex $element_type_info  [expr $section_type_num+1]]
-		set section_type_info [GiD_Info materials $section_type_name]
-
-		set slab_thickness_index [lsearch $section_type_info "Slab_thickness#UNITS#"]
-		set slab_thickness [lindex $section_type_info [expr $slab_thickness_index + 1]]
-		
-		set slab_protection_index [lsearch $section_type_info "protection_thickness#UNITS#"]
-		set slab_protection_thickness [lindex $section_type_info [expr $slab_protection_index + 1]]
-		
-		set slab_protection_mat_index [lsearch $section_type_info "protection_material#CB#(1,2,3)"]
-		set slab_protection_mat [lindex $section_type_info [expr $slab_protection_mat_index + 1]]
-		set line_id_list($line_id) [lreplace $line_id_list($line_id) end-3 end $width $slab_thickness $slab_protection_thickness $slab_protection_mat]
-		
-		GiD_AssignData condition $condition_name lines $line_id_list($line_id)  $line_id
-		GiD_AssignData condition $surf_condition_name surfaces $line_id_list($line_id)  $associated_surf_ids
-
 	}
 }
 
@@ -626,9 +637,15 @@ proc Fire::AssignCentralElementFlag {} {
 		foreach geometric_entity [array names geometry_elements_mesh] {
 		
 			if {$cond == "Surface_Gas_Temperatures"} {
+							
 							set xyz [GidUtils::GetEntityCenter surface $geometric_entity]
-							set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements_mesh($geometric_entity)]
+							if {[llength $geometry_elements_mesh($geometric_entity)] == 1} {
+								set central_elem_id $geometry_elements_mesh($geometric_entity) 
+							} else {
+								set central_elem_id [GidUtils::GetClosestElement surface $xyz $geometry_elements_mesh($geometric_entity)]
+							}
 							GiD_AssignData condition Surface_Gas_Temperatures_Central Elements $geometry_elements_args($geometric_entity) $central_elem_id
+							
 			} elseif {$cond == "Line_Composite_Section_Beam"} {
 							set xyz [GidUtils::GetEntityCenter line $geometric_entity]
 							set central_elem_id [GidUtils::GetClosestElement line $xyz $geometry_elements_mesh($geometric_entity)]

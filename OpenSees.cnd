@@ -152,6 +152,28 @@ STATE: DISABLED
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
+CONDITION: Line_connectivity_condition_debug
+CONDTYPE: over lines
+CONDMESHTYPE: over nodes
+CANREPEAT: no
+QUESTION: geometric_parent
+VALUE: 0
+QUESTION: ID
+VALUE: 0
+STATE: DISABLED
+QUESTION: type
+VALUE: 0
+STATE: DISABLED
+END CONDITION
+
+CONDITION: Line_composite_section_slab_error
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+QUESTION: Type
+VALUE: 
+END CONDITION
+
 CONDITION: Line_Composite_Section_Beam_central
 CONDTYPE: over lines
 CONDMESHTYPE: over body elements
@@ -208,20 +230,6 @@ CANREPEAT: no
 QUESTION: Id#CB#(_)
 VALUE: 0
 STATE: HIDDEN
-END CONDITION
-
-CONDITION: Line_connectivity_condition_debug
-CONDTYPE: over lines
-CONDMESHTYPE: over nodes
-CANREPEAT: no
-QUESTION: geometric_parent
-VALUE: 0
-QUESTION: ID
-VALUE: 0
-STATE: DISABLED
-QUESTION: type
-VALUE: 0
-STATE: DISABLED
 END CONDITION
 
 CONDITION: Surface_Composite_Section

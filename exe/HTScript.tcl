@@ -1043,11 +1043,11 @@ if {$slab} {
 	set T6 106
 	HTNodeSet $T6 -Entity 1 -Locx [expr -0.5*$b] -Locy [expr -0.5*$h + 0.5*$tf]
 	set T7 107
-	HTNodeSet $T7 -Entity 1 -Locx [expr -$f_quarter] -Locy [expr -0.5*$h + 0.5*$tf]
+	HTNodeSet $T7 -Entity $T7_entity -Locx [expr -$f_quarter] -Locy [expr -0.5*$h + 0.5*$tf]
 	set T8 108
 	HTNodeSet $T8 -Entity 2 -Locx 0.0 -Locy [expr -0.5*$h + 0.5*$tf]
 	set T9 109
-	HTNodeSet $T9 -Entity 3 -Locx [expr $f_quarter] -Locy [expr -0.5*$h + 0.5*$tf]
+	HTNodeSet $T9 -Entity $T9_entity -Locx [expr $f_quarter] -Locy [expr -0.5*$h + 0.5*$tf]
 	set T10 110
 	HTNodeSet $T10 -Entity 3 -Locx [expr 0.5*$b] -Locy [expr -0.5*$h + 0.5*$tf]
 
@@ -1055,11 +1055,11 @@ if {$slab} {
 	set T11 111
 	HTNodeSet $T11 -Entity 5 -Locx [expr -0.5*$b] -Locy [expr 0.5*$h - 0.5*$tf]
 	set T12 112
-	HTNodeSet $T12 -Entity 5 -Locx [expr -$f_quarter] -Locy [expr 0.5*$h - 0.5*$tf]
+	HTNodeSet $T12 -Entity $T12_entity -Locx [expr -$f_quarter] -Locy [expr 0.5*$h - 0.5*$tf]
 	set T13 113
 	HTNodeSet $T13 -Entity 6 -Locx 0.0 -Locy [expr 0.5*$h - 0.5*$tf]
 	set T14 114
-	HTNodeSet $T14 -Entity 7 -Locx [expr $f_quarter] -Locy [expr 0.5*$h - 0.5*$tf]
+	HTNodeSet $T14 -Entity $T14_entity -Locx [expr $f_quarter] -Locy [expr 0.5*$h - 0.5*$tf]
 	set T15 115
 	HTNodeSet $T15 -Entity 7 -Locx [expr 0.5*$b] -Locy [expr 0.5*$h - 0.5*$tf]
 
@@ -1125,9 +1125,72 @@ if {$slab} {
 		HTRecorder -file "Thermal_load\\BeamColumn$ID.dat" -NodeSet $StiffenedBeamTemp
 	}
 }
-HTAnalysis HeatTransfer TempIncr 5 1000 2 Newton
-HTAnalyze [expr $tFinal/$dt] $dt
-set reachedTime [getHTTime]
+
+proc RelaxTolerance { dt tolerance lastTime } {
+	set tolerance [expr $tolerance*2]
+	puts "Increased tolerance to $tolerance"
+	if {$tolerance > 100} {
+		puts "tolerance exceeds 100C, aborting analysis."
+		return -1
+	}
+	HTAnalysis HeatTransfer TempIncr $tolerance 300 2 Newton
+	HTAnalyze 1 $dt
+	set reachedTime [getHTTime]
+	if {[expr $reachedTime - $lastTime < $dt*1e-3]} {
+		set OK 0
+	} else { 
+		set OK 1
+	}
+	
+	if {$OK == 1} {
+		return $OK
+	} else {
+		set OK [RelaxTolerance $dt $tolerance $lastTime]
+	}
+	if {$OK == 1} {
+		return $OK
+	} else {
+		return -1
+	}
+}
+puts "\n\n\n"
+set OK 1
+set tolerance 5
+set reachedTime 0
+set lastTime 0
+HTAnalysis HeatTransfer TempIncr $tolerance 300 2 Newton
+
+while {$reachedTime < $tFinal} {
+	if { $OK > 0 } {
+		set lastTime [getHTTime]
+		puts "Attempting analysis for time: [expr $reachedTime + $dt]"
+		HTAnalyze 1 $dt
+		set reachedTime [getHTTime]
+		puts "reachedTime: $reachedTime"
+		puts "lastTime:$lastTime"
+		puts "Difference is: [expr $reachedTime - $lastTime]" 
+		
+		if {[expr $reachedTime - $lastTime < $dt*1e-3]} {
+			puts "Current step failed."
+			set OK 0
+		} else { 
+			puts "Current step succeeded."
+			set OK 1
+		}
+	} elseif { $OK < 0} {
+		puts "tolerance exceeded. Cannot continue."
+		break
+	} else {
+		puts "Seems analysis failed last step."
+		set OK [RelaxTolerance $dt $tolerance $lastTime]
+		set reachedTime [getHTTime]
+		set tolerance 5
+	}
+}
+
+
+# HTAnalyze [expr $tFinal/$dt] $dt
+
 if {[expr $tFinal - $reachedTime] < 1e-3} {
 	puts "Success"
 } else {

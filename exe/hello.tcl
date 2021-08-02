@@ -38,6 +38,24 @@ proc getProp { entity_ID prop {entity_type Lines} { display 1 }} {
 	return "$theProperty$PropertyUnit $theProperty $PropertyUnit"
 }
 
+proc getSecProp { entity_ID prop {entity_type Lines} { display 1 } } {
+	set sec [getSec $entity_ID $entity_type 0]
+	set property [GiD_AccessValue get material $sec $prop]
+	set ok [catch {
+		set temp [GidConvertValueUnit $property]
+		set temp [ParserNumberUnit $temp theProperty PropertyUnit]
+	}]
+	 if {$ok} {
+		W "Error caught!"
+		set theProperty $property
+		set PropertyUnit ""
+	}
+	
+	if {$display} {
+		W "the property is: $theProperty, and its unit is: $PropertyUnit"
+	}
+	return "$theProperty$PropertyUnit $theProperty $PropertyUnit"
+} 
 
 proc fixQuadConnectivity {} {
 	set list_of_quad_elems [GiD_Mesh list -element_type Quadrilateral element]
@@ -261,3 +279,4 @@ proc FindElem { ID } {
 		W "element $ID info could not be ertrieved.\nDouble-check that element exists."
 	}
 }
+

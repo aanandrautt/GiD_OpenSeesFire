@@ -11,6 +11,7 @@ proc Fire::ResetIDs { } {
 proc GiD_Event_BeforeMeshGeneration { element_size } {
 	set time_start [clock seconds]	
 	WarnWinText ".....Starting pre-meshing commands at [clock format $time_start -format %H:%M:%S].....\n\n"
+	SourceHello
 	Fire::ResetIDs
 	set current_interval [lindex [GiD_Info intvdata num] 0]
 	set num_of_intervals [lindex [GiD_Info intvdata num] 1]
@@ -692,6 +693,8 @@ proc W {anything} {
 }
 
 proc SourceHello { } {
-	source "C:\\Program Files\\GiD\\GiD 15.0.2\\problemtypes\\OpenSees.gid\\exe\\hello.tcl"
+	set OpenSeesProblemTypePath [OpenSees::GetProblemTypePath]
+	cd "$OpenSeesProblemTypePath/exe"
+	source hello.tcl
 }
 

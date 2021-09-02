@@ -54,12 +54,7 @@
 *loop materials
 *set var ElementCounter=0
 # *MatProp(0) *\
-*loop elems
-*# *ElemsNum
-*if(strcmp(MatProp(0),ElemsMatProp(0))==0)
-*set var ElementCounter=operation(ElementCounter+1)
-*endif
-*end elems
+*set var ElementCounter=tcl(getNumOfElem *MatProp(0))
 (*ElementCounter)
 *end materials
 *set var dummy=tcl(ClearZeroLengthLists )

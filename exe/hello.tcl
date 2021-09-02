@@ -25,6 +25,12 @@ proc getSec { entity_ID {entity_type Lines} { display 1 }} {
 	return $section
 }
 
+proc getNumOfElem { elemName } {
+	set mat_ID [lsearch [GiD_Info materials] "$elemName"]
+	set n [llength [GiD_Mesh list -material [expr $mat_ID + 1] element]]
+	return $n
+}
+
 proc getProp { entity_ID prop {entity_type Lines} { display 1 }} {
 	set property [GiD_AccessValue get material [getMat $entity_ID $entity_type 0] $prop]
 		

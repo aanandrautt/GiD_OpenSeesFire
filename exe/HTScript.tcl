@@ -116,19 +116,29 @@ if {$slab && [expr $composite || $stiffened]} {
 }
 
 # meshing parameters
-set f_elemx [expr max(4,int(0.5*($b - $tw)/0.025))]
+# minimum element sizes
+# flange - x direction (width)
+set f_min_x 0.025
+# flange - y direction (thickness)
+set f_min_y 0.015
+# web - x direction (thickness) 
+set w_min_x 0.015
+#web - y direction (height)
+set w_min_y 0.025
+
+set f_elemx [expr max(4,int(0.5*($b - $tw)/$f_min_x))]
 if {fmod($f_elemx,2)} {
 	set f_elemx [expr int($f_elemx+1)]
 }
-set f_elemy [expr max(4,int($tf/0.015))]
+set f_elemy [expr max(4,int($tf/$f_min_y))]
 if {fmod($f_elemy,2)} {
 	set f_elemy [expr int($f_elemy+1)]
 }
-set w_elemx [expr max(4,int($tw/0.015))]
+set w_elemx [expr max(4,int($tw/$w_min_x))]
 if {fmod($w_elemx,2)} {
 	set w_elemx [expr int($w_elemx+1)]
 }
-set w_elemy [expr max(8,int(($h-$tf)/0.025))]
+set w_elemy [expr max(8,int(($h-$tf)/$w_min_y))]
 if {fmod($w_elemy,4)} {
 	if {![expr fmod($w_elemy + fmod($w_elemy,4),4)]} {
 		set w_elemy [expr int($w_elemy + fmod($w_elemy,4))]

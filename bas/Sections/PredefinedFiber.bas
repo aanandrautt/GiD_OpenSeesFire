@@ -1,3 +1,4 @@
+### *MatProp(0)
 *set var FiberTag=SectionID
 *set var SelectedSteelMaterial=tcl(FindMaterialNumber *MatProp(Steel_material) *DomainNum)
 *set var MaterialExists=tcl(CheckUsedMaterials *SelectedSteelMaterial)
@@ -18,7 +19,7 @@
 *elseif(strcmp(MatProp(Material:),"MinMax")==0)
 *include ..\Materials\Uniaxial\MinMax.bas
 *else
-*MessageBox Error: Unsupported Rebar material for Fiber Section
+*MessageBox Error: Unsupported steel material for Fiber Section
 *endif
 *set var dummy=tcl(AddUsedMaterials *SelectedSteelMaterial)
 *break
@@ -46,7 +47,7 @@
 *elseif(strcmp(MatProp(Material:),"MinMax")==0)
 *include ..\Materials\Uniaxial\MinMax.bas
 *else
-*MessageBox Error: Unsupported Rebar material for Fiber Section
+*MessageBox Error: Unsupported steel material for Fiber Section
 *endif
 *set var dummy=tcl(AddUsedMaterials *SelectedPlateSteelMaterial)
 *break
@@ -76,7 +77,7 @@
 *elseif(strcmp(MatProp(Material:),"MinMax")==0)
 *include ..\Materials\Uniaxial\MinMax.bas
 *else
-*MessageBox Error: Unsupported Rebar material for Fiber Section
+*MessageBox Error: Unsupported steel material for Fiber Section
 *endif
 *set var dummy=tcl(AddUsedMaterials *SelectedWebPlateSteelMaterial)
 *break

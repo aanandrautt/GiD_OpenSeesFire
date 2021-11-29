@@ -1,4 +1,4 @@
-# *tcl(UserMaterial::GetMaterialName *MatProp(0))
+### *tcl(UserMaterial::GetMaterialName *MatProp(0))
 *#
 *# define PlateRebar for top longitudinal reinforcement
 *#
@@ -91,25 +91,26 @@ nDMaterial PlateRebarThermal *PlateRebarTransTag *SelectedTransverseRBMaterial  
 *format "%6d%6d%6g"
 nDMaterial PlateRebarThermal *PlateRebarDeckingTag *SelectedDeckingRBMaterial *angle
 *#
-*# define CDPMaterial for concrete
+*# define CDPThermal for concrete
 *#
-*set var PlaneStressUserMaterialTag=PlaneStressUserMaterialTag+1
-*set var fc=MatProp(Concrete_compressive_strength,real)
-*set var fct=MatProp(Concrete_tensile_strength,real)
-*set var epsc0=MatProp(Concrete_strain_at_compr_strength,real)
-*set var Ec=operation(1.5*fc/epsc0)
-*set var n=MatProp(Compressive_cracking_energy_multiplier_n,real)
-*set var m=MatProp(Tensile_cracking_energy_multiplier_m,real)
-*set var gc=operation((fc/Ec)*(n-1)*fc/2)
-*set var gt=operation((fct/Ec)*(m-1)*fct/2)
-*#
-#nDMaterial  CDPPlaneStressThermal matTag Ec  v  ft  fc  gt  gc
-*format "%6d%6g%6g%6g%6g%6g"
-nDMaterial CDPPlaneStressThermal   *PlaneStressUserMaterialTag *Ec 0.2 *fct *fc *gt *gc
-*# define PlateFromPlaneStress material
-*set var PlateFromPlaneStressMaterialTag=PlateFromPlaneStressMaterialTag+1
-*format "%6d%6d%10g"
-nDMaterial PlateFromPlaneStressThermal *PlateFromPlaneStressMaterialTag *PlaneStressUserMaterialTag *MatProp(Cover_G,real)
+*set var SelectedCDPMaterial=tcl(FindMaterialNumber *MatProp(Concrete_material) *DomainNum)
+*#set var MaterialExists=tcl(CheckUsedMaterials *SelectedDeckingRBMaterial )
+*set var MaterialExists=tcl(CheckUsedMaterials *SelectedCDPMaterial)
+*if(MaterialExists==-1)
+*loop materials *NotUsed
+*set var MaterialID=tcl(FindMaterialNumber *Matprop(0) *DomainNum)
+*if(SelectedCDPMaterial==MaterialID)
+*if(strcmp(MatProp(Material:),"CDPThermal")==0)
+*include ..\Materials\nD\CDP.bas
+*else
+*MessageBox Error: Unsupported concrete material for LayeredShell Section
+*endif
+*set var dummy=tcl(AddUsedMaterials *SelectedCDPMaterial)
+*break
+*endif
+*end materials
+*endif
+*#set var PlateFromPlaneStressMaterialTag=SelectedCDPMaterial
 *#
 *#
 *#
@@ -186,7 +187,7 @@ section LayeredShellThermal *LayeredShellTag *\
 *if(botCover!=0)
 *for(i=1;i<=nlayersBotCover;i=i+1)
 *format "%d%g"
-*PlateFromPlaneStressMaterialTag *BotCoverThick *\
+*SelectedCDPMaterial *BotCoverThick *\
 *endfor
 *endif
 *#
@@ -204,7 +205,7 @@ section LayeredShellThermal *LayeredShellTag *\
 *#
 *for(i=1;i<=nlayersCore;i=i+1)
 *format "%d%g"
-*PlateFromPlaneStressMaterialTag *coreThick *\
+*SelectedCDPMaterial *coreThick *\
 *endfor
 *#
 *# Top Rebars
@@ -221,8 +222,7 @@ section LayeredShellThermal *LayeredShellTag *\
 *if(topCover!=0)
 *for(i=1;i<=nlayersTopCover;i=i+1)
 *format "%d%g"
-*PlateFromPlaneStressMaterialTag *topCoverThick *\
+*SelectedCDPMaterial *topCoverThick *\
 *endfor
 *endif
-*set var PlateFromPlaneStressMaterialTag=PlateFromPlaneStressMaterialTag+1
 

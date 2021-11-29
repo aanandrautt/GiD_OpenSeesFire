@@ -1,3 +1,4 @@
+### *tcl(UserMaterial::GetMaterialName *MatProp(0))
 *set var PlateThickness=MatProp(Thickness,real)
 *set var nLayers=MatProp(n_layers,int)
 *set var layerThickness=operation(PlateThickness/nLayers)

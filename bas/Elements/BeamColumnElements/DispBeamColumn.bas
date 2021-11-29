@@ -56,7 +56,7 @@ ERROR: This version of GiD+OpenSees does not allow 2D models
 *set var SelectedSection=tcl(FindMaterialNumber *MatProp(Section) *DomainNum)
 *set var MaterialExists=tcl(CheckUsedMaterials *SelectedSection)
 *# IF IT HAS NOT BEEN DEFINED YET
-# Section for element: *MatProp(0)
+### Section for element: *MatProp(0)
 *if(MaterialExists==-1)
 *loop materials *NotUsed
 *set var SectionID=tcl(FindMaterialNumber *MatProp(0) *DomainNum)

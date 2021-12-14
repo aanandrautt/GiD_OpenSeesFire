@@ -113,8 +113,8 @@ ERROR: This version of GiD+OpenSees does not allow 2D models
 *endif
 *#--------------Y as vertical axis-------------
 *elseif(strcmp(GenData(Vertical_axis),"Y")==0)
-*#Vertical elements
 *if(fabs(NodesCoord(1,1)-NodesCoord(2,1))<=1e-8 && fabs(NodesCoord(1,3)-NodesCoord(2,3))<=1e-8)
+*#Vertical elements
 *if(strcmp(ElemsMatProp(Geometric_transformation),"Linear")==0)
 *set var TransfTag=TransfTag1
 *elseif(strcmp(ElemsMatProp(Geometric_transformation),"P-Delta")==0)
@@ -128,8 +128,8 @@ ERROR: This version of GiD+OpenSees does not allow 2D models
 *elseif(strcmp(ElemsMatProp(Geometric_transformation),"P-Delta")==0)
 *set var TransfTag=TransfTag4
 *else
-*set var TransfTag=TransfTag6
 *endif
+*set var TransfTag=TransfTag6
 *endif
 *endif
 *set var SecTag=tcl(FindMaterialNumber *ElemsMatProp(Section) *DomainNum)
@@ -168,7 +168,11 @@ element dispBeamColumnThermal *ElemsNum *ElemsConec *ElemsMatProp(Number_of_inte
 *endif
 *endif
 *end materials
+*if(*GenData(Activate_auto_mass,int) == 1)
+*set var MassPerLength=operation(FiberArea*ElemsMatProp(Mass_density,real)*GenData(Mass_factor,real))
+*else
 *set var MassPerLength=operation(FiberArea*ElemsMatProp(Mass_density,real))
+*endif
 *format "%8g"
   -mass *MassPerLength
 *# if it is DBC

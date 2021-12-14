@@ -1047,6 +1047,28 @@ VALUE: 0.0ton/m^3
 TKWIDGET: TK_MaterialWikiInfo
 END MATERIAL
 
+MATERIAL: CDPThermal
+COMMENT: \n
+QUESTION: Material:#CB#(CDPThermal)
+VALUE: CDPThermal
+TKWIDGET: TK_UpdateInfoBar
+QUESTION: Concrete_compressive_strength#UNITS#
+VALUE: 20 MPa
+HELP: positive value
+QUESTION: Concrete_tensile_strength#UNITS#
+VALUE: 2.2 MPa
+QUESTION: Concrete_strain_at_compr_strength
+VALUE: 2.0e-3
+QUESTION: Compressive_cracking_energy_multiplier_n
+VALUE: 10
+QUESTION: Tensile_cracking_energy_multiplier_m
+VALUE: 10
+QUESTION: Shear_ret._factor
+VALUE: 0.1
+QUESTION: Cover_G#UNITS#
+VALUE: 12.5 GPa
+END MATERIAL
+
 MATERIAL: J2PlaneStressThermal
 COMMENT: \n
 QUESTION: Material:#CB#(J2Plasticity)
@@ -1453,21 +1475,8 @@ QUESTION: protection_material#CB#(1,2,3,4,5)
 VALUE: 1
 HELP: 1. Material 1\n2. Material 2\n3. Material 3
 TITLE: Concrete
-QUESTION: Concrete_compressive_strength#UNITS#
-VALUE: 20 MPa
-HELP: positive value
-QUESTION: Concrete_tensile_strength#UNITS#
-VALUE: 2.2 MPa
-QUESTION: Concrete_strain_at_compr_strength
-VALUE: 2.0e-3
-QUESTION: Compressive_cracking_energy_multiplier_n
-VALUE: 10
-QUESTION: Tensile_cracking_energy_multiplier_m
-VALUE: 10
-QUESTION: Shear_ret._factor
-VALUE: 0.1
-QUESTION: Cover_G#UNITS#
-VALUE: 12.5 GPa
+QUESTION: Concrete_material#MAT#(Multidimensional_(nD)_Materials,User_Materials)
+VALUE: CDPThermal
 TITLE: Reinforcement
 QUESTION: Longitudinal_steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
 VALUE: Steel01

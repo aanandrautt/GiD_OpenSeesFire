@@ -666,6 +666,8 @@ proc Fiber::SectionTorsionalContribution { x y } {
 	if {$x > 0 && $y > 0} {
 	set a [expr max($x,$y)*0.5]; #half long side
 	set b [expr min($x,$y)*0.5]; #half short side
+	# from Roark's Formulas for stress & Strain, 7th Edition, Warren C. Young & Richard G. Budynas
+	# retrieved from Wikipedia on 02/03/2022
 	set J [expr $a*pow($b,3.0)*(16.0/3.0 - 3.36*($b/$a)*(1 - pow($b,4)/(12*pow($a,4))))]
 		return $J
 	} else {

@@ -627,14 +627,14 @@ proc Fiber::CalcJG { event args } {
 							
 							set J [expr $J_stiff_web + $J_web_remainder + 2*$J_flange]
 						} else {
-							set J_web [Fiber::SectionTorsionalContribution [expr $h-$tf] $tw]
+							set J_web [Fiber::SectionTorsionalContribution [expr $h-2*$tf] $tw]
 							set J_flange  [Fiber::SectionTorsionalContribution $b $tf]
 							set J [expr $J_web + 2*$J_flange]
 						}
-						
 						set GJ [format "%1.0f" [expr $G*$J]]
 						
 						set GJ $GJ$GJUnit
+						W "GJ = $GJ$GJUnit"
 
 						set ok [DWLocalSetValue $GDN $STRUCT Torsional_stiffness $GJ]
 							
@@ -664,22 +664,10 @@ proc Fiber::CalcJG { event args } {
 }
 proc Fiber::SectionTorsionalContribution { x y } {
 	if {$x > 0 && $y > 0} {
-	set a [expr min($x,$y)]; #short side
-	set b [expr max($x,$y)]; #long side
-	set ba [expr $b/$a]
-	set multiplier [expr 1/3.0]
-		if {$ba < 1} {
-			W "b/a cannot be less than 1."
-		} elseif {$ba >= 1 && $ba <= 2.5} {
-			set multiplier [Fiber::LinearlyInterpolate 1 2.5 0.141 0.249 $ba]
-		} elseif {$ba > 2.5 && $ba <= 6} {
-			set multiplier [Fiber::LinearlyInterpolate 2.5 6 0.249 0.299 $ba]
-		} elseif {$ba > 6 && $ba <= 10} {
-			set multiplier [Fiber::LinearlyInterpolate 6 10 0.299 0.312 $ba]
-		} elseif {$ba > 10 && $ba <=1e6} {
-			set multiplier [Fiber::LinearlyInterpolate 10 1e6 0.312 [expr 1/3.0] $ba]
-		}
-	return [expr $multiplier*$b*pow($a,3)]
+	set a [expr max($x,$y)*0.5]; #half long side
+	set b [expr min($x,$y)*0.5]; #half short side
+	set J [expr $a*pow($b,3.0)*(16.0/3.0 - 3.36*($b/$a)*(1 - pow($b,4)/(12*pow($a,4))))]
+		return $J
 	} else {
 		return 0
 	}

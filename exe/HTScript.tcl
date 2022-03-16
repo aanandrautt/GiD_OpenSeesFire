@@ -802,7 +802,7 @@ if {$FireExposure == 1} {
 	puts "User-defined fire exposure."
 	
 } elseif {$FireExposure == 4} {
-	set fileName "Arup800.dat"
+	set fileName "user.dat"
 	FireModel	UserDefined	1	-file	$fileName -type 1
 	puts "User-defined fire exposure."
 } else {

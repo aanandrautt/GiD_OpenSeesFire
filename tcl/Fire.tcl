@@ -358,6 +358,33 @@ proc Fire::GenerateThermoCouples {} {
 	close $fileHandle
 }
 
+proc Fire::GenerateMinimalThermoCouples { {file_name TCouples_simplified.txt} } {
+	array unset thermocouple_data
+	set condition_name "Line_Gas_Temperatures Surface_Gas_Temperatures Line_Composite_Section_Slab"
+	foreach cond $condition_name {
+		set geometric_entity_list [GiD_Info Conditions $cond geometry]
+		foreach geometric_entity $geometric_entity_list {
+			set geometric_entity_id [lindex $geometric_entity 1]
+			set condition_id [lindex $geometric_entity 4]
+			set xyz ""
+			if {$cond == "Surface_Gas_Temperatures"} {
+				set xyz [GidUtils::GetEntityCenter surface $geometric_entity_id]
+			} else {
+				set xyz [GidUtils::GetEntityCenter line $geometric_entity_id]
+			}
+			set thermocouple_data($condition_id) $xyz
+		}
+	}
+	set sorted_thermocouple_data_keys [lsort -integer [array names thermocouple_data]]
+	set fileHandle [open "[OpenSees::GetProjectPath]/Records/$file_name" w+]
+	foreach key $sorted_thermocouple_data_keys {
+		set xyz $thermocouple_data($key)
+		set x [lindex $xyz 0]; set y [lindex $xyz 1]; set z [lindex $xyz 2];
+		puts $fileHandle "$key,$x,$y,$z"
+	}
+	close $fileHandle
+}
+
 proc GetLineHigherEntities { line_ID } {
 	set line_info_list [split [GiD_Info list_entities -more line $line_ID] \n]
 	set higher_entity_list [lindex  $line_info_list [expr [llength $line_info_list] - 3]]

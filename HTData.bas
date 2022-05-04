@@ -1,4 +1,4 @@
-ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tFinal dt hfire hamb
+ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tFinal dt hfire hamb {section_material}
 *set var HTtime=GenData(fire_duration,real)
 *set var HTtimestep=GenData(HT_time_step,real)
 *set var override=GenData(override_default_h,int)
@@ -30,6 +30,11 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *else
 *set var plt = 0.0
 *endif
+*if(strcmp(MatProp(heat_transfer),"carbon_steel")==0)
+*set var secMat=1
+*else
+*set var secMat=2
+*endif
 *set var tf=MatProp(Flange_thickness_tf,real)
 *set var tw=MatProp(Web_thickness_tw,real)
 *set var h=MatProp(Height_h,real)
@@ -57,7 +62,7 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var ha = globalhamb
 *endif
 *format "%d%d%g%g%g%g%g%g%d%g%g%g%g
-*cond(ID,int)	0	0	*pmat	*tf	*tw	*h	*b	*dp	0.0	0.1	0.9	*plt	*fire	*HTtime *HTtimestep *hf	*ha			
+*cond(ID,int)	0	0	*pmat	*tf	*tw	*h	*b	*dp	0.0	0.1	0.9	*plt	*fire	*HTtime *HTtimestep *hf	*ha	*secMat			
 *endif
 *end elems
 *#slabs
@@ -118,6 +123,11 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var dps=cond(slab_protection,real)
 *set var ts=cond(slab_depth,real)
 *set var bs=cond(slab_width,real)
+*if(strcmp(MatProp(heat_transfer),"carbon_steel")==0)
+*set var secMat=1
+*else
+*set var secMat=2
+*endif
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
 *endif

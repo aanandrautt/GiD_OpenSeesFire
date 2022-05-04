@@ -1,11 +1,13 @@
 wipe
 wipeHT 
 set mode auto
-set variables {ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tFinal dt hfire hamb}
+set variables {ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tFinal dt hfire hamb section_material}
 puts "argc = $argc"
 puts "number of variables = [llength $variables]"
 if {$mode == "auto"} { 
-	if {$argc >= [llength $variables]} {
+	# we use llength variables - 1 because we added "section_material" and we do not want to break compatibility with older versions
+	# if section_material is not given then it will be assigned the default value of 1
+	if {$argc >= [expr [llength $variables] - 1]} {
 		lassign $argv {*}$variables
 	} else {
 		puts "Script requires [llength $variables] arguments. Only $argc arguments were given. Aborting analysis."
@@ -42,6 +44,7 @@ if {$sidesHeated != 3 && $sidesHeated != 4} {
 }
 if {$mode == "manual"} {
 	set protection_material 1
+	set section_material 1
 	set tf 25e-3
 	set tw 10e-3
 	set h 400e-3
@@ -342,7 +345,14 @@ if {$slab} {
 HeatTransfer 2D;
 
 #Defining HeatTransfer Material with Material tag 1.
-HTMaterial CarbonSteelEC3 1;
+
+# for compatibility with older versions of HTscript that do not define section_material
+if { ($section_material == "") || ($section_material == 1) } {
+	HTMaterial CarbonSteelEC3 1;
+} else {
+	HTMaterial aluminum 1;
+}
+
 HTMaterial SFRM 2 $protection_material;
 HTMaterial ConcreteEC2 3 0.0;
 puts "creating entities"

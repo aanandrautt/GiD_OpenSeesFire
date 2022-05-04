@@ -1340,6 +1340,8 @@ VALUE: Fiber
 STATE: HIDDEN
 QUESTION: Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
 VALUE: Steel01
+QUESTION: heat_transfer#CB#(carbon_steel, aluminum)
+VALUE: carbon_steel
 QUESTION: T_section#CB#(0,1)
 VALUE:0
 DEPENDENCIES: (0,HIDE,Two_back_to_back_sections,#CURRENT#)

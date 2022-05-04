@@ -360,9 +360,9 @@ TKWIDGET: TK_UpdateInfoBar
 QUESTION: Formulation#CB#(ECSteel)
 VALUE: ECSteel
 STATE: HIDDEN
-QUESTION: Type#CB#(EC2NH,EC2NC,EC3)
+QUESTION: Type#CB#(EC2NH,EC2NC,EC3,Aluminum)
 VALUE: EC2NH
-HELP: EC2NH:Hot rolled EC2 reinforcing steel.\nCold formed EC2 reinforcing steel.\nEC3 reinforcing steel.
+HELP: EC2NH:Hot rolled EC2 reinforcing steel\nCold formed EC2 reinforcing steel\nEC3 reinforcing steel.\nAluminum EN AW-6061 from EN 1999-1-2:2007
 QUESTION: Yield_Stress_Fy#UNITS#
 VALUE: 500 MPa
 QUESTION: Initial_elastic_tangent_E0#UNITS#

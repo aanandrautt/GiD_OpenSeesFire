@@ -286,3 +286,81 @@ proc FindElem { ID } {
 	}
 }
 
+
+
+proc Run_existing_paramteric_study_2 {} {
+
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set GiDProjectName [OpenSees::GetProjectName]
+	set OpenSeesPath [OpenSees::GetOpenSeesPath]
+	set HTScriptPath "[OpenSees::GetProblemTypePath]/exe/Parametric_HTScript.tcl"
+	set OSPCRPath "[OpenSees::GetProblemTypePath]/exe/OSPCR-MP"
+	global GidProcWin
+	
+	set records_folder [file join "$GiDProjectDir" "Records"]
+	
+	set HT_data_file [file join "$GiDProjectDir" "Records" "HT.dat" ]
+	
+	set cases_data_file [file join "$GiDProjectDir" "Records" "cases.dat" ]
+	set cases_data_file_handle [open $cases_data_file r]
+	set first_line 1
+	set cases ""
+	set times ""
+	while { [gets $cases_data_file_handle line] >= 0 } {
+		if { !$first_line } {
+			lappend cases [lindex $line 0]
+			lappend times [lindex $line 1]
+		} else {
+			set first_line 0
+		}
+	}
+	close $cases_data_file_handle
+	
+	
+
+	if {[file exists $HT_data_file] } {
+		GiD_Process Mescape Files Save
+		set n [expr [Fire::GetNumOWorkers] + 1]
+		
+		set i 0
+		foreach case $cases {
+			W "case is: $case"
+			set case_folder [file join "$records_folder" "cases" "$case"]
+			file copy -force $HT_data_file $case_folder 
+			file copy -force $HTScriptPath $case_folder 
+			cd $case_folder
+			set time_file [open analysis_time.tcl w+]
+				puts $time_file "set tFinal [lindex $times $i]"
+			close $time_file
+			eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" OpenSees Parametric_HTScript.tcl \"$HT_data_file\"
+		} 
+		
+		
+		
+		
+		
+		
+		
+
+		# run analysis
+		#eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" OpenSees Parametric_HTScript.tcl \"$HT_data_file\"
+
+		if {[file exists "Report.txt"] } {
+
+
+		} else {
+
+		        AnalysisInformationWindow "NoRun"
+		}
+
+	} else {
+
+		tk_dialog .gid.errorMsg "Error" "The HT.dat file was not created." error 0 "  Ok  "
+
+	}
+	file delete $records_folder/Parametric_HTScript.tcl
+	UpdateInfoBar
+	cd "[OpenSees::GetProblemTypePath]/exe"
+	return ""
+}
+

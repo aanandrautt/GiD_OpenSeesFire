@@ -1,10 +1,16 @@
-
+*if(IntvData(Parametric_cases,int)==1)
+set Lincr $case_step_size
+*format "%d"
+set Nsteps [expr $case_total_time/$case_step_size]
+*else
 *format "%g"
 set Lincr *LoadIncr
 *format "%d"
 set Nsteps *steps
+*endif
 set committedSteps 1
 set LoadCounter 0
+
 
 set strIni {}
 *if(strcmp(IntvData(Convergence_criterion),"Norm_Unbalance")==0)

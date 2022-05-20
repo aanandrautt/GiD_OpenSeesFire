@@ -88,8 +88,12 @@ constraints *IntvData(Constraint_handler)
 *set var steps=IntvData(Analysis_steps,int)
 *set var totTime=IntvData(Total_analysis_time,real)
 *set var LoadIncr=operation(totTime/steps)
+*if(IntvData(Parametric_cases,int)==1)
+*else
+integrator LoadControl $case_step_size
 *format "%g"
 integrator LoadControl *LoadIncr
+*endif
 *elseif(strcmp(IntvData(Integrator_type),"Displacement_control")==0)
 *set var steps=IntvData(Analysis_steps,int)
 *if(ndime==2)

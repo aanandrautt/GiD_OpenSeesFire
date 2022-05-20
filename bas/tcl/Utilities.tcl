@@ -1360,3 +1360,9 @@ proc LogFile {} {
 	return [join [list logFile \"[OpenSees::GetProjectName].log\"] ]
 
 }
+
+proc LogFile_cases {} {
+
+	return [join [list logFile \"../Records/cases/\$case/Results/[OpenSees::GetProjectName]-\$case.log\"] ]
+
+}

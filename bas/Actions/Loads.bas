@@ -215,14 +215,14 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *end materials
 *if(isStiffened==1)
 *format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) -genInterpolation *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int))) -genInterpolation *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *else
 *if(angle == 90 || angle == 270)
 *format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int))) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *else
 *format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+    eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int)) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *endif
 *endif
 *endif

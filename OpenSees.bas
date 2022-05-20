@@ -37,6 +37,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+*if(GenData(Muli-case_fire_exposure,int)==1)
+set case [lindex $argv 0]
+set prefix "cases/$case"
+puts "This is $case"
+set case_total_time [lindex $argv 2]
+set case_step_size [lindex $argv 3]
+*endif
+*if(GenData(Muli-case_fire_exposure,int)==0)
+*tcl(LogFile)
+*else
+*tcl(LogFile_cases)
+*endif
 # --------------------------------------------------------------------------------------------------------------
 # U N I T S
 # --------------------------------------------------------------------------------------------------------------
@@ -321,9 +333,6 @@ model BasicBuilder -ndm *ndime -ndf *currentDOF
 *# Recorders
 *#
 *include bas\Model\Recorders.bas
-
-*tcl(LogFile)
-
 puts ""
 puts " __   __       __          __                   _       "
 puts "/ _ .|  \\ _|_ /  \\ _  _ _ (_  _ _ _  | _ |_ _ _(_ _  _ _"

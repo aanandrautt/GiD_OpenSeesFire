@@ -698,13 +698,17 @@ proc LappendUnique { a_list another_list } {
 }
 
 # method for generating string for the directory of the thermal loading files
-proc Fire::GetTempFileDir { ID a_string } {
+proc Fire::GetTempFileDir { ID a_string { many_cases 0 } } {
 	if {$a_string == "slab"} {
-		return "\"../Records/Thermal_load/Slab$ID.dat\""
+		set file_name "Slab"
 	} elseif {$a_string == "beam-column"} {
-		return "\"../Records/Thermal_load/BeamColumn$ID.dat\""
+		set file_name "BeamColumn"
 	}
-	
+	if { $many_cases } {
+		return "\"../Records/cases/\$case/Thermal_load/$file_name$ID.dat\""
+	} else {
+		return "\"../Records/Thermal_load/$file_name$ID.dat\""
+	}
 }
 
 # method to get the number of workers

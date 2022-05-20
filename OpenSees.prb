@@ -39,24 +39,12 @@ TITLE: Project information
 QUESTION: _#CB#(_)
 VALUE:
 TKWIDGET: GenData::Description
-TITLE: Modeling_Options
+TITLE: Fire_Options
 QUESTION: _#CB#(_)
 VALUE:
-QUESTION: Model_dimensions#CB#(2,3)
-VALUE: 3
-STATE: DISABLED
-HELP: Only 3D models allowed in GiD+OpenSees - Thermal Element Version.
-DEPENDENCIES: (2,SET,Vertical_axis,Y)
-TKWIDGET: TK_EditModelDim
-QUESTION: Vertical_axis#CB#(Y,Z)
-VALUE: Z
-STATE: DISABLED
-HELP: Current version of this interface has only been checked with Z as vertical. 
-QUESTION: _#CB#(_)
-VALUE:
-QUESTION: Enable_6_DOFs_for_truss_elements#CB#(0,1)
+QUESTION: Muli-case_fire_exposure#CB#(0,1)
 VALUE: 0
-HELP: For 3D models, enable this option to use trusses with 6 DOF elements (e.g. shells).
+HELP: If this is activated, then it will be expected that temperature files will exist in "cases" and its subdirectories in the "records" dirctories.
 QUESTION: Exposure_type#CB#(standard_fire,Hydrocarbon,FDS,user)
 VALUE: standard_fire
 QUESTION: fire_duration#UNITS#
@@ -77,6 +65,24 @@ HELP: User defined h coefficient for unexposed side of slabs and composite beams
 QUESTION: num_of_workers
 VALUE: 3
 HELP: Number of workers assigned to heat transfer.\nMinimum is 1, maximum depends on your hardware.\n3 is an optimised number for the test CPU with 8 cores. 
+TITLE: Modeling_Options
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: Model_dimensions#CB#(2,3)
+VALUE: 3
+STATE: DISABLED
+HELP: Only 3D models allowed in GiD+OpenSees - Thermal Element Version.
+DEPENDENCIES: (2,SET,Vertical_axis,Y)
+TKWIDGET: TK_EditModelDim
+QUESTION: Vertical_axis#CB#(Y,Z)
+VALUE: Z
+STATE: DISABLED
+HELP: Current version of this interface has only been checked with Z as vertical. 
+QUESTION: _#CB#(_)
+VALUE:
+QUESTION: Enable_6_DOFs_for_truss_elements#CB#(0,1)
+VALUE: 0
+HELP: For 3D models, enable this option to use trusses with 6 DOF elements (e.g. shells).
 TITLE: Eigenvalue_Analysis
 QUESTION: _#CB#(_)
 VALUE:
@@ -389,6 +395,8 @@ QUESTION: _#CB#(_)
 VALUE:
 QUESTION: Enabled#CB#(1,0)
 VALUE: 1
+QUESTION: Parametric_cases#CB#(1,0)
+VALUE: 0
 QUESTION: Description
 VALUE:
 QUESTION: System_of_equations#CB#(BandGeneral,BandSPD,ProfileSPD,SparseGEN,UmfPack,FullGeneral,SparseSYM)

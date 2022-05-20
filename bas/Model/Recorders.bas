@@ -41,15 +41,31 @@ recorder Node -file Node_rotVelocities.out -time -nodeRange 1 *cntNodes -dof 3 v
 *endif
 *# 3D
 *else
+*if(GenData(Muli-case_fire_exposure,int)==1)
+file mkdir "../Records/cases/$case/Results/"
+*endif
 *if(GenData(Nodal_displacements,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Node -file Node_displacements.out -time -nodeRange 1 *cntNodes -dof 1 2 3 disp
+*else
+recorder Node -file "../Records/cases/$case/Results/Node_displacements.out" -time -nodeRange 1 *cntNodes -dof 1 2 3 disp
+*endif
 *endif
 *if(GenData(Nodal_rotations,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Node -file Node_rotations.out -time -nodeRange 1 *cntNodes -dof 4 5 6 disp
+*else
+recorder Node -file "../Records/cases/$case/Results/Node_rotations.out" -time -nodeRange 1 *cntNodes -dof 4 5 6 disp
+*endif
 *endif
 *if(GenData(Nodal_reactions,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Node -file Node_forceReactions.out -time -nodeRange 1 *cntNodes -dof 1 2 3 reaction
 recorder Node -file Node_momentReactions.out -time -nodeRange 1 *cntNodes -dof 4 5 6 reaction
+*else
+recorder Node -file "../Records/cases/$case/Results/Node_forceReactions.out" -time -nodeRange 1 *cntNodes -dof 1 2 3 reaction
+recorder Node -file "../Records/cases/$case/Results/Node_momentReactions.out" -time -nodeRange 1 *cntNodes -dof 4 5 6 reaction
+*endif
 *endif
 *if(Transient_analysis==1)
 *if(GenData(Nodal_accelerations,int)==1)
@@ -98,7 +114,11 @@ recorder Element -file stdBrick_strain.out -time -eleRange *FirstBrickElemNumber
 *#
 *if(cntShell!=0)
 *if(GenData(Forces,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file ShellMITC4_force.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/ShellMITC4_force.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
 *ElemsNum *\
@@ -107,7 +127,11 @@ recorder Element -file ShellMITC4_force.out -time -ele *\
 forces
 *endif
 *if(GenData(Stresses,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file ShellMITC4_stress.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/ShellMITC4_stress.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
 *ElemsNum *\
@@ -116,7 +140,11 @@ recorder Element -file ShellMITC4_stress.out -time -ele *\
 stresses
 *endif
 *if(GenData(Strains,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file ShellMITC4_strain.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/ShellMITC4_strain.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"Shell")==0)
 *ElemsNum *\
@@ -130,7 +158,11 @@ strains
 *#
 *if(cntShellDKGQ!=0)
 *if(GenData(Forces,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file ShellDKGQ_force.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/ShellDKGQ_force.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *ElemsNum *\
@@ -139,7 +171,11 @@ recorder Element -file ShellDKGQ_force.out -time -ele *\
 forces
 *endif
 *if(GenData(Stresses,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file ShellDKGQ_stress.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/ShellDKGQ_stress.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *ElemsNum *\
@@ -148,7 +184,11 @@ recorder Element -file ShellDKGQ_stress.out -time -ele *\
 stresses
 *endif
 *if(GenData(Strains,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file ShellDKGQ_strain.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/ShellDKGQ_strain.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"ShellDKGQ")==0)
 *ElemsNum *\
@@ -346,7 +386,11 @@ plasticDeformation
 *#
 *if(cntDBC!=0)
 *if(GenData(Local_forces,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file DispBeamColumn_localForce.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/DispBeamColumn_localForce.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
 *ElemsNum *\
@@ -355,7 +399,11 @@ recorder Element -file DispBeamColumn_localForce.out -time -ele *\
 localForce
 *endif
 *if(GenData(Basic_deformation,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file DispBeamColumn_basicDeformation.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/DispBeamColumn_basicDeformation.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
 *ElemsNum *\
@@ -364,7 +412,11 @@ recorder Element -file DispBeamColumn_basicDeformation.out -time -ele *\
 basicDeformation
 *endif
 *if(GenData(Plastic_deformation,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file DispBeamColumn_plasticDeformation.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/DispBeamColumn_plasticDeformation.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumn")==0)
 *ElemsNum *\
@@ -378,7 +430,11 @@ plasticDeformation
 *#
 *if(cntDBCI!=0)
 *if(GenData(Local_forces,int)==1)
+*if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Element -file DispBeamColumnInt_localForce.out -time -ele *\
+*else
+recorder Element -file "../Records/cases/$case/Results/DispBeamColumnInt_localForce.out" -time -ele *\
+*endif
 *loop elems
 *if(strcmp(ElemsMatProp(Element_type:),"dispBeamColumnInt")==0)
 *ElemsNum *\

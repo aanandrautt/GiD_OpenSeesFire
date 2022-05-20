@@ -288,7 +288,7 @@ proc FindElem { ID } {
 
 
 
-proc Run_existing_paramteric_study_2 {} {
+proc Run_existing_paramteric_study_HT {} {
 
 	set GiDProjectDir [OpenSees::GetProjectPath]
 	set GiDProjectName [OpenSees::GetProjectName]

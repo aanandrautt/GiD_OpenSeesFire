@@ -41,9 +41,6 @@ recorder Node -file Node_rotVelocities.out -time -nodeRange 1 *cntNodes -dof 3 v
 *endif
 *# 3D
 *else
-*if(GenData(Muli-case_fire_exposure,int)==1)
-file mkdir "../Records/cases/$case/Results/"
-*endif
 *if(GenData(Nodal_displacements,int)==1)
 *if(GenData(Muli-case_fire_exposure,int)==0)
 recorder Node -file Node_displacements.out -time -nodeRange 1 *cntNodes -dof 1 2 3 disp

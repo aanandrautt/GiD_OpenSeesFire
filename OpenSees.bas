@@ -40,14 +40,19 @@
 *if(GenData(Muli-case_fire_exposure,int)==1)
 set case [lindex $argv 0]
 set prefix "cases/$case"
-puts "This is $case"
 set case_total_time [lindex $argv 2]
 set case_step_size [lindex $argv 3]
 *endif
 *if(GenData(Muli-case_fire_exposure,int)==0)
 *tcl(LogFile)
 *else
+file mkdir "../Records/cases/$case/Results/"
 *tcl(LogFile_cases)
+*endif
+*if(GenData(Muli-case_fire_exposure,int)==1)
+puts "This is $case"
+puts "case total time = $case_total_time"
+puts "step size = $case_step_size"
 *endif
 # --------------------------------------------------------------------------------------------------------------
 # U N I T S

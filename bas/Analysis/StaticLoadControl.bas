@@ -2,6 +2,8 @@
 set Lincr $case_step_size
 *format "%d"
 set Nsteps [expr $case_total_time/$case_step_size]
+puts "\n\nLincr = case step size = $Lincr"
+puts "Nsteps = case_total_time/case_step_size = $Nsteps\n\n"
 *else
 *format "%g"
 set Lincr *LoadIncr

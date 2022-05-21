@@ -364,3 +364,81 @@ proc Run_existing_paramteric_study_HT {} {
 	return ""
 }
 
+proc Run_existing_paramteric_study_structure {} {
+
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set GiDProjectName [OpenSees::GetProjectName]
+	set OpenSeesPath [OpenSees::GetOpenSeesPath]
+	set HTScriptPath "[OpenSees::GetProblemTypePath]/exe/Parametric_HTScript.tcl"
+	set OSPCRPath "[OpenSees::GetProblemTypePath]/exe/OSPCR-MP"
+	
+
+	set tcl_file [file join "$GiDProjectDir" "OpenSees" "$GiDProjectName.tcl" ]
+	set opensees_folder [file join "$GiDProjectDir" "OpenSees"]
+	
+	
+	
+	global GidProcWin
+	
+	set records_folder [file join "$GiDProjectDir" "Records"]
+	
+	set HT_data_file [file join "$GiDProjectDir" "Records" "HT.dat" ]
+	
+	set cases_data_file [file join "$GiDProjectDir" "Records" "cases.dat" ]
+	
+	
+	if {[file exists $tcl_file] } {
+		cd $opensees_folder
+		GiD_Process Mescape Files Save
+		set n [expr [Fire::GetNumOWorkers] + 1]
+		eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" OpenSees $GiDProjectName.tcl \"../Records/cases.dat\"
+		
+
+	} else {
+
+		tk_dialog .gid.errorMsg "Error" "The .tcl file was not created." error 0 "  Ok  "
+
+	}
+	UpdateInfoBar
+	cd "[OpenSees::GetProblemTypePath]/exe"
+	return ""
+}
+
+proc Run_existing_tcl_parametric { doPost } {
+
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set GiDProjectName [OpenSees::GetProjectName]
+	set OpenSeesPath [OpenSees::GetOpenSeesPath]
+	global GidProcWin
+
+	set tcl_file [file join "$GiDProjectDir" "OpenSees" "$GiDProjectName.tcl" ]
+	set opensees_folder [file join "$GiDProjectDir" "OpenSees"]
+
+	if {[file exists $tcl_file] } {
+
+		GiD_Process Mescape Files Save
+
+		cd $opensees_folder
+
+		# run analysis
+
+		eval exec [auto_execok start] \"\" [list [file attributes $OpenSeesPath -shortname]] \"$tcl_file\"
+
+		if {[file exists "$GiDProjectName.log"] } {
+
+		        CheckLogAndPost $GiDProjectDir $GiDProjectName $doPost 0
+
+		} else {
+
+		        AnalysisInformationWindow "NoRun"
+		}
+
+	} else {
+
+		tk_dialog .gid.errorMsg "Error" "The .tcl file was not created." error 0 "  Ok  "
+
+	}
+
+	UpdateInfoBar
+	return ""
+}

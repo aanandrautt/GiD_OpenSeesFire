@@ -215,11 +215,11 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 *end materials
 *if(isStiffened==1)
 *format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int))) -genInterpolation *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int)) -genInterpolation *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *else
 *if(angle == 90 || angle == 270)
 *format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int))) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+    eleLoad -ele *ElemsNum -type -beamThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int)) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *else
 *format "%d%8g%8g%8g%8g"
     eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int)) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
@@ -253,7 +253,7 @@ pattern Plain *PatternTag *IntvData(Loading_type) {
 WARNING: Section has an angle of *angle but the composite section fire load assumes it has angle of 0. 
 *endif
 *format "%d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
+    eleLoad -ele *ElemsNum -type -beamThermal -z -source *tcl(Fire::GetTempFileDir *cond(ID,int) beam-column *GenData(Muli-case_fire_exposure,int)) *fiberY1 *fiberY2 *fiberZ1 *fiberZ2
 *endif
 *end elems
 *endif
@@ -282,7 +282,7 @@ WARNING: Section has an angle of *angle but the composite section fire load assu
 *set var topFiber=operation(1.001*(thickness+deckingThick)/2.0-offset)
 *set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0-offset)
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -shellThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) slab) *botFiber *topFiber	
+    eleLoad -ele *ElemsNum -type -shellThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) slab *GenData(Muli-case_fire_exposure,int)) *botFiber *topFiber	
 *endif
 *end elems
 *endif
@@ -311,7 +311,7 @@ WARNING: Section has an angle of *angle but the composite section fire load assu
 *set var topFiber=operation(1.001*(thickness+deckingThick)/2.0-offset)
 *set var botFiber=operation(-1.001*(thickness+deckingThick)/2.0-offset)
 *format "%6d%8g%8g%8g%8g"
-    eleLoad -ele *ElemsNum -type -shellThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) slab) *botFiber *topFiber	
+    eleLoad -ele *ElemsNum -type -shellThermal -source *tcl(Fire::GetTempFileDir *cond(ID,int) slab *GenData(Muli-case_fire_exposure,int)) *botFiber *topFiber	
 *endif
 *end elems
 *endif

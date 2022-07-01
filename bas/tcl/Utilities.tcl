@@ -343,6 +343,7 @@ proc Run_existing_paramteric_study {} {
 		if { !$first_line } {
 			lappend cases [lindex $line 0]
 			lappend times [lindex $line 1]
+			W "case: [lindex $line 0], time: [lindex $line 1]"
 		} else {
 			set first_line 0
 		}
@@ -363,8 +364,10 @@ proc Run_existing_paramteric_study {} {
 			file copy -force $HTScriptPath $case_folder 
 			cd $case_folder
 			set time_file [open analysis_time.tcl w+]
+				W "index = $i, time = [lindex $times $i]"
 				puts $time_file "set tFinal [lindex $times $i]"
 			close $time_file
+			incr i
 			eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" OpenSees Parametric_HTScript.tcl \"$HT_data_file\"
 		} 
 

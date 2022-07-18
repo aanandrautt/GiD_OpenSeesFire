@@ -1366,6 +1366,6 @@ proc LogFile {} {
 
 proc LogFile_cases {} {
 
-	return [join [list logFile \"../Records/cases/\$case/Results/[OpenSees::GetProjectName]-\$case.log\"] ]
+	return [join [list logFile \"../Records/cases_log/[OpenSees::GetProjectName]-\$case.log\"] ]
 
 }

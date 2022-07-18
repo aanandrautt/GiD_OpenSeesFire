@@ -391,7 +391,9 @@ proc Run_existing_paramteric_study_structure {} {
 		cd $opensees_folder
 		GiD_Process Mescape Files Save
 		set n [expr [Fire::GetNumOWorkers] + 1]
-		eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" OpenSees $GiDProjectName.tcl \"../Records/cases.dat\"
+		set OpenSeesPath [OpenSees::GetOpenSeesPath]
+		set OpenSees_exec [list [file attributes $OpenSeesPath -shortname]]
+		eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" \"$OpenSees_exec\" $GiDProjectName.tcl \"../Records/cases.dat\"
 		
 
 	} else {

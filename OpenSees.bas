@@ -47,6 +47,7 @@ set case_step_size [lindex $argv 3]
 *tcl(LogFile)
 *else
 file mkdir "../Records/cases/$case/Results/"
+file mkdir "../Records/cases_log"
 *tcl(LogFile_cases)
 *endif
 *if(GenData(Muli-case_fire_exposure,int)==1)

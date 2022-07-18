@@ -797,7 +797,7 @@ if {$slab} {
 SetInitialT 293.15
 HTConstants 1 $hfire 293.15 0.85 0.85
 HTConstants 2 $hamb 293.15 0.85 0.85
-
+puts "\n\n\n\n\npresent directory is:[pwd]\n\n\n\n"
 # thermal load assignment 
 set fileName "tempLoc$ID.out"
 puts "file is $fileName"
@@ -811,12 +811,12 @@ if {$FireExposure == 1} {
  
 } elseif {$FireExposure == 3} {
 	FireModel	UserDefined	1	-file	$fileName -type 1
-	puts "User-defined fire exposure."
+	puts "\n\n---------------------------User-defined fire exposure. File is $fileName ---------------------------\n\n"
 	
 } elseif {$FireExposure == 4} {
 	set fileName "user.dat"
 	FireModel	UserDefined	1	-file	$fileName -type 1
-	puts "User-defined fire exposure."
+	puts "\n\n---------------------------User-defined fire exposure. File is $fileName ---------------------------\n\n"
 } else {
 	puts "unknown fire exposure type. Aborting analysis." 
 	return -1

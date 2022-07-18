@@ -24,8 +24,8 @@ proc GiD_Event_BeforeMeshGeneration { element_size } {
 		WarnWinText "\n-----Interval: $interval-----"
 		Fire::AssignSurfaceCompositeSectionCond
 		WarnWinText "\n-----Interval: $interval-----"
-		Fire::PairCompositeSections fire 0.00001 0.5
-		Fire::PairCompositeSections ambient 0.00001 0.5
+		Fire::PairCompositeSections fire 0.00001 1.0
+		Fire::PairCompositeSections ambient 0.00001 1.0
 		WarnWinText "\n-----Ran all functions in interval: $interval-----"
 	}
 	GiD_IntervalData set $current_interval
@@ -302,13 +302,16 @@ proc Fire::PairCompositeSections { state xytolerance ztolerance } {
 				set delta_z_f [lindex $distance_f_i 2]
 				set err [expr abs($delta_x_i)  + abs($delta_y_i) + abs($delta_x_f)  + abs($delta_y_f)]
 			}
-			set z_err [expr abs($delta_z_i) + abs($delta_z_f)]
-			# if the error is still large, or if the z difference is over a present tolerance then 
+			set z_err [expr max(abs($delta_z_i), abs($delta_z_f))]
+			# if the error is still large, or if the z difference is over a preset tolerance then 
 			# this can only mean that the two lines are NOT a pair so we do nothing for now. 
+			# W "leader line: $leader_line and follower line: $follower_line were checked."
+			# W "Error = $err, xy-tolerance = $xytolerance\nZ Error = $z_err, z-tolerance = $ztolerance\n"
 			if {$err < $xytolerance && $z_err < $ztolerance} {
 				# if the error and z difference is less than the tolerance then the two lines are
 				# a pair and will be added to the list of pairs.
 				lappend line_pairs "$leader_line $follower_line"
+				# W "leader line: $leader_line and follower line: $follower_line are a match!"
 			}  		
 		}
 	}

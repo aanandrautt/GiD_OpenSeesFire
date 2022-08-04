@@ -1339,7 +1339,7 @@ QUESTION: Section:#CB#(Fiber)
 VALUE: Fiber
 STATE: HIDDEN
 QUESTION: Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
-VALUE: Steel01
+VALUE: Steel01Thermal
 QUESTION: heat_transfer#CB#(carbon_steel,aluminum)
 VALUE: carbon_steel
 QUESTION: T_section#CB#(0,1)
@@ -1373,7 +1373,7 @@ VALUE: 0
 HELP: Enter angle in degrees
 HELP: For finding torsional stiffness JG
 QUESTION: Plate_Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
-VALUE: Steel01
+VALUE: Steel01Thermal
 QUESTION: Plate_l#UNITS#
 VALUE: 250 mm
 QUESTION: Plate_t#UNITS#
@@ -1387,7 +1387,7 @@ VALUE:0
 DEPENDENCIES: (0,HIDE,Web_plate_l,#CURRENT#,HIDE,Web_plate_t,#CURRENT#,HIDE,Web_plate_Y_fibers,#CURRENT#,HIDE,Web_plate_Z_fibers,#CURRENT#,HIDE,Web_plate_Steel_material,#CURRENT#)
 DEPENDENCIES: (1,RESTORE,Web_plate_l,#CURRENT#,RESTORE,Web_plate_t,#CURRENT#,RESTORE,Web_plate_Y_fibers,#CURRENT#,RESTORE,Web_plate_Z_fibers,#CURRENT#,RESTORE,Web_plate_Steel_material,#CURRENT#)
 QUESTION: Web_plate_Steel_material#MAT#(Uniaxial_Steel_Materials,User_Materials)
-VALUE: Steel01
+VALUE: Steel01Thermal
 QUESTION: Web_plate_l#UNITS#
 VALUE: 12.5 in
 QUESTION: Web_plate_t#UNITS#

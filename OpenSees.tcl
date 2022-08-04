@@ -901,6 +901,8 @@ proc AfterLoadGIDProject { filespd } {
 	# Project name is set after complete load
 
 	OpenSees::SetProjectNameAndPath
+	Transform::PopulateTagsArray
+	source hello.tcl
 }
 
 proc SaveGIDProject { filespd } {

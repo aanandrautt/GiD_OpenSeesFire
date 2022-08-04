@@ -61,8 +61,6 @@ proc Transform::PopulateTagsArray { } {
 	for {set i 1} {$i <= $num} {incr i} {
 		W [Transform::ReturnTransformSyntax $i]
 	}
-
-	
 }
 
 proc Transform::PrintTransformTags { } {
@@ -125,14 +123,24 @@ proc Transform::PrintFlattenedTransform { } {
 		W "of which part 1 is: [lindex $pair 0], and part 2 is: [lindex $pair 1]\n"
 	}
 }
+
 proc Transform::ReturnTransformSyntax { transform_tag } {
 	set transform_index [expr $transform_tag - 1]
 	if {!fmod($transform_index,2)} { 
-		set syntax "[lindex $Transform::flattenedTransforms $transform_index]; #Vertical" 
+		set syntax "[lindex $Transform::flattenedTransforms $transform_index]; #Vertical with angle = [Transform::ReturnAngleFromTag $transform_tag]" 
 	} else { 
-		set syntax "[lindex $Transform::flattenedTransforms $transform_index]; #Non-vertical" 
+		set syntax "[lindex $Transform::flattenedTransforms $transform_index]; #Non-vertical with angle = [Transform::ReturnAngleFromTag $transform_tag]" 
 	}
 	return $syntax
+}
+
+proc Transform::ReturnAngleFromTag { transform_tag } {
+	foreach angle [array names Transform::transformation_tags] {
+		if {[lsearch $Transform::transformation_tags($angle) $transform_tag] >= 0 } {
+			return $angle
+		} 
+	}
+	return "ERROR: transform tag was not found to correspond to an angle"	
 }
 
 proc Transform::ReturnTransformTag { original_tag angle } {

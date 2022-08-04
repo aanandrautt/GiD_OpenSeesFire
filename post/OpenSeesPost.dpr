@@ -3489,7 +3489,7 @@ begin
     // shellMITC4 per layer
     //
 
-    for i := 1 to 20 do  // dirty way but 20 layers are enough
+    for i := 1 to 99 do  // dirty way but 20 layers are enough
     begin
     // Concrete
         WriteResults(false,
@@ -3554,7 +3554,7 @@ begin
     // shellDKGQ per layer
     //
 
-    for i := 1 to 20 do  // dirty way but 20 layers are enough
+    for i := 1 to 99 do  // dirty way but 20 layers are enough
     begin
     // Concrete
 

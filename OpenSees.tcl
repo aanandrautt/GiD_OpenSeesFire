@@ -819,6 +819,7 @@ proc InitGIDProject { dir } {
 						Transform.tcl \
 						PProcess.tcl \
 						Dynamics.tcl \
+						Joints.tcl \
 						RecordersNS.tcl \
 						MeshRepair.tcl \
 						Recorder.tcl} {

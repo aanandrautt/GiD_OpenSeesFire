@@ -1,15 +1,19 @@
 namespace eval Joint {
 	variable condition_ID 1
-	variable joint_ID 1
 	variable constraint_ID [expr $Fire::constraint_ID + 1]
 }
 
 proc Joint::ResetIDs { } {
 	set Joint::condition_ID 1
-	set Joint::joint_ID 1
 	set Joint::constraint_ID [expr $Fire::constraint_ID + 1]
 }
-
+proc Joint::PremeshGeneration { } {
+	Joint::AssignConditionIDs
+	Joint::MatchConditionIDs
+}
+proc Joint::PostMesh { } {
+	Joint::AssignJoints
+}
 proc Joint::AssignConditionIDs { } {
 # variable condition_ID
 	W "\n------------------------------------------"
@@ -110,11 +114,10 @@ proc Joint::PairLinesAndID { leader_lines follower_lines xytolerance ztolerance 
 		}
 	}
 	W "There are $num_of_leaders leader lines, $num_of_followers follower lines, and [llength [array names line_pairs]] line pairs."
-	W $line_pairs
 	return $line_pairs
 }
 
-proc Joint::MatchJointIDs { {xytolerance 1.0e-4 } {ztolerance 1.0e-4} } {
+proc Joint::MatchConditionIDs { {xytolerance 1.0e-4 } {ztolerance 1.0e-4} } {
 	set leader_lines [GiD_Info Conditions Line_Slab_Joint_Leader geometry]
 	set follower_lines [GiD_Info Conditions Line_Slab_Joint_Follower geometry]
 	
@@ -134,3 +137,175 @@ proc Joint::MatchJointIDs { {xytolerance 1.0e-4 } {ztolerance 1.0e-4} } {
 		GiD_AssignData condition Line_Slab_Joint_Follower lines $condition_args $line_id
 	}
 }
+
+
+
+
+# The following command assumes that all conditions have been assigned an ID number, all information 
+# was propagated successfully from leader to follower conditions by being paired up. This function 
+# operates upon the mesh and thus expects to be called only after the mesh has been created. Similar
+# to the function Fire::PairCompositeSections, this function takes a state ('fire' or 'ambient') as well
+# as a tolerance for xy. Since this function is only called after the various conditions/geometric 
+# entities have been paired up, it does not need to check for difference in z as that has already been
+# performed.  
+#
+proc Joint::AssignJoints { {xytolerance 1.0e-4} } {
+	WarnWinText "\n------------------------------------------------------------------------"
+	WarnWinText "Entering Joint::AssignJoints" 
+	W "Current time is: [clock format [clock seconds] -format %H:%M:%S]"
+	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
+	WarnWinText "------------------------------------------------------------------------\n"
+	set interval [lindex [GiD_Info intvdata num] 0]
+	
+	
+	set leader_condition_name "Line_Slab_Joint_Leader"
+	set follower_condition_name "Line_Slab_Joint_Follower"
+ 
+	set nodes_to_collapse ""
+	
+	set leader_node_list [GiD_Info Conditions $leader_condition_name mesh]
+	array unset leader_node_array
+	foreach leader_node $leader_node_list {
+		set node_id [lindex $leader_node 1] 
+		set cond_id [lindex $leader_node 4]
+		set args [lrange $leader_node 3 end]
+		# Make sure that the item at index 0 of the condition ID is always
+		# the arguments for that condition, follower by the nodes over which
+		# the condition was applied. 
+		if {![info exists leader_node_array($cond_id)]} {
+			lappend leader_node_array($cond_id) "$args"
+		}                
+		lappend leader_node_array($cond_id) $node_id
+	}
+	
+	set follower_node_list [GiD_Info Conditions $follower_condition_name mesh]
+	array unset follower_node_array
+	foreach follower_node $follower_node_list {
+		set node_id [lindex $follower_node 1] 
+		set cond_id [lindex $follower_node 4]
+		set args [lrange $follower_node 3 end]
+		# Make sure that the item at index 0 of the condition ID is always
+		# the arguments for that condition, follower by the nodes over which
+		# the condition was applied. 
+		if {![info exists follower_node_array($cond_id)]} {
+			lappend follower_node_array($cond_id) "$args"
+		}                
+		lappend follower_node_array($cond_id) $node_id
+	}
+		
+	
+	# check if the conditions match
+	set leader_conditions [array names leader_node_array]
+	set follower_conditions [array names follower_node_array]
+	set conds_commons [FindListCommonItems $leader_conditions $follower_conditions]
+	set common_conds [lindex $conds_commons 1]
+	if {[lindex $conds_commons 0]} {
+		W "All leader conditions are common with follower conditions."
+	} else {
+		set uncommon_conds [lindex $conds_commons 2]
+		W "The following conditions are uncommon:\n$uncommon_conds"
+		foreach bug $uncommon_conds {
+			if {$bug in $leader_conditions} {
+				set debug_args [lrange [lindex $leader_node_array($bug) 0] 0 1]
+				set nodes_to_debug [lrange $leader_node_array($bug) 1 end]
+				lappend debug_args "leader without follower"
+			} else {
+				set debug_args [lrange [lindex $follower_node_array($bug) 0] 0 1]
+				set nodes_to_debug [lrange $follower_node_array($bug) 1 end]
+				lappend debug_args "follower without leader"
+			}
+			foreach bugged_node $nodes_to_debug {
+				GiD_IntervalData set 1
+				GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $bugged_node
+				GiD_IntervalData set $interval
+			}
+		}
+	}
+
+		
+		# pair up nodes and apply connection condition
+		array unset node_pairs
+		#variable constraint_ID
+		set count 1 
+		foreach cond_id $common_conds {
+			set args [lindex $leader_node_array($cond_id) 0]
+			set leader_node_ids [lrange $leader_node_array($cond_id) 1 end]
+			set follower_node_ids [lrange $follower_node_array($cond_id) 1 end]
+			lappend node_pairs($cond_id) $args
+			foreach leader_node $leader_node_ids {
+				set xyz_leader [lindex [GiD_Info Coordinates $leader_node mesh] 0];
+				foreach follower_node $follower_node_ids {
+					
+					set xyz_follower [lindex [GiD_Info Coordinates $follower_node mesh] 0];
+					# WarnWinText "Follower node $follower_node x y z = $xyz_follower"
+					set distance_vect [math::linearalgebra::sub_vect  $xyz_leader  $xyz_follower]
+					set delta_x [lindex $distance_vect 0]
+					set delta_y [lindex $distance_vect 1]
+					if {abs($delta_x) < 1e-5 && abs($delta_y) < 1e-5} {
+						if {$leader_node == $follower_node} {
+							W "Warning: leader and follower nodes have the same ID: $leader_node"
+							set debug_args [lrange $args 0 1]
+							lappend debug_args "identical leader and follower"
+							GiD_IntervalData set 1
+							GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_args $leader_node
+							GiD_IntervalData set $interval
+						} else {
+							lappend node_pairs($cond_id) "$leader_node $follower_node"
+						}
+					}
+				}
+			}
+			set condition_type [lindex $args 2]
+			
+			if {$condition_type == "rigid_link"} {
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							set cond_args "$Joint::constraint_ID [lindex $args 3]"
+							GiD_IntervalData set 1
+							GiD_AssignData condition Point_Rigid_link_master_node Nodes $cond_args [lindex $pair 0]
+							GiD_AssignData condition Point_Rigid_link_slave_nodes Nodes $cond_args [lindex $pair 1]
+							GiD_IntervalData set $interval							
+							set Joint::constraint_ID [expr $Joint::constraint_ID + 1]
+					}
+			} elseif {$condition_type == "equal_DOF"} {
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							GiD_IntervalData set 1
+							set cond_args_follower "$Joint::constraint_ID [lrange $args 4 9]"
+							GiD_AssignData condition Point_Equal_constraint_master_node Nodes "$Joint::constraint_ID 0 0" [lindex $pair 0]
+							GiD_AssignData condition Point_Equal_constraint_slave_nodes Nodes $cond_args_follower [lindex $pair 1]
+							GiD_IntervalData set $interval							
+							set Joint::constraint_ID [expr $Joint::constraint_ID + 1]
+					}
+			
+			} elseif {$condition_type == "common_nodes"} {
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							set nodes_to_collapse [LappendUnique $nodes_to_collapse $pair] 
+					}
+			} elseif {$condition_type == "finite"} {
+			W  "condition type is finite!!!"
+					foreach pair [lrange $node_pairs($cond_id) 1 end] {
+							GiD_IntervalData set 1
+						
+							GiD_Mesh create element append Line 2 "[lindex $pair 1] [lindex $pair 0]" [lindex $args 10]
+							
+							GiD_IntervalData set $interval							
+							set Joint::constraint_ID [expr $Joint::constraint_ID + 1]
+					}
+			
+			}
+			
+		}
+	if {[llength $nodes_to_collapse] == 0} {
+		W "nodes_to_collapse: none"
+	} else {
+		W "nodes_to_collapse: $nodes_to_collapse"
+		set cmd [join "GiD_Process Mescape Utilities Collapse Nodes" " "]
+		foreach node $nodes_to_collapse {
+			lappend cmd $node
+		}
+		lappend cmd escape escape
+		eval $cmd
+	}
+}
+
+
+

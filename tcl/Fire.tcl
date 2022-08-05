@@ -28,6 +28,7 @@ proc GiD_Event_BeforeMeshGeneration { element_size } {
 		Fire::PairCompositeSections ambient 0.00001 1.0
 		WarnWinText "\n-----Ran all functions in interval: $interval-----"
 	}
+	Joint::PremeshGeneration
 	GiD_IntervalData set $current_interval
 	WarnWinText "Returned to original interval: $current_interval"
 	set time_end [clock seconds]
@@ -64,8 +65,11 @@ proc PostMeshing { fail } {
 		W "Assigning nodal masses corresponding to quad element\n if Automass is turned on in gen data starting at [clock format [clock seconds] -format %H:%M:%S]"
 		Dynamics::AutoMass
 		W "Finished assigning mass information to nodes at [clock format [clock seconds] -format %H:%M:%S]."
+		W "Starting postmesh Joint assignments starting at [clock format [clock seconds] -format %H:%M:%S]"
+		Joint::PostMesh
+		W "Finished postmesh Joint assignments starting at [clock format [clock seconds] -format %H:%M:%S]"
 		GiD_IntervalData set $current_interval
-		WarnWinText "Returned to original interval: $current_interval"
+		W "Returned to original interval: $current_interval"
 		W "\nCreating geometric transforms at [clock format [clock seconds] -format %H:%M:%S]."
 		Transform::PopulateTagsArray
 		W "\nFinished creating transforms and populting the corresponding array at [clock format [clock seconds] -format %H:%M:%S].\n"

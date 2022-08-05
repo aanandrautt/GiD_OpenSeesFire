@@ -316,6 +316,11 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 	}
 	proc Opt1_13 { } {
 
+		GidOpenConditions Joints
+		HideInfoBar
+	}
+	proc Opt1_14 { } {
+
 		GidOpenConditions Debug_conditions
 		HideInfoBar
 	}
@@ -334,6 +339,7 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		img/Toolbar/$GiDtheme/btn_Mass.png \
 		img/Toolbar/$GiDtheme/btn_Loads.png \
 		img/Toolbar/$GiDtheme/btn_Thermo.png \
+		img/Toolbar/$GiDtheme/btn_Joints.png \
 		img/Toolbar/$GiDtheme/btn_Debug.png \
 		img/Toolbar/$GiDtheme/btn_Separator.png \
 		img/Toolbar/$GiDtheme/btn_About.png \
@@ -353,6 +359,7 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		[list -np- OpenSees::Opt1_11] \
 		[list -np- OpenSees::Opt1_12] \
 		[list -np- OpenSees::Opt1_13] \
+		[list -np- OpenSees::Opt1_14] \
 		"" \
 		"-np- VisitWeb http://gidopensees.rclab.civil.auth.gr" \
 	]
@@ -371,6 +378,7 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		"Assign Mass/Damping" \
 		"Assign Loads" \
 		"Assign thermocouples" \
+		"Assign joints" \
 		"Check debug conditions" \
 		"" \
 		"GiD+OpenSees Website" \

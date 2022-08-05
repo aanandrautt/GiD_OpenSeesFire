@@ -131,6 +131,60 @@ DEPENDENCIES: (Pin_YZ,RESTORE,Y-Translation,1,RESTORE,Z-Translation,1,RESTORE,X-
 TKWIDGET: TK_RestraintsWikiInfo
 END CONDITION
 
+BOOK: Joints
+
+CONDITION: Line_Slab_Joint_Leader
+CONDTYPE: over lines
+CONDMESHTYPE: over nodes
+CANREPEAT: no
+COMMENT: \tApply condition over the leader joint face of the slab.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: ID
+VALUE: 0
+STATE: HIDDEN
+QUESTION: connection_type#CB#(rigid_link,equal_DOF,common_nodes,finite)
+VALUE: rigid_link
+DEPENDENCIES: (rigid_link,RESTORE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,HIDE,Joint_spring,#CURRENT#)
+DEPENDENCIES: (equal_DOF,HIDE,Rigid_link_type,#CURRENT#,RESTORE,X-Translation,#CURRENT#,RESTORE,Y-Translation,#CURRENT#,RESTORE,Z-Translation,#CURRENT#,RESTORE,X-Rotation,#CURRENT#,RESTORE,Y-Rotation,#CURRENT#,RESTORE,Z-Rotation,#CURRENT#,HIDE,Joint_spring,#CURRENT#)
+DEPENDENCIES: (common_nodes,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,HIDE,Joint_spring,#CURRENT#)
+DEPENDENCIES: (finite,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,RESTORE,Joint_spring,#CURRENT#)
+QUESTION: Rigid_link_type#CB#(Bar,Beam)
+VALUE: Beam
+QUESTION: X-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: Y-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Translation#CB#(1,0)
+VALUE: 1
+QUESTION: X-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Y-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Z-Rotation#CB#(1,0)
+VALUE: 1
+QUESTION: Joint_spring
+VALUE: place-holder: does nothing!!
+STATE: DISABLED
+HELP: Not yet implemented - does nothing for now!
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Slab_Joint_Follower
+CONDTYPE: over lines
+CONDMESHTYPE: over nodes
+CANREPEAT: no
+COMMENT: \tApply condition over the follower joint face of the slab.\n
+QUESTION: geometric_parent#FUNC#(NumEntity)
+VALUE: 0
+STATE: HIDDEN
+QUESTION: ID
+VALUE: 0
+STATE: HIDDEN
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
 BOOK: Debug_conditions
 
 CONDITION: Surface_Gas_Temperatures_central
@@ -146,6 +200,7 @@ VALUE: 0
 STATE: DISABLED
 QUESTION: convective_coefficient
 VALUE: 25
+STATE: DISABLED
 QUESTION: central_element#CB#(1,0)
 VALUE: 1
 STATE: DISABLED
@@ -158,6 +213,7 @@ CONDMESHTYPE: over nodes
 CANREPEAT: no
 QUESTION: geometric_parent
 VALUE: 0
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
 STATE: DISABLED

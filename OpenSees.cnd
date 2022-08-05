@@ -140,12 +140,12 @@ CANREPEAT: no
 COMMENT: \tApply condition over the leader joint face of the slab.\n
 QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: connection_type#CB#(rigid_link,equal_DOF,common_nodes,finite)
-VALUE: rigid_link
+VALUE: equal_DOF
 DEPENDENCIES: (rigid_link,RESTORE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,HIDE,Joint_spring,#CURRENT#)
 DEPENDENCIES: (equal_DOF,HIDE,Rigid_link_type,#CURRENT#,RESTORE,X-Translation,#CURRENT#,RESTORE,Y-Translation,#CURRENT#,RESTORE,Z-Translation,#CURRENT#,RESTORE,X-Rotation,#CURRENT#,RESTORE,Y-Rotation,#CURRENT#,RESTORE,Z-Rotation,#CURRENT#,HIDE,Joint_spring,#CURRENT#)
 DEPENDENCIES: (common_nodes,HIDE,Rigid_link_type,#CURRENT#,HIDE,X-Translation,#CURRENT#,HIDE,Y-Translation,#CURRENT#,HIDE,Z-Translation,#CURRENT#,HIDE,X-Rotation,#CURRENT#,HIDE,Y-Rotation,#CURRENT#,HIDE,Z-Rotation,#CURRENT#,HIDE,Joint_spring,#CURRENT#)
@@ -178,10 +178,10 @@ CANREPEAT: no
 COMMENT: \tApply condition over the follower joint face of the slab.\n
 QUESTION: geometric_parent#FUNC#(NumEntity)
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 QUESTION: ID
 VALUE: 0
-STATE: HIDDEN
+STATE: DISABLED
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 

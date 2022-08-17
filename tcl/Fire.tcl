@@ -28,9 +28,11 @@ proc GiD_Event_BeforeMeshGeneration { element_size } {
 		Fire::PairCompositeSections ambient 0.00001 1.0
 		WarnWinText "\n-----Ran all functions in interval: $interval-----"
 	}
-	Joint::PremeshGeneration
+	#Joint::PremeshGeneration
+	Joint::AssignConditionIDs
+	Joint::MatchConditionIDs
 	GiD_IntervalData set $current_interval
-	WarnWinText "Returned to original interval: $current_interval"
+	W "Returned to original interval: $current_interval"
 	set time_end [clock seconds]
 	set PreMeshTime [expr $time_end-$time_start]
 	WarnWinText "\n\n.....Finished all pre-meshing commands at [clock format $time_end -format %H:%M:%S]....."
@@ -66,7 +68,8 @@ proc PostMeshing { fail } {
 		Dynamics::AutoMass
 		W "Finished assigning mass information to nodes at [clock format [clock seconds] -format %H:%M:%S]."
 		W "Starting postmesh Joint assignments starting at [clock format [clock seconds] -format %H:%M:%S]"
-		Joint::PostMesh
+		#Joint::PostMesh
+		Joint::AssignJoints
 		W "Finished postmesh Joint assignments starting at [clock format [clock seconds] -format %H:%M:%S]"
 		GiD_IntervalData set $current_interval
 		W "Returned to original interval: $current_interval"

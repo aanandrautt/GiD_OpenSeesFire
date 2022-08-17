@@ -816,10 +816,11 @@ proc InitGIDProject { dir } {
 						SecAggregator.tcl \
 						UserMaterial.tcl \
 						Fire.tcl \
+						Joints.tcl \
+						MeshOps.tcl \
 						Transform.tcl \
 						PProcess.tcl \
 						Dynamics.tcl \
-						Joints.tcl \
 						RecordersNS.tcl \
 						MeshRepair.tcl \
 						Recorder.tcl} {

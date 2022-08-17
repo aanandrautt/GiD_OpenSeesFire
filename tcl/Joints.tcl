@@ -36,6 +36,10 @@ proc Joint::AssignConditionIDs { } {
 }
 
 proc Joint::PairLinesAndID { leader_lines follower_lines xytolerance ztolerance } {
+	W "\n------------------------------------------"
+	W "Entering function Joint::PairLinesAndID at [clock format [clock seconds] -format %H:%M:%S]"
+	W "------------------------------------------\n"
+	
 	set line_pairs ""
 	set num_of_leaders [llength $leader_lines]
 	set num_of_followers [llength $follower_lines]
@@ -113,11 +117,16 @@ proc Joint::PairLinesAndID { leader_lines follower_lines xytolerance ztolerance 
 			}  		
 		}
 	}
-	W "There are $num_of_leaders leader lines, $num_of_followers follower lines, and [llength [array names line_pairs]] line pairs."
+	W "For joints, there are $num_of_leaders leader lines, $num_of_followers follower lines, and [llength $line_pairs] line pairs."
 	return $line_pairs
 }
 
 proc Joint::MatchConditionIDs { {xytolerance 1.0e-4 } {ztolerance 1.0e-4} } {
+	W "\n------------------------------------------"
+	W "Entering function Joint::MatchConditionIDs at [clock format [clock seconds] -format %H:%M:%S]"
+	W "------------------------------------------\n"
+	
+	
 	set leader_lines [GiD_Info Conditions Line_Slab_Joint_Leader geometry]
 	set follower_lines [GiD_Info Conditions Line_Slab_Joint_Follower geometry]
 	
@@ -229,6 +238,7 @@ proc Joint::AssignJoints { {xytolerance 1.0e-4} } {
 		set count 1 
 		foreach cond_id $common_conds {
 			set args [lindex $leader_node_array($cond_id) 0]
+			set condition_type [lindex $args 2]
 			set leader_node_ids [lrange $leader_node_array($cond_id) 1 end]
 			set follower_node_ids [lrange $follower_node_array($cond_id) 1 end]
 			lappend node_pairs($cond_id) $args
@@ -255,7 +265,6 @@ proc Joint::AssignJoints { {xytolerance 1.0e-4} } {
 					}
 				}
 			}
-			set condition_type [lindex $args 2]
 			
 			if {$condition_type == "rigid_link"} {
 					foreach pair [lrange $node_pairs($cond_id) 1 end] {

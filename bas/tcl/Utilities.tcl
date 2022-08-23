@@ -322,7 +322,7 @@ proc Run_existing_HT {} {
 	return ""
 }
 
-proc Run_existing_paramteric_study {} {
+proc Run_existing_paramteric_HT_study {} {
 	set GiDProjectDir [OpenSees::GetProjectPath]
 	set GiDProjectName [OpenSees::GetProjectName]
 	set OpenSeesPath [OpenSees::GetOpenSeesPath]
@@ -390,6 +390,48 @@ proc Run_existing_paramteric_study {} {
 	return ""
 }
 
+
+proc Run_existing_paramteric_study_structure {} {
+
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set GiDProjectName [OpenSees::GetProjectName]
+	set OpenSeesPath [OpenSees::GetOpenSeesPath]
+	set HTScriptPath "[OpenSees::GetProblemTypePath]/exe/Parametric_HTScript.tcl"
+	set OSPCRPath "[OpenSees::GetProblemTypePath]/exe/OSPCR-MP"
+	
+
+	set tcl_file [file join "$GiDProjectDir" "OpenSees" "$GiDProjectName.tcl" ]
+	set opensees_folder [file join "$GiDProjectDir" "OpenSees"]
+	
+	
+	
+	global GidProcWin
+	
+	set records_folder [file join "$GiDProjectDir" "Records"]
+	
+	set HT_data_file [file join "$GiDProjectDir" "Records" "HT.dat" ]
+	
+	set cases_data_file [file join "$GiDProjectDir" "Records" "cases.dat" ]
+	
+	
+	if {[file exists $tcl_file] } {
+		cd $opensees_folder
+		GiD_Process Mescape Files Save
+		set n [expr [Fire::GetNumOWorkers] + 1]
+		set OpenSeesPath [OpenSees::GetOpenSeesPath]
+		set OpenSees_exec [list [file attributes $OpenSeesPath -shortname]]
+		eval exec [auto_execok start] \"\" mpiexec -n $n \"$OSPCRPath\" \"$OpenSees_exec\" $GiDProjectName.tcl \"../Records/cases.dat\"
+		
+
+	} else {
+
+		tk_dialog .gid.errorMsg "Error" "The .tcl file was not created." error 0 "  Ok  "
+
+	}
+	UpdateInfoBar
+	cd "[OpenSees::GetProblemTypePath]/exe"
+	return ""
+}
 proc Run_existing_tcl_and_postprocess { } {
 
 	set true 1
@@ -979,8 +1021,15 @@ proc Opt6_dialog { } {
 
 	return ""
 }
+proc run_parametric_ht {} {
 
-proc Opt7_dialog { } {
+	W "place-holder"
+}
+proc run_parametric_fem {} {
+
+	W "place-holder 2"
+}
+proc reset_analysis { } {
 
 	OpenSees::SetProjectNameAndPath
 	set GiDProjectDir [OpenSees::GetProjectPath]
@@ -1225,6 +1274,9 @@ proc OpenSees_Menu { dir } {
 	[= "Postprocess only"] \
 	[= "Run analysis and postprocess"] \
 	"---" \
+	[= "Run HT for parametric cases"] \
+	[= "Run structural analysis for parametric cases"] \
+	"---" \
 	[= "Reset analysis"] \
 	"---" \
 	[= "Open .tcl file"] \
@@ -1260,7 +1312,10 @@ proc OpenSees_Menu { dir } {
 	{Opt5_dialog} \
 	{Opt6_dialog} \
 	{} \
-	{Opt7_dialog} \
+	{Run_existing_paramteric_HT_study} \
+	{Run_existing_paramteric_study_structure} \
+	{} \
+	{reset_analysis} \
 	{} \
 	{mnu_open_tcl} \
 	{mnu_open_log} \
@@ -1294,6 +1349,9 @@ proc OpenSees_Menu { dir } {
 	mnu_ht_out.png \
 	mnu_TCL_Analysis.png \
 	mnu_TCL_Analysis.png \
+	"" \
+	mnu_Parametric_ht.png \
+	mnu_Parametric_fem.png \
 	"" \
 	mnu_Reset.png \
 	"" \

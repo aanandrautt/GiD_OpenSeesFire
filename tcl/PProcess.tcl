@@ -145,10 +145,62 @@ proc PProcess::WriteFakeNodalDispFile { } {
 	}
 	close $file_handle
 }
-
+proc PProcess::GetCases { {print 0 } } {
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set cases_data_file [file join "$GiDProjectDir" "Records" "cases.dat" ]
+	set cases_data_file_handle [open $cases_data_file r]
+	set first_line 1; # boolean to ignore the first line
+	set cases ""
+	set HT_times ""
+	set FE_times ""
+	set FE_time_steps ""
+	while { [gets $cases_data_file_handle line] >= 0 } {
+		if { !$first_line } {
+			lappend cases [lindex $line 0]
+			lappend HT_times [lindex $line 1]
+			lappend FE_times [lindex $line 2]
+			lappend FE_time_steps [lindex $line 3]
+			if $print {
+				W "case: [lindex $line 0], HT time: [lindex $line 1], FE time: [lindex $line 2], FE time step: [lindex $line 3]"
+			}
+		} else {
+			set first_line 0
+		}
+	}
+	close $cases_data_file_handle
+	
+	return [list "$cases" "$HT_times" "$FE_times" "$FE_time_steps"]
+}
 proc PProcess::FactorFireTime { factor {addition 0} } {
 	set initial_dir [pwd]
 	set HT_res_dir [file join [OpenSees::GetProjectPath] "Records" "Thermal_load" ]
+	cd $HT_res_dir
+	set all_files [glob *.dat]
+	foreach fileName $all_files {
+		set file_handle [open $fileName r]
+		set temp_file_handle [open $fileName.temp w+]
+		while {[gets $file_handle line] >= 0} {
+			set new_time [expr [lindex $line 0]*$factor + $addition]
+			set new_line [lreplace #$line 0 0 $new_time]
+			puts $temp_file_handle $new_line
+		}
+		close $file_handle
+		close $temp_file_handle
+		file rename -force $fileName.temp $fileName
+	}
+	cd $initial_dir
+}
+
+proc PProcess::FactorFireTimeCases { factor {addition 0} } {
+	set cases [lindex [GetCases] 0]
+	foreach case $cases {
+		PProcess::FactorFireTimeForCase $factor $addition $case
+	}
+}
+
+proc PProcess::FactorFireTimeForCase { factor {addition 0} {case "case-0"}} {
+	set initial_dir [pwd]
+	set HT_res_dir [file join [OpenSees::GetProjectPath] "Records" "cases" "$case" "Thermal_load" ]
 	cd $HT_res_dir
 	set all_files [glob *.dat]
 	foreach fileName $all_files {

@@ -1,6 +1,6 @@
 proc commands {} {
- W "getMat, getSec, getProp fixQuadConnectivity, calcVonMises, PProcess::FactorFireTime {factor {addition 0}}\n, Transform::PopulateTagsArray, FactorResultsTime { dT }"
- W "FindElementWOMat, FindElem { ID }"
+ W "getMat, getSec, getProp fixQuadConnectivity, calcVonMises\n, Transform::PopulateTagsArray, FactorResultsTime { dT }"
+ W "FindElementWOMat, FindElem { ID },\nPProcess::FactorFireTime {factor {addition 0}},\nPProcess::FactorFireTimeCases { factor {addition 0} },\nPProcess::FactorFireTimeForCase { factor {addition 0} {case \"case-0\"}}"
 }
 proc getMat { entity_ID {entity_type Lines} { display 1 }} {
 	set entity_info [GiD_Info list_entities $entity_type $entity_ID]
@@ -286,3 +286,29 @@ proc FindElem { ID } {
 	}
 }
 
+proc GetCases { {print 0 } } {
+	set GiDProjectDir [OpenSees::GetProjectPath]
+	set cases_data_file [file join "$GiDProjectDir" "Records" "cases.dat" ]
+	set cases_data_file_handle [open $cases_data_file r]
+	set first_line 1; # boolean to ignore the first line
+	set cases ""
+	set HT_times ""
+	set FE_times ""
+	set FE_time_steps ""
+	while { [gets $cases_data_file_handle line] >= 0 } {
+		if { !$first_line } {
+			lappend cases [lindex $line 0]
+			lappend HT_times [lindex $line 1]
+			lappend FE_times [lindex $line 2]
+			lappend FE_time_steps [lindex $line 3]
+			if $print {
+				W "case: [lindex $line 0], HT time: [lindex $line 1], FE time: [lindex $line 2], FE time step: [lindex $line 3]"
+			}
+		} else {
+			set first_line 0
+		}
+	}
+	close $cases_data_file_handle
+	
+	return [list "$cases" "$HT_times" "$FE_times" "$FE_time_steps"]
+}

@@ -5,6 +5,9 @@ namespace eval Joint {
 
 proc Joint::ResetIDs { } {
 	set Joint::condition_ID 1
+	Joint::UpdateConstraintIDs
+}
+proc Joint::UpdateConstraintIDs { } {
 	set Joint::constraint_ID [expr $Fire::constraint_ID + 1]
 }
 proc Joint::PremeshGeneration { } {
@@ -165,7 +168,8 @@ proc Joint::AssignJoints { {xytolerance 1.0e-4} } {
 	WarnWinText "The tolerance for the combined xy directions is given as: $xytolerance"	
 	WarnWinText "------------------------------------------------------------------------\n"
 	set interval [lindex [GiD_Info intvdata num] 0]
-	
+	Joint::UpdateConstraintIDs
+	W "Fire::constraint_ID = $Fire::constraint_ID, Joint::constraint_ID = $Joint::constraint_ID"
 	
 	set leader_condition_name "Line_Slab_Joint_Leader"
 	set follower_condition_name "Line_Slab_Joint_Follower"

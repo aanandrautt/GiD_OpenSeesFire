@@ -312,3 +312,34 @@ proc GetCases { {print 0 } } {
 	
 	return [list "$cases" "$HT_times" "$FE_times" "$FE_time_steps"]
 }
+
+proc GetDuplicateMasterNodes {} {
+	# Message in line number 263. Error: For each Equal constraint ID group, only one master node can be selected.
+	set interval [lindex [GiD_Info intvdata num] 0]
+	
+	set equal_dof_master_nodes [GiD_Info Conditions Point_Equal_constraint_master_node mesh]
+	set rigid_link_master_nodes [GiD_Info Conditions Point_Rigid_link_master_node mesh]
+	set master_nodes [concat $equal_dof_master_nodes $rigid_link_master_nodes]
+	array unset master_nodes_arr
+	array unset duplicate_master_cond
+	
+	foreach node_data $master_nodes {
+		set node_id [lindex $node_data 1]
+		set cond_id [lindex $node_data 3]
+		lappend master_nodes_arr($cond_id) $node_id
+	}
+	foreach cond_id [array names master_nodes_arr] {
+		if { [llength $master_nodes_arr($cond_id)] > 1 } {
+			lappend duplicate_master_cond($cond_id) {*}$master_nodes_arr($cond_id)
+		}
+	}
+	GiD_IntervalData set 1
+	set i 1
+	foreach cond_id [array names duplicate_master_cond] {
+		set debug_info "$i $cond_id"
+		lappend debug_info "double master node condition"
+		GiD_AssignData condition Line_connectivity_condition_debug Nodes $debug_info $duplicate_master_cond($cond_id)
+		set i [expr $i + 1]
+	}
+	GiD_IntervalData set $interval
+}

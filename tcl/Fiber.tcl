@@ -634,7 +634,7 @@ proc Fiber::CalcJG { event args } {
 						set GJ [format "%1.0f" [expr $G*$J]]
 						
 						set GJ $GJ$GJUnit
-						W "GJ = $GJ$GJUnit"
+						"GJ = $GJ"
 
 						set ok [DWLocalSetValue $GDN $STRUCT Torsional_stiffness $GJ]
 							

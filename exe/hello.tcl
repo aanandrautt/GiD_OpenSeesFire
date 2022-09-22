@@ -123,6 +123,85 @@ proc fixQuadConnectivity {} {
 	}
 	W "Finished fixing quad element connectivity. All quad elements may now be post processed without issue."
 }
+
+proc fixQuadConnectivity2 { } {
+	set list_of_quad_elems [GiD_Mesh list -element_type Quadrilateral element]
+	W "Fixing quad element connectivity..."
+	foreach quad_elem $list_of_quad_elems {
+		# W "Quad element: $quad_elem"
+		array unset node_coordinates
+		set original_nodes [lrange [GiD_Mesh get element $quad_elem] end-3 end]
+		foreach node_ $original_nodes {
+			set xyz [GiD_Mesh get node $node_ coordinates]
+			lappend node_coordinates($node_) {*}$xyz
+		}
+		#
+		#	top nodes 
+		#	_________________
+		#	|				|
+		#	|				|
+		#------------------------------
+		#	|				|
+		#	|				|
+		#	_________________
+		#	bottom nodes
+		set y_ordered_nodes [SortListByIndices $original_nodes [SortArrayByValue node_coordinates [array names node_coordinates] 1]]
+		set bottom_nodes [lrange $y_ordered_nodes 0 1]
+		set top_nodes [lrange $y_ordered_nodes 2 end]
+		#------------------------------
+		#	|		|		|
+		#	|		|		|
+		#	________|_________
+		#	first	|	second
+		#	node	|	node
+		#  first nodes
+		set first_nodes [SortListByIndices $bottom_nodes [SortArrayByValue node_coordinates $bottom_nodes 0]]
+		
+		#	last nodes
+		#	fourth		third
+		#	node	|	node
+		#	________|_________
+		#	|		|		|
+		#	|		|		|
+		#------------------------------
+		set last_nodes [SortListByIndices $top_nodes [SortArrayByValue node_coordinates $top_nodes 0] 1]
+		set ordered_nodes [concat $first_nodes $last_nodes]
+		GiD_Mesh edit element $quad_elem Quadrilateral 4 $ordered_nodes
+	}
+}
+
+proc SortArrayByValue { passed_array keys_to_sort { value_index 0 }} {
+	# sorts the given keys_to_sort of an array based on the value_index
+	# the array holds at value_index for each key. Returns a sorted index
+	#---------------------------------------------------------------------
+	# an array is a collection of variables so must use this
+	# command to pass it to a function
+	upvar $passed_array an_array
+	set order ""
+	set values ""
+	foreach key $keys_to_sort {
+		lappend values [lindex $an_array($key) $value_index]
+	}
+	return [lsort -real -indices -increasing $values]
+}
+
+proc SortListByIndices { a_list indices { reverse 0 }}	{
+	# sorts the given list based on a given list of indices. Basically like
+	# fancy indexing in python: a_list[2, 3, 1]
+	# reverse returns the reverse of the given index. Needed for sorting
+	# nodes without further complicating SortArrayByValue
+	#---------------------------------------------------------------------
+	set sorted_list ""
+	foreach index $indices {
+		lappend sorted_list [lindex $a_list $index]
+	}
+	if {$reverse} {
+		return [lreverse $sorted_list] 
+	} else {
+		return $sorted_list
+	}
+}
+
 proc calcVonMises { layer } {
 	set GPs "1 2 3 4"
 	foreach GP $GPs {

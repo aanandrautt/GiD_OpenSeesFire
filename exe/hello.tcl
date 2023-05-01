@@ -18,7 +18,7 @@ proc getMat { entity_ID {entity_type Lines} { display 1 }} {
 	return $Mat
 }
 proc getSec { entity_ID {entity_type Lines} { display 1 }} {
-	set section [GiD_AccessValue get material [getMat $entity_ID $entity_type 0] Type]
+	set section [GiD_AccessValue get material [getMat $entity_ID $entity_type 0] Section]
 	if {$display} {
 		W $section
 	}
@@ -48,11 +48,11 @@ proc getSecProp { entity_ID prop {entity_type Lines} { display 1 } } {
 	set sec [getSec $entity_ID $entity_type 0]
 	set property [GiD_AccessValue get material $sec $prop]
 	set ok [catch {
-		set temp [GidConvertValueUnit $property]
+		set temp [GidConvertValueUnit $property];
 		set temp [ParserNumberUnit $temp theProperty PropertyUnit]
 	}]
 	 if {$ok} {
-		W "Error caught!"
+		# we don't need an error - simply the property does not have a unit
 		set theProperty $property
 		set PropertyUnit ""
 	}
@@ -63,6 +63,35 @@ proc getSecProp { entity_ID prop {entity_type Lines} { display 1 } } {
 	return "$theProperty$PropertyUnit $theProperty $PropertyUnit"
 } 
 
+##############################getting parametric protection thicknesses###################
+proc getGeometryCond { condition_name { entity_ID -1}} {
+	if {$entity_ID < 0} {
+		return [GiD_Info conditions $condition_name geometry]
+	} else {
+		return [lindex [GiD_Info conditions $condition_name geometry $entity_ID] 0]
+	}
+}
+
+proc getCondProp { condition_name property_index entity_ID } {
+	set cond_info [getGeometryCond $condition_name $entity_ID] 
+	
+	 return [lindex $cond_info [expr $property_index + 3]]
+}
+
+proc getMatData { material_name material_property } {
+	return [lrange [GiD_AccessValue get material $material_name $material_property] 2 end]
+}
+
+proc getProtectionThickness { entity_ID } {
+	set protection_mat [getCondProp Parametric_SFRM_material 1 $entity_ID]
+	return [lrange [getMatData $protection_mat thickness] 2 end]
+}
+
+proc getParametricThicknesses { entity_ID } {
+	set parametric_mat [getCondProp Parametric_SFRM_material 0 $entity_ID]
+	return [lrange [getMatData $parametric_mat thicknesses] 2 end]
+}
+##############################getting parametric protection thicknesses###################
 proc fixQuadConnectivity {} {
 	set list_of_quad_elems [GiD_Mesh list -element_type Quadrilateral element]
 	W "Fixing quad element connectivity..."
@@ -124,7 +153,9 @@ proc fixQuadConnectivity {} {
 	W "Finished fixing quad element connectivity. All quad elements may now be post processed without issue."
 }
 
-proc fixQuadConnectivity2 { } {
+proc fixQuadConnectivityGlobal { } {
+	# Ensures that all quad elements are connected to nodes counter-clockwise starting with
+	# node with lowest x and y (bottom left corner)
 	set list_of_quad_elems [GiD_Mesh list -element_type Quadrilateral element]
 	W "Fixing quad element connectivity..."
 	foreach quad_elem $list_of_quad_elems {
@@ -145,7 +176,7 @@ proc fixQuadConnectivity2 { } {
 		#	|				|
 		#	_________________
 		#	bottom nodes
-		set y_ordered_nodes [SortListByIndices $original_nodes [SortArrayByValue node_coordinates [array names node_coordinates] 1]]
+		set y_ordered_nodes [SortListByIndices $original_nodes [SortArrayByValue node_coordinates $original_nodes 1]]
 		set bottom_nodes [lrange $y_ordered_nodes 0 1]
 		set top_nodes [lrange $y_ordered_nodes 2 end]
 		#------------------------------
@@ -167,9 +198,66 @@ proc fixQuadConnectivity2 { } {
 		set last_nodes [SortListByIndices $top_nodes [SortArrayByValue node_coordinates $top_nodes 0] 1]
 		set ordered_nodes [concat $first_nodes $last_nodes]
 		GiD_Mesh edit element $quad_elem Quadrilateral 4 $ordered_nodes
+		
 	}
+	W "Finished fixing quad connectivities."
 }
 
+proc fixQuadConnectivityElement { element_id } {
+	# Ensures that given quad element is connected to nodes counter-clockwise starting with
+	# node with lowest x and y (bottom left corner)
+	set list_of_quad_elems [GiD_Mesh list -element_type Quadrilateral element $element_id]
+	W "Fixing quad element connectivity..."
+	foreach quad_elem $list_of_quad_elems {
+		# W "Quad element: $quad_elem"
+		array unset node_coordinates
+		set original_nodes [lrange [GiD_Mesh get element $quad_elem] end-3 end]
+		W "Original nodes: $original_nodes"
+		foreach node_ $original_nodes {
+			set xyz [GiD_Mesh get node $node_ coordinates]
+			lappend node_coordinates($node_) {*}$xyz
+			W "node $node_ (x,y,z) = $node_coordinates($node_)"
+		}
+		#
+		#	top nodes 
+		#	_________________
+		#	|				|
+		#	|				|
+		#------------------------------
+		#	|				|
+		#	|				|
+		#	_________________
+		#	bottom nodes
+		set y_ordered_nodes [SortListByIndices $original_nodes [SortArrayByValue node_coordinates $original_nodes 1]]
+		W "Y-ordered nodes: $y_ordered_nodes"
+		set bottom_nodes [lrange $y_ordered_nodes 0 1]
+		set top_nodes [lrange $y_ordered_nodes 2 end]
+		W "Bottom nodes: $bottom_nodes\nTop nodes: $top_nodes"
+		#------------------------------
+		#	|		|		|
+		#	|		|		|
+		#	________|_________
+		#	first	|	second
+		#	node	|	node
+		#  first nodes
+		set first_nodes [SortListByIndices $bottom_nodes [SortArrayByValue node_coordinates $bottom_nodes 0]]
+		
+		#	last nodes
+		#	fourth		third
+		#	node	|	node
+		#	________|_________
+		#	|		|		|
+		#	|		|		|
+		#------------------------------
+		set last_nodes [SortListByIndices $top_nodes [SortArrayByValue node_coordinates $top_nodes 0] 1]
+		W "First nodes: $first_nodes\nLast nodes: $last_nodes"
+		set ordered_nodes [concat $first_nodes $last_nodes]
+		W "Ordered nodes: $ordered_nodes"
+		GiD_Mesh edit element $quad_elem Quadrilateral 4 $ordered_nodes
+	}
+}								
+#set y_ordered_nodes [SortListByIndices $original_nodes [SortArrayByValue passed_array     keys_to_sort     			]
+ #set y_ordered_nodes [SortListByIndices $original_nodes [SortArrayByValue node_coordinates [array names node_coordinates] 1]]
 proc SortArrayByValue { passed_array keys_to_sort { value_index 0 }} {
 	# sorts the given keys_to_sort of an array based on the value_index
 	# the array holds at value_index for each key. Returns a sorted index
@@ -421,4 +509,261 @@ proc GetDuplicateMasterNodes {} {
 		set i [expr $i + 1]
 	}
 	GiD_IntervalData set $interval
+}
+
+
+# Currently ONLY works for very simply I sections!
+proc CreateHTDatFile { {directory 0} } {
+	if {$directory == 0} {
+		set directory [file join [OpenSees::GetProjectPath] "Records"] 
+	}
+	append directory  "/HT.dat"
+	W "Writing HT data to: $directory"
+	set fileHandle [open $directory  w+]
+	# print header
+	puts $fileHandle "ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tFinal dt hfire hamb {section_material}"
+	
+	foreach cond "Line_Gas_Temperatures" {
+		# The following function is very important, but should not be called from
+		# here, but rather from the function to create the many HT files after 
+		# each transition to different fire protection layout
+		# Fire::AssignBeamProtection
+		array unset HT_data
+		set geometric_entity_list [GiD_Info Conditions $cond geometry]
+		foreach entity $geometric_entity_list {
+			set condition_args [lrange $entity 3 end]
+			set entity_ID [lindex $entity 1]
+			set ID [lindex $condition_args 1]
+
+			# get fire protection properties
+			
+			set dp [lindex [GidConvertValueUnit [lindex $condition_args 5]] 0]
+			set protection_material [lindex $condition_args 4]
+			if {![string is double $protection_material]} {
+			set protection_material [GiD_AccessValue get material $protection_material protection_material]
+			}
+			# get section properties
+			set tf [lindex [GidConvertValueUnit [lindex [getSecProp $entity_ID Flange_thickness_tf Lines 0] 0]] 0]
+			set tw [lindex [GidConvertValueUnit [lindex [getSecProp $entity_ID Web_thickness_tw Lines 0] 0]] 0]
+			set h [lindex [GidConvertValueUnit [lindex [getSecProp $entity_ID Height_h Lines 0] 0]] 0]
+			set b [lindex [GidConvertValueUnit [lindex [getSecProp $entity_ID Flange_width_b Lines 0] 0]] 0]
+			
+			set composite 0
+			set slab 0
+			set dps 0
+			set ts 0
+			set bs 0
+			set plt 0
+			if {$cond == "Gas_Temperatures" } {
+				set composite 0
+				set slab 0
+				set dps 0
+				set ts 0
+				set bs 0
+				set plt 0
+			}
+			set FireExposure [GiD_AccessValue get gendata Exposure_type]
+			if {$FireExposure == "standard_fire"} {
+				set FireExposure 1
+			} elseif {$FireExposure == "Hydrocarbon"} {
+				set FireExposure 2
+			} elseif {$FireExposure == "FDS"} {
+				set FireExposure 3
+			} else {
+				set FireExposure 4
+			}
+			
+			set tFinal [lindex [GidConvertValueUnit [GiD_AccessValue get gendata fire_duration]] 0]
+			set dt [lindex [GidConvertValueUnit [GiD_AccessValue get gendata HT_time_step]] 0]
+			
+			set override_default_h [GiD_AccessValue get gendata override_default_h]
+			if {$override_default_h} {
+				set hfire [GiD_AccessValue get gendata convective_h_fire]
+				set hamb [GiD_AccessValue get gendata convective_h_ambient]
+			} else {
+				set hfire [lindex $condition_args 3]
+				set hamb [GiD_AccessValue get gendata convective_h_ambient]
+			}
+			set section_material [GiD_AccessValue get material [getSec $entity_ID Lines 0] heat_transfer]
+			if {$section_material == "carbon_steel"} {
+				set section_material 1
+			} else {
+				set section_material 2
+			}						
+	
+			
+			#W "ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tFinal dt hfire hamb {section_material}"
+			puts $fileHandle "$ID\t$composite\t$slab\t$protection_material\t$tf\t$tw\t$h\t$b\t$dp\t$dps\t$ts\t$bs\t$plt\t$FireExposure\t$tFinal\t$dt\t$hfire\t$hamb\t$section_material"
+		}
+	}
+	
+	close $fileHandle
+}
+
+proc GetParametricFP {} {
+	set fp_materials [GiD_Info materials(Fire_Protection_Materials)]
+	set parametric_fp ""
+	foreach material $fp_materials {
+		if {[GiD_AccessValue get material $material Material] == "parametric_SFRM"} {
+				lappend parametric_fp $material
+			}					
+	}
+	return $parametric_fp
+}
+
+proc GetPFPMaterialAndElements { } {
+	array unset parametric_data
+	foreach cond "Line_Parametric_SFRM" {
+		set geometric_entity_list [GiD_Info Conditions $cond geometry]
+		foreach entity_info $geometric_entity_list {
+			set entity_ID [lindex $entity_info 1]
+			set parametric_FP [lindex $entity_info 3]
+			lappend parametric_data($parametric_FP) $entity_ID
+		}
+	
+	}
+	
+	set list_of_PFP_materials ""
+	set list_of_PFP_material_elements ""
+	set list_of_PFP_info ""
+	foreach pfp_mat [array names parametric_data] {
+		lappend list_of_PFP_materials $pfp_mat
+		lappend list_of_PFP_material_elements $parametric_data($pfp_mat)
+		lappend list_of_PFP_info "$pfp_mat $parametric_data($pfp_mat)"
+	}
+	
+	#TODO: CHANGE THE ARRAY TO A LIST: {{key, value}, {key, value},... 
+	# but only do this AFTER you finish the loops because using the
+	# array allows us to keep the material name unique
+	set result ""
+	lappend result $list_of_PFP_materials; # index 0 returns only materials list
+	lappend result $list_of_PFP_material_elements ; # index 1 returns only elements list
+	lappend result $list_of_PFP_info ; # index 2 returns list of lists each containing both materials and elements
+	return $result
+}
+}
+
+proc GetMaxNumOfParametricFPThicknesses { parametric_material_list } {
+	set max_num_thicknesses 0
+	foreach pfp_mat $parametric_material_list {
+		set thicknesses [GiD_AccessValue get material $pfp_mat thicknesses]
+		set max_num_thicknesses [expr max([lindex $thicknesses 1], $max_num_thicknesses)]
+	}
+	return $max_num_thicknesses
+}
+proc GetPFPProps { pfp_mat } {
+	set thicknesses [lrange [GiD_AccessValue get material $pfp_mat thicknesses] 2 end]
+	set mat_id [GiD_AccessValue get material $pfp_mat protection_material]
+	return [list $mat_id "$thicknesses"]
+}
+proc BuildCasesDirectoryStructure { } { 
+	set num_fires [GiD_AccessValue get gendata num_of_fire_cases]
+	set list_of_pfps [lindex  [GetPFPMaterialAndElements] 0]
+	set max_num_thicknesses [GetMaxNumOfParametricFPThicknesses $list_of_pfps]
+	set max_num_thicknesses [expr max(1, $max_num_thicknesses)]
+	set num_of_cases [expr $max_num_thicknesses*$num_fires]
+	set directories ""
+	for {set i 0} {$i < $num_of_cases} {incr i} {
+		lappend directories [file join [OpenSees::GetProjectPath] "Records" "cases" "case-$i" ] 
+	}
+	foreach directory $directories {
+		file mkdir $directory
+	}
+	return $directories
+}
+proc AppendListUntilLength { a_list length } {
+	set list_len [llength $a_list]
+	if {$list_len == $length} {
+		return $a_list
+	} elseif {$list_len > $length} {
+		W "WARNING: a_list passed has $list_len but will be truncated to $length elements."
+		return [lrange $a_list 0 $length]
+	}
+	set last_elem [lindex $a_list end]
+	for {set i 0 } {$i < [expr $length - $list_len]} {incr i} {
+		lappend a_list $last_elem
+	}
+	return $a_list
+}
+proc CreatePFPLayouts { } {
+	set PFP_materials [lindex [GetPFPMaterialAndElements] 0]
+	set max_num_thicknesses [GetMaxNumOfParametricFPThicknesses $PFP_materials]
+	set pfp_layouts ""
+	set PFP_materials_elements [lindex [GetPFPMaterialAndElements] 2]
+	foreach pfp_mat_info $PFP_materials_elements {
+		set pfp_mat [lindex $pfp_mat_info 0]
+		set elements [lrange $pfp_mat_info 1 end]
+		set mat_id [lindex [GetPFPProps $pfp_mat] 0]
+		set thicknesses [lindex [GetPFPProps $pfp_mat] 1]
+		set thicknesses [AppendListUntilLength $thicknesses $max_num_thicknesses]
+		lappend pfp_layouts [list $pfp_mat $mat_id "$thicknesses" "$elements"]
+	}
+	return $pfp_layouts
+}
+
+
+# MATERIAL: Standard_SFRM
+# COMMENT: \n\tPredefined SFRM material properties with temperature\n\tdependent values for density, conductivity, and heat\n\tcapacity. 
+# COMMENT: \n\tMaterials are:\n\t1. CAFCO-300\n\t2. Carboline Type-5MD\n\t3. Tyfo WR-AFP\n\t4. Carboline\n\t5. Monokote MK-5\n\n\t\Details of material properties in section 5.3.3 of:\n\tOrabi, MA (2021) State of the Art Large Scale Simulation of Buildings in Fire: The Case of WTC7\n\n
+# QUESTION: Material:#CB#(Standard_SFRM)
+# VALUE: Standard_SFRM
+# QUESTION: protection_material#CB#(1,2,3,4,5)
+# VALUE: 5
+# TKWIDGET: TK_UpdateInfoBar
+# END MATERIAL
+
+
+# BOOK: Fire_Protection
+
+# CONDITION: Line_SFRM
+# CONDTYPE: over lines
+# CONDMESHTYPE: over body elements
+# CANREPEAT: no
+# COMMENT: Apply a specific thickness of SFRM material.\n
+# QUESTION: SFRM_Material#MAT#(Fire_Protection_Materials,User_Materials)
+# VALUE: Standard_SFRM
+# QUESTION: thickness#UNITS#
+# VALUE: 0mm
+# TKWIDGET: TK_ActiveIntervalinLoads
+# END CONDITION
+
+# pfp_layouts = [list $pfp_mat $mat_id "$thicknesses" "$elements"]
+
+proc CreateParametricHTFiles { pfp_layouts } {
+	set directories [BuildCasesDirectoryStructure]
+	W [lindex $directories 0]
+	set num_cases [llength $directories]
+	set PFP_materials [lindex [GetPFPMaterialAndElements] 0]
+	set num_pfp_materials [llength $PFP_materials]
+	set max_num_thicknesses [GetMaxNumOfParametricFPThicknesses $PFP_materials]
+	set num_fires [GiD_AccessValue get gendata num_of_fire_cases] 
+	for {set j 0} {$j < $num_fires} {incr j} {
+		for {set i 0} {$i < $max_num_thicknesses } {incr i} {
+			W "Creating data for case: [expr $j*$max_num_thicknesses + $i] out of $num_cases"
+			set directory [lindex $directories [expr $j*$max_num_thicknesses + $i]]
+			
+			
+			foreach layout $pfp_layouts {
+				
+				# create a standard fire protection material
+				set pfp_mat_name [lindex $layout 0]
+				append pfp_mat_name "_[expr $j*$max_num_thicknesses + $i]"
+				# if a material with the same name exists:
+				if {[catch [GiD_Info material $pfp_mat_name]]} {
+					GiD_CreateData delete material $pfp_mat_name
+				}
+				
+				GiD_CreateData create material Standard_SFRM $pfp_mat_name "Standard_SFRM [lindex $layout 1]"
+				set thicknesses [lindex $layout 2]
+				set thickness [lindex $thicknesses $i]mm
+				set condition_data "$pfp_mat_name $thickness"
+				
+				set elements [lindex $layout 3]
+				GiD_AssignData condition Line_SFRM lines $condition_data $elements
+			}
+			Fire::AssignBeamProtection
+			CreateHTDatFile $directory
+		}
+	}
+
 }

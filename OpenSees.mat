@@ -607,7 +607,7 @@ VALUE: -3.5e-3#WIDTH#(15)
 TKWIDGET: TK_MaterialWikiInfo
 END MATERIAL
 
-MATERIAL: Concrete02_(Linear_tension_softening)
+MATERIAL: ConcreteECThermal
 COMMENT: \n\tUpdate material window to assign selected Class/Type.\n\tSelect 'Custom' to enter user values.\n
 QUESTION: Material:#CB#(Concrete02)
 VALUE: Concrete02
@@ -2895,4 +2895,41 @@ QUESTION: _#CB#(_)
 VALUE:
 STATE: HIDDEN
 TKWIDGET: EqualDOF::AutoClear
+END MATERIAL
+
+BOOK: Fire_Protection_Materials
+
+MATERIAL: Standard_SFRM
+COMMENT: \n\tPredefined SFRM material properties with temperature\n\tdependent values for density, conductivity, and heat\n\tcapacity. 
+COMMENT: \n\tMaterials are:\n\t1. CAFCO-300\n\t2. Carboline Type-5MD\n\t3. Tyfo WR-AFP\n\t4. Carboline\n\t5. Monokote MK-5\n\n\t\Details of material properties in section 5.3.3 of:\n\tOrabi, MA (2021) State of the Art Large Scale Simulation of Buildings in Fire: The Case of WTC7\n\n
+QUESTION: Material:#CB#(Standard_SFRM)
+VALUE: Standard_SFRM
+QUESTION: protection_material#CB#(1,2,3,4,5)
+VALUE: 5
+TKWIDGET: TK_UpdateInfoBar
+END MATERIAL
+
+MATERIAL: Parametric_SFRM_thickness
+COMMENT: \n\tPredefined SFRM material properties with temperature\n\tdependent values for density, conductivity, and heat\n\tcapacity. 
+QUESTION: Material:#CB#(parametric_SFRM)
+VALUE: parametric_SFRM
+STATE: DISABLED
+QUESTION: protection_group#MAT#(Parametric_Groups,User_Materials)
+VALUE: Fire_Protection_Group
+QUESTION: protection_material#CB#(1,2,3,4,5)
+VALUE: 5
+QUESTION: thicknesses(in_mm)
+VALUE: #N# 1 0.0
+COMMENT: \n\tMaterials are:\n\t1. CAFCO-300\n\t2. Carboline Type-5MD\n\t3. Tyfo WR-AFP\n\t4. Carboline\n\t5. Monokote MK-5\n\n\t\Details of material properties in section 5.3.3 of:\n\tOrabi, MA (2021) State of the Art Large Scale Simulation of Buildings in Fire: The Case of WTC7\n\n
+TKWIDGET: TK_UpdateInfoBar
+END MATERIAL
+
+
+BOOK: Parametric_Groups
+Material: Fire_Protection_Parametric_Group
+COMMENT: \n\tGroup used to control how parametric fire protection layouts are generated.\n\tParametric fire protections thickness values are applied 1-to-1 if in same group.\n\tOtherwise, a layout consisting fire protection of all-to-all is created everytime.\n
+QUESTION: Material:#CB#(P_Group)
+VALUE: FP_Group
+STATE: DISABLED
+TKWIDGET: TK_UpdateInfoBar
 END MATERIAL

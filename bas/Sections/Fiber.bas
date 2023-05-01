@@ -1,10 +1,10 @@
 *set var FiberTag=SectionID
 *if(ndime==3)
 *# ANWAR ORABI: For some reason I cannot seem to get both the bridge deck and I sections to work. Need to use !=0 for I_section, in stead of for bridge deck.
-*if(strcmp(Matprop(Cross_section),"I_Section")==0 || strcmp(Matprop(Cross_section),"Stiffened_I_Section")==0 )
+*if(strcmp(Matprop(Cross_section),"I_Section")==0)
 *include PredefinedFiber.bas
 *endif 
-*if(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)
+*if(strcmp(Matprop(Cross_section),"Bridge_Deck")!=0)
 *# if it is a Fiber Section, We need to check which uniaxial materials we need to define
 *set var SelectedCoreMaterial=tcl(FindMaterialNumber *MatProp(Core_material) *DomainNum)
 *set var SelectedCoverMaterial=tcl(FindMaterialNumber *MatProp(Cover_material) *DomainNum)
@@ -403,7 +403,7 @@ layer straight *SelectedRBMaterial *operation(Howmanybars-2) *MatProp(Middle_Bar
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
 *format "%d"
-section Fiber *FiberTag *\
+section fiberSecThermal *FiberTag *\
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -473,7 +473,7 @@ layer straight *SelectedRBMaterial *HowmanyBottombars *MatProp(Bottom_bar_area,r
 *endif
 
 *format "%d"
-section Fiber *FiberTag *\
+section fiberSecThermal *FiberTag *\
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -562,7 +562,7 @@ fiber *operation(width/2-(width/2-tw/2)/2) *operation(height-Zcm-cover) *MatProp
 *set var coverFibers=tcl(NumofCoverFibers *cover *radius *raddivision)
 
 *format "%d"
-section Fiber *FiberTag *\
+section fiberSecThermal *FiberTag *\
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -675,7 +675,7 @@ DeckFiberSection3D *FiberTag *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID
 *endif
 *# --------------------------------------------- 2D ---------------------------------------------------
 *elseif(ndime==2)
-*if(strcmp(Matprop(Cross_section),"Bridge_Deck")==0)
+*if(strcmp(Matprop(Cross_section),"Bridge_Deck")!=0)
 *set var SelectedCoreMaterial=tcl(FindMaterialNumber *MatProp(Core_material) *DomainNum)
 *set var SelectedCoverMaterial=tcl(FindMaterialNumber *MatProp(Cover_material) *DomainNum)
 *set var SelectedRBMaterial=tcl(FindMaterialNumber *MatProp(Reinforcing_Bar_material) *DomainNum)
@@ -953,7 +953,7 @@ DeckFiberSection3D *FiberTag *GJ *conc1ID *conc2ID *steel1ID *steel2ID *steel3ID
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
 *format "%d"
-section Fiber *FiberTag *\
+section fiberSecThermal *FiberTag *\
 *if(MatProp(Torsional_stiffness_GJ,real)!=0 && MatProp(Activate_torsional_stiffness,int)==1)
 *format "%g"
 -GJ *MatProp(Torsional_stiffness_GJ,real) *\
@@ -1059,7 +1059,7 @@ layer straight *SelectedRBMaterial *operation(Howmanybars-2) *MatProp(Middle_Bar
 *set var zhalf=operation(width/2.0)
 *set var cover=MatProp(Cover_depth_for_bars,real)
 
-section Fiber *FiberTag {
+section fiberSecThermal *FiberTag {
 *set var ydivision=MatProp(Fibers_in_local_y_direction,int)
 *set var zdivision=MatProp(Fibers_in_local_z_direction,int)
 *set var ycoverFibers=tcl(NumofCoverFibers *cover *height *ydivision)
@@ -1118,7 +1118,7 @@ layer straight *SelectedRBMaterial *HowmanyBottombars *MatProp(Bottom_bar_area,r
 *if(width<=tw || height<=ts || cover>tw)
 *MessageBox Error: Invalid geometric values in Fiber Tee Beam Section.
 *endif
-section Fiber *FiberTag {
+section fiberSecThermal *FiberTag {
 *set var zdivision=MatProp(Fibers_in_local_z_direction,int)
 *set var ydivision=MatProp(Fibers_in_local_y_direction,int)
 *set var ycoverFibers=tcl(NumofCoverFibers *cover *height *ydivision)
@@ -1200,7 +1200,7 @@ fiber *operation(height-Ycm-cover) *operation(+width/2-(width/2-tw/2)/2) *MatPro
 *set var CoreExternalRadius=operation(radius-cover)
 *set var coverFibers=tcl(NumofCoverFibers *cover *radius *raddivision)
 
-section Fiber *FiberTag {
+section fiberSecThermal *FiberTag {
 
 # Create the core fibers
 

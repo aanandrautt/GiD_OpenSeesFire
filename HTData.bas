@@ -39,8 +39,8 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var tw=MatProp(Web_thickness_tw,real)
 *set var h=MatProp(Height_h,real)
 *set var b=MatProp(Flange_width_b,real)
-*set var pmat=MatProp(protection_material,int)
-*set var dp=MatProp(protection_thickness,real)
+*set var pmat=cond(protection_material,int)
+*set var dp=cond(protection_thickness,real)
 *if(Matprop(Web_plate_stiffened,int)==1)
 *set var wpt = MatProp(Web_plate_t,real)
 *set var tw=operation(tw+wpt*2)
@@ -78,7 +78,7 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *if(strcmp(MatProp(Section:),"LayeredShell")==0)
 *set var plt = 0.0
 *set var ts=MatProp(Slab_thickness,real)
-*set var pmat=MatProp(protection_material,int)
+*set var pmat=cond(protection_material,int)
 *set var dps=MatProp(protection_thickness,real)
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a LayeredShell section
@@ -118,8 +118,8 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var tw=MatProp(Web_thickness_tw,real)
 *set var h=MatProp(Height_h,real)
 *set var b=MatProp(Flange_width_b,real)
-*set var pmat=MatProp(protection_material,int)
-*set var dp=MatProp(protection_thickness,real)
+*set var pmat=cond(protection_material,int)
+*set var dp=cond(protection_thickness,real)
 *set var dps=cond(slab_protection,real)
 *set var ts=cond(slab_depth,real)
 *set var bs=cond(slab_width,real)

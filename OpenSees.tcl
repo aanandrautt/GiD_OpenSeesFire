@@ -130,7 +130,8 @@ proc OpenSees::ChangeData {} {
 	GiD_DataBehaviour materials Surface_Elements geomlist {surfaces}
 	GiD_DataBehaviour materials Solid_Elements geomlist {volumes}
 	GiD_DataBehaviour materials AutoZL hide {assign draw unassign impexp}
-
+	GiD_DataBehaviour materials Fire_Protection_Materials hide {assign draw unassign impexp}
+	
 	GiDMenu::UpdateMenus
 }
 
@@ -266,62 +267,77 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		GidOpenMaterials "Multidimensional_(nD)_Materials"
 		HideInfoBar
 	}
-
 	proc Opt1_5 { } {
 
-		GidOpenMaterials "Section_Force-Deformation"
+		GidOpenMaterials "Fire_Protection_Materials"
 		HideInfoBar
 	}
 
 	proc Opt1_6 { } {
 
-		GidOpenMaterials "Combined_Materials"
+		GidOpenMaterials "Section_Force-Deformation"
 		HideInfoBar
 	}
 
 	proc Opt1_7 { } {
+
+		GidOpenMaterials "Combined_Materials"
+		HideInfoBar
+	}
+
+	proc Opt1_8 { } {
 
 		GidOpenMaterials "Records"
 		HideInfoBar
 
 	}
 
-	proc Opt1_8 { } {
+	proc Opt1_9 { } {
 
 		GidOpenConditions Restraints
 		HideInfoBar
 	}
 
-	proc Opt1_9 { } {
+	proc Opt1_10 { } {
 
 		GidOpenConditions Constraints
 		HideInfoBar
 	}
 
-	proc Opt1_10 { } {
+	proc Opt1_11 { } {
 
 		GidOpenConditions Mass/Damping
 		HideInfoBar
 	}
 
-	proc Opt1_11 { } {
+	proc Opt1_12 { } {
 
 		GidOpenConditions Loads
 		HideInfoBar
 	}
-	proc Opt1_12 { } {
+	proc Opt1_13 { } {
 
 		GidOpenConditions Thermocouples
 		HideInfoBar
 	}
-	proc Opt1_13 { } {
+	proc Opt1_14 { } {
+
+		GidOpenConditions Fire_Protection
+		HideInfoBar
+	}
+	proc Opt1_15 { } {
 
 		GidOpenConditions Joints
 		HideInfoBar
 	}
-	proc Opt1_14 { } {
+	proc Opt1_16 { } {
 
 		GidOpenConditions Debug_conditions
+		HideInfoBar
+	}
+		proc Opt1_17 { } {
+
+		GidOpenMaterials Parametric_Groups
 		HideInfoBar
 	}
 
@@ -330,6 +346,7 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		img/Toolbar/$GiDtheme/btn_Mat_UniC.png \
 		img/Toolbar/$GiDtheme/btn_Mat_UniS.png \
 		img/Toolbar/$GiDtheme/btn_Mat_ND.png \
+		img/Toolbar/$GiDtheme/btn_Mat_protection.png \
 		img/Toolbar/$GiDtheme/btn_Mat_Section.png \
 		img/Toolbar/$GiDtheme/btn_Mat_SeriesParallel.png \
 		img/Toolbar/$GiDtheme/btn_Separator.png \
@@ -339,8 +356,10 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		img/Toolbar/$GiDtheme/btn_Mass.png \
 		img/Toolbar/$GiDtheme/btn_Loads.png \
 		img/Toolbar/$GiDtheme/btn_Thermo.png \
+		img/Toolbar/$GiDtheme/btn_Fire_protection.png \
 		img/Toolbar/$GiDtheme/btn_Joints.png \
 		img/Toolbar/$GiDtheme/btn_Debug.png \
+		img/Toolbar/$GiDtheme/btn_Mat_PG.png \
 		img/Toolbar/$GiDtheme/btn_Separator.png \
 		img/Toolbar/$GiDtheme/btn_About.png \
 		"
@@ -351,8 +370,8 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		[list -np- OpenSees::Opt1_4] \
 		[list -np- OpenSees::Opt1_5] \
 		[list -np- OpenSees::Opt1_6] \
-		"" \
 		[list -np- OpenSees::Opt1_7] \
+		"" \
 		[list -np- OpenSees::Opt1_8] \
 		[list -np- OpenSees::Opt1_9] \
 		[list -np- OpenSees::Opt1_10] \
@@ -360,6 +379,9 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		[list -np- OpenSees::Opt1_12] \
 		[list -np- OpenSees::Opt1_13] \
 		[list -np- OpenSees::Opt1_14] \
+		[list -np- OpenSees::Opt1_15] \
+		[list -np- OpenSees::Opt1_16] \
+		[list -np- OpenSees::Opt1_17] \
 		"" \
 		"-np- VisitWeb http://gidopensees.rclab.civil.auth.gr" \
 	]
@@ -369,6 +391,7 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		"Define Concrete Uniaxial Materials" \
 		"Define Steel Uniaxial Materials" \
 		"Define Multidimensional Materials" \
+		"Define Fire Protection Materials" \
 		"Define Section Force-Deformation" \
 		"Define Combined Materials" \
 		"" \
@@ -378,8 +401,10 @@ proc OpenSees::Toolbar1 {{type "DEFAULT INSIDELEFT"}} {
 		"Assign Mass/Damping" \
 		"Assign Loads" \
 		"Assign thermocouples" \
+		"Assign fire protection" \
 		"Assign joints" \
 		"Check debug conditions" \
+		"Define Parametric Groups" \
 		"" \
 		"GiD+OpenSees Website" \
 		}

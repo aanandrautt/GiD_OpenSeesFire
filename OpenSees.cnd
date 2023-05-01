@@ -276,6 +276,12 @@ VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
 STATE: HIDDEN
+QUESTION: protection_material#MAT#(Fire_Protection_Materials,User_Materials)
+VALUE: Standard_SFRM
+STATE: DISABLED
+QUESTION: protection_thickness#UNITS#
+VALUE: 0mm
+STATE: DISABLED
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
@@ -351,6 +357,12 @@ VALUE: 25
 QUESTION: central_element#CB#(1,0)
 VALUE: 0
 STATE: HIDDEN
+QUESTION: protection_material#MAT#(Fire_Protection_Materials,User_Materials)
+VALUE: Predefined_SFRM
+STATE: DISABLED
+QUESTION: protection_thickness#UNITS#
+VALUE: 0mm
+STATE: DISABLED
 TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION
 
@@ -1394,4 +1406,28 @@ QUESTION: Rz_material#MAT#(Standard_Uniaxial_Materials,Uniaxial_Steel_Materials,
 VALUE: Elastic
 STATE: DISABLED
 TKWIDGET: TK_ZeroLengthWikiInfo
+END CONDITION
+
+BOOK: Fire_Protection
+
+CONDITION: Line_SFRM
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: Apply a specific thickness of SFRM material.\n
+QUESTION: SFRM_Material#MAT#(Fire_Protection_Materials,User_Materials)
+VALUE: Standard_SFRM
+QUESTION: thickness#UNITS#
+VALUE: 0mm
+TKWIDGET: TK_ActiveIntervalinLoads
+END CONDITION
+
+CONDITION: Line_Parametric_SFRM
+CONDTYPE: over lines
+CONDMESHTYPE: over body elements
+CANREPEAT: no
+COMMENT: Apply an array of thicknesses of SFRM material.\n
+QUESTION: Parametric_SFRM_material#MAT#(Fire_Protection_Materials,User_Materials)
+VALUE: Parametric_Thickness
+TKWIDGET: TK_ActiveIntervalinLoads
 END CONDITION

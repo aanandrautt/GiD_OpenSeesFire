@@ -44,6 +44,9 @@ QUESTION: _#CB#(_)
 VALUE:
 QUESTION: Muli-case_fire_exposure#CB#(0,1)
 VALUE: 0
+DEPENDENCIES: (0,HIDE,num_of_fire_cases,#CURRENT#) (1,RESTORE,num_of_fire_cases,#CURRENT#)
+QUESTION: num_of_fire_cases
+VALUE: 1
 HELP: If this is activated, then it will be expected that temperature files will exist in "cases" and its subdirectories in the "records" dirctories.
 QUESTION: Exposure_type#CB#(standard_fire,Hydrocarbon,FDS,user)
 VALUE: standard_fire

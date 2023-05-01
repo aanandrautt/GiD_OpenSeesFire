@@ -30,7 +30,9 @@ proc Fire::AssignConditionIds {} {
 		                set geometric_entity_id [lindex $geometric_entity 1]
 		                
 		                set condition_args [lrange $geometric_entity 3 end]
+						# give the condition the geometric parent ID
 		                set condition_args [lreplace $condition_args 0 0 $geometric_entity_id]
+						
 						if {$cond == "Line_Composite_Section_Slab_AMBIENT"} {
 							set condition_args [lreplace $condition_args 1 1 $Fire::composite_ID]
 							GiD_AssignData condition $cond lines $condition_args $geometric_entity_id
@@ -573,6 +575,50 @@ proc FindListCommonItems { list1 list2 } {
 	lappend answer $all_common $common $uncommon
 	return $answer
 }
+
+# Takes the fire protection material and thickness from the fire protection condition and assigns them
+# to the thermocouple conditions
+proc Fire::AssignBeamProtection {} {
+set condition_name "Line_Gas_Temperatures Line_Composite_Section_Beam"
+foreach cond $condition_name { 
+	
+	set geometric_entity_list [GiD_Info Conditions $cond geometry]
+	foreach geometric_entity_cond_info $geometric_entity_list {
+	
+			set geometric_entity_id [lindex $geometric_entity_cond_info 1]
+			set cond_args [lrange $geometric_entity_cond_info 3 end]
+			
+			# check if the entity has fire protection on it
+			set has_protection [Fire::hasFireProtection $geometric_entity_id]
+			if { $has_protection } {
+				set sfrm_args [lindex [GiD_Info Conditions Line_SFRM geometry $geometric_entity_id] 0]
+				set sfrm_args [lrange $sfrm_args 3 end]
+				set protection_material [Fire::getProtectionMaterialValue [lindex $sfrm_args 0]]
+				set protection_thickness [lindex $sfrm_args 1]
+			} else {
+				set protection_material 1
+				set protection_thickness 0mm
+			}
+			set  cond_args [lreplace $cond_args 4 5 {*}"$protection_material $protection_thickness"]
+			# remove the unnecessary info bits: the {E ID - ....} metadata from GiD_Info
+			#set cond_args [lrange $cond_args 3 end]
+			GiD_AssignData condition $cond lines $cond_args $geometric_entity_id
+	}
+}
+}
+
+proc Fire::hasFireProtection { geometric_entity } {
+	# checks if a geometric member has a fire protection condition applied.
+	 if {[GiD_Info Conditions Line_SFRM geometry $geometric_entity] == ""} {
+		return 0
+	} else {
+		return 1
+	}
+}
+proc Fire::getProtectionMaterialValue { SFRM_mat } {
+	 return [GiD_AccessValue get material $SFRM_mat protection_material]
+}
+
 # The following command is used purely to select a representative element and apply a 
 # copy of one of the condition related to its HT analysis. The condition is used by 
 # the bas file to generate the HT data files.

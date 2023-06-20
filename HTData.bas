@@ -25,29 +25,13 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *if(SelectedSection==SectionID)
 *set var dummy=tcl(AddUsedMaterials *SelectedSection)
 *if(strcmp(MatProp(Section:),"Fiber")==0)
-*if(strcmp(MatProp(Cross_section),"Stiffened_I_Section")==0)
-*set var plt=MatProp(Plate_t,real)
+*if(strcmp(MatProp(heat_transfer),"Concrete")==0)
+*set var secMat=3
 *else
-*set var plt = 0.0
-*endif
-*if(strcmp(MatProp(heat_transfer),"carbon_steel")==0)
 *set var secMat=1
-*else
-*set var secMat=2
 *endif
-*set var tf=MatProp(Flange_thickness_tf,real)
-*set var tw=MatProp(Web_thickness_tw,real)
 *set var h=MatProp(Height_h,real)
-*set var b=MatProp(Flange_width_b,real)
-*set var pmat=cond(protection_material,int)
-*set var dp=cond(protection_thickness,real)
-*if(Matprop(Web_plate_stiffened,int)==1)
-*set var wpt = MatProp(Web_plate_t,real)
-*set var tw=operation(tw+wpt*2)
-*if(tw>b)
-*set var tw=b
-*endif
-*endif
+*set var b=MatProp(width_b,real)
 *else
 *MessageBox Error: Cannot grab section properties from anything other than a Fiber section
 *endif
@@ -61,8 +45,8 @@ ID composite slab protection_material tf tw h b dp dps ts bs plt FireExposure tF
 *set var hf = cond(convective_coefficient,real)
 *set var ha = globalhamb
 *endif
-*format "%d%d%g%g%g%g%g%g%d%g%g%g%g
-*cond(ID,int)	0	0	*pmat	*tf	*tw	*h	*b	*dp	0.0	0.1	0.9	*plt	*fire	*HTtime *HTtimestep *hf	*ha	*secMat			
+*format "%d%g%g%d%g%g%g%g
+*cond(ID,int)	0	0	0	 0	0	*h	*b	0	0.0	0.1	0.9	 0	*fire	*HTtime *HTtimestep *hf	*ha	*secMat				
 *endif
 *end elems
 *#slabs

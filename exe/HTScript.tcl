@@ -18,10 +18,6 @@ file mkdir log
 file mkdir Thermal_load
 logFile "log/log$ID.log"
 set phaseChangeCoeff 0
-if {$protection_material == 5} {
-	set phaseChangeCoeff 1
-}
-
 
 puts "This is job number $ID"
 foreach arg $variables {
@@ -29,50 +25,6 @@ foreach arg $variables {
 }
 # puts "received secondinput = [lindex $argv 1]"
 
-# set sidesHeated [lindex $argv 1]
-set sidesHeated 4
-if {$composite} {
-	# set sidesHeated 3
-	# set composite 0
-	set bs [expr $b*1.25]
-	puts "set bs to 1.25*width of the beam"
-	# puts "Performed following modifications:\n1.changed sides heated to 3 in stead of 4.\n2.set composite to 0.\n3.set bs to 1.25*width of beam."
-}
-if {$sidesHeated != 3 && $sidesHeated != 4} {
-	puts "sidesHeated got a value of $sidesHeated; can only be 3 or 4."
-	return -1
-}
-if {$mode == "manual"} {
-	set protection_material 1
-	set section_material 1
-	set tf 25e-3
-	set tw 10e-3
-	set h 400e-3
-	set b 300e-3
-	set dp 10e-3
-
-	set dps 0.020
-	set ts 150e-3
-	set bs 600e-3
-
-	set plt 0.0
-
-	set composite FALSE
-	set slab TRUE
-
-	set FireExposure 1
-	#1 for standard fire
-	#2 for hydroCarbon fire
-	#3 for FDS/user-defined fire
-
-	set tFinal 1000
-	set dt 10
-	set hfire 35.0
-	set hamb 10.0
-}
-set values "$tf $tw $b $dp $dps $ts"
-set okay 1
-set i 0
 
 while {$okay && $i < [llength $values]} {
 	set item [lindex $values $i]
@@ -91,706 +43,61 @@ if {!$okay} {
 	}
 }
 
-
-if {$dp == 0} {
-	set protected FALSE
-} else {
-	set protected TRUE
-}
-
-if {$plt == 0} {
-	set stiffened FALSE
-} else {
-	set stiffened TRUE
-}
-
-if {$composite && $stiffened} {
-	puts "the section cannot be stiffened and composite at the same time."
-	return -1
-}
-
-if {$slab && [expr $composite || $stiffened]} {
-	if {$composite} {
-		puts "Section cannot be a slab and composite at the same time. Aborting analysis."
-	} else {
-		puts "Section cannot be a slab and stiffened at the same time. Aborting analysis."
-	}
-	return -1
-}
-
 # meshing parameters
 # minimum element sizes
-# flange - x direction (width)
+# x direction (width)
 set f_min_x 0.025
-# flange - y direction (thickness)
+# y direction (thickness)
 set f_min_y 0.015
-# web - x direction (thickness) 
-set w_min_x 0.015
-#web - y direction (height)
-set w_min_y 0.025
 
-set f_elemx [expr max(4,int(0.5*($b - $tw)/$f_min_x))]
-if {fmod($f_elemx,2)} {
-	set f_elemx [expr int($f_elemx+1)]
-}
-set f_elemy [expr max(4,int($tf/$f_min_y))]
-if {fmod($f_elemy,2)} {
-	set f_elemy [expr int($f_elemy+1)]
-}
-set w_elemx [expr max(4,int($tw/$w_min_x))]
-if {fmod($w_elemx,2)} {
-	set w_elemx [expr int($w_elemx+1)]
-}
-set w_elemy [expr max(8,int(($h-$tf)/$w_min_y))]
-if {fmod($w_elemy,4)} {
-	if {![expr fmod($w_elemy + fmod($w_elemy,4),4)]} {
-		set w_elemy [expr int($w_elemy + fmod($w_elemy,4))]
-	} else {
-		set w_elemy [expr int($w_elemy - fmod($w_elemy,4))]
-	}
-}
 
-set p_elem 4
+set f_elemx [expr max(50,int(0.5*($b/$f_min_x))]
 
-set s_elemy 8
-if {$ts/$s_elemy > 25e-3} {
-	set s_elemy 16
-	if {$ts/$s_elemy > 25e-3} {
-		set s_elemy 24
-	}
-}
-if {$slab} {
-	set s_elemx [expr max(20,int(($bs)/0.05))]
-} else {
-	set s_elemx [expr max(8,int(($bs-$b)/0.025))]
-}
-if {fmod($s_elemx,2)} {
-	set s_elemx [expr int($s_elemx + 1)]
-}
+set f_elemy [expr max(50,int(0.5*$h/$f_min_y))]
 
-puts "flange mesh: dfx, dfy = $f_elemx, $f_elemy"
-puts "web mesh: dwx, dwy = $w_elemx, $w_elemy"
-puts "slab mesh: dsx, dsy = $s_elemx, $s_elemy"
-puts "protection mesh: $p_elem"
-# Block centroids 
-set f_x [expr 0.5*$b - 0.5*$tw]
-set w_y [expr $h - 2*$tf]
-set s_x [expr 0.5*($bs - $b)]
-if {$composite && $s_x <= 0} {
-	puts "slab is less wide than the beam:\nBeam is $b m wide, while slab is $bs m wide.\nTerminating analysis."
-	return -1
-}
 
-if {$slab} {
-	set centrex1 0.0
-	set centrey1 0.0
-	if {$protected} {
-		set centrex2 0.0
-		set centrey2 [expr -0.5*$ts - 0.5*$dps]
-	}
-} else {
-	set centrex1 [expr -0.5*$f_x-0.5*$tw] 
-	set centrey1 [expr -0.5*$h + 0.5*$tf]
 
-	set centrex2 0.0
-	set centrey2 [expr -0.5*$h + 0.5*$tf]
+puts "mesh: dfx, dfy = $f_elemx, $f_elemy"
 
-	set centrex3 [expr 0.5*$f_x + 0.5*$tw] 
-	set centrey3 [expr -0.5*$h + 0.5*$tf]
 
-	set centrex4 0.0
-	set centrey4 0.0
 
-	set centrex5 [expr -0.5*$f_x-0.5*$tw] 
-	set centrey5 [expr  0.5*$h - 0.5*$tf]
+#defined for RC Block by [Anand Kumar (anandk.iitj@gmail.com) 2023]
 
-	set centrex6 0.0
-	set centrey6 [expr  0.5*$h - 0.5*$tf]
+#length dimension
+set centrex111 [expr $b*0.5] 
 
-	set centrex7 [expr 0.5*$f_x + 0.5*$tw] 
-	set centrey7 [expr 0.5*$h - 0.5*$tf]
-	if {$composite} {
-		set centrex8 [expr -0.5*$b - 0.5*$s_x]
-		set centrey8 [expr 0.5*$h + 0.5*$ts]
+#hight dimension    
+set centrey111 [expr $h*0.5]
 
-		set centrex9 [expr 0.5*$b + 0.5*$s_x]
-		set centrey9 [expr 0.5*$h + 0.5*$ts]
-		
-		set centrex54 [expr -0.5*$f_x - 0.5*$tw] 
-		set centrey54 [expr 0.5*$h + 0.5*$ts]
-
-		set centrex64 0.0 
-		set centrey64 [expr 0.5*$h + 0.5*$ts]
-
-		set centrex74 [expr 0.5*$f_x + 0.5*$tw] 
-		set centrey74 [expr 0.5*$h  + 0.5*$ts]
-	} elseif {$stiffened} {
-		set centrex100 [expr -$f_x-0.5*$tw - 0.5*$plt] 
-		set centrey100 [expr -0.5*$h + 0.5*$tf]
-		
-		set centrex110 [expr -$f_x-0.5*$tw - 0.5*$plt] 
-		set centrey110 0.0
-
-		set centrex120 [expr -$f_x-0.5*$tw - 0.5*$plt] 
-		set centrey120 [expr 0.5*$h - 0.5*$tf]	
-
-		set centrex130 [expr $f_x+0.5*$tw+0.5*$plt] 
-		set centrey130 [expr -0.5*$h + 0.5*$tf]
-		
-		set centrex140 [expr $f_x+0.5*$tw+0.5*$plt] 
-		set centrey140 0.0
-
-		set centrex150 [expr $f_x+0.5*$tw+0.5*$plt]
-		set centrey150 [expr 0.5*$h - 0.5*$tf]
-	}
-
-	if {$protected} {
-		# bottom flange
-		set centrex11 [expr -0.5*$f_x - 0.5*$tw] 
-		set centrey11 [expr -0.5*$h - 0.5*$dp]	
-		
-		set centrex21 0.0 
-		set centrey21 [expr -0.5*$h - 0.5*$dp]
-
-		set centrex31 [expr 0.5*$f_x + 0.5*$tw] 
-		set centrey31 [expr -0.5*$h - 0.5*$dp]
-		
-		if {$stiffened} {
-			#left stiffening plate
-			set centrex1001 [expr -$f_x-0.5*$tw - 0.5*$plt]  
-			set centrey1001 [expr -0.5*$h -0.5*$dp]
-			
-			set centrex1002 [expr -$f_x-0.5*$tw - $plt - 0.5*$dp] 
-			set centrey1002 [expr -0.5*$h + 0.5*$tf]
-			
-			set centrex1102 [expr -$f_x-0.5*$tw - $plt - 0.5*$dp] 
-			set centrey1102 0.0
-
-			set centrex1202 [expr -$f_x-0.5*$tw - $plt - 0.5*$dp] 
-			set centrey1202 [expr 0.5*$h - 0.5*$tf]	
-			
-			set centrex1204 [expr -$f_x-0.5*$tw - 0.5*$plt] 
-			set centrey1204 [expr 0.5*$h + 0.5*$dp]
-
-			#right stiffening plate
-			set centrex1301 [expr $f_x+0.5*$tw+0.5*$plt] 
-			set centrey1301 [expr -0.5*$h -0.5*$dp]
-			
-			set centrex1303 [expr $f_x+ 0.5*$tw + $plt + 0.5*$dp] 
-			set centrey1303 [expr -0.5*$h + 0.5*$tf]
-			
-			set centrex1403 [expr $f_x+ 0.5*$tw + $plt + 0.5*$dp]
-			set centrey1403 0.0
-
-			set centrex1503 [expr $f_x+ 0.5*$tw + $plt + 0.5*$dp]
-			set centrey1503 [expr 0.5*$h - 0.5*$tf]	
-
-			set centrex1504 [expr $f_x+0.5*$tw+0.5*$plt]
-			set centrey1504 [expr 0.5*$h + 0.5*$dp]	
-		} elseif {!$stiffened} {
-			set centrex12 [expr -0.5*$b - 0.5*$dp] 
-			set centrey12 [expr -0.5*$h + 0.5*$tf]
-			
-			set centrex14 [expr -0.5*$f_x - 0.5*$tw] 
-			set centrey14 [expr -0.5*$h + $tf + 0.5*$dp]
-			
-			set centrex33 [expr 0.5*$b + 0.5*$dp] 
-			set centrey33 [expr -0.5*$h + 0.5*$tf]
-
-			set centrex34 [expr 0.5*$f_x + 0.5*$tw] 
-			set centrey34 [expr -0.5*$h + $tf + 0.5*$dp]
-			
-			
-			# web
-			set centrex42 [expr -0.5*$tw - 0.5*$dp] 
-			set centrey42 0.0
-
-			set centrex43 [expr 0.5*$tw + 0.5*$dp] 
-			set centrey43 0.0
-			
-			# top flange
-
-			set centrex51 [expr -0.5*$f_x - 0.5*$tw] 
-			set centrey51 [expr 0.5*$h - $tf - 0.5*$dp]
-
-			set centrex52 [expr -0.5*$b - 0.5*$dp] 
-			set centrey52 [expr 0.5*$h - 0.5*$tf]
-
-			set centrex71 [expr 0.5*$f_x + 0.5*$tw] 
-			set centrey71 [expr 0.5*$h - $tf - 0.5*$dp]
-
-			set centrex73 [expr 0.5*$b + 0.5*$dp] 
-			set centrey73 [expr 0.5*$h - 0.5*$tf]
-		}
-
-		if {!$composite} {
-			set centrex54 [expr -0.5*$f_x - 0.5*$tw] 
-			set centrey54 [expr 0.5*$h + 0.5*$dp]
-
-			set centrex64 0.0 
-			set centrey64 [expr 0.5*$h + 0.5*$dp]
-
-			set centrex74 [expr 0.5*$f_x + 0.5*$tw] 
-			set centrey74 [expr 0.5*$h + 0.5*$dp]
-		} elseif {$composite} {
-			set centrex81 [expr -0.5*$b - 0.5*$s_x]
-			set centrey81 [expr 0.5*$h - 0.5*$dps]
-
-			set centrex91 [expr 0.5*$b + 0.5*$s_x]
-			set centrey91 [expr 0.5*$h - 0.5*$dps]
-		
-		}
-	}
-}
 HeatTransfer 2D;
 
 #Defining HeatTransfer Material with Material tag 1.
 
 # for compatibility with older versions of HTscript that do not define section_material
-if { ($section_material == "") || ($section_material == 1) } {
-	HTMaterial CarbonSteelEC3 1;
+if { ($section_material == "") || ($section_material == 3) } {
+	HTMaterial ConcreteEC2 3 0.0;
 } else {
 	HTMaterial aluminum 1;
 }
 
 HTMaterial SFRM 2 $protection_material;
-HTMaterial ConcreteEC2 3 0.0;
-puts "creating entities"
-if {$slab} {
-	HTEntity Block 1 $centrex1 $centrey1 $bs $ts;
-	if {$protected} {
-		HTEntity Block 2 $centrex2 $centrey2 $bs $dps;
-	}
-} else {
-	#Creating entitities
-	puts "first set"
-	HTEntity Block 1 $centrex1 $centrey1 $f_x $tf;
-	HTEntity Block 2 $centrex2 $centrey2 $tw  $tf;
-	HTEntity Block 3 $centrex3 $centrey3 $f_x $tf;
-	HTEntity Block 4 $centrex4 $centrey4 $tw  $w_y;
-	HTEntity Block 5 $centrex5 $centrey5 $f_x $tf;
-	HTEntity Block 6 $centrex6 $centrey6 $tw  $tf;
-	HTEntity Block 7 $centrex7 $centrey7 $f_x $tf;
-	puts "stiffened set"
-	if {$stiffened} {
-		#left stiffening plate
-		HTEntity Block 100 $centrex100 $centrey100 $plt $tf;
-		HTEntity Block 110 $centrex110 $centrey110 $plt $w_y;
-		HTEntity Block 120 $centrex120 $centrey120 $plt $tf;
+puts "Creating entities for Concrete section"
 
-		#right stiffening plate
-		HTEntity Block 130 $centrex130 $centrey130 $plt $tf;
-		HTEntity Block 140 $centrex140 $centrey140 $plt $w_y;
-		HTEntity Block 150 $centrex150 $centrey150 $plt $tf;
-	}
-	puts "composite set"
-	if {$composite} {
-		HTEntity Block 8 $centrex8 $centrey8 $s_x $ts;
-		HTEntity Block 9 $centrex9 $centrey9 $s_x $ts;
-		HTEntity Block 54 $centrex54 $centrey54 $f_x $ts;
-		HTEntity Block 64 $centrex64 $centrey64 $tw $ts;
-		HTEntity Block 74 $centrex74 $centrey74 $f_x $ts;
-	}
-	puts "protected set"
-	if {$protected} {
-	puts "protected set"
-		if {!$stiffened} {
-		puts "protected and unstiffened"
-			HTEntity Block 14 $centrex14 $centrey14 $f_x $dp;
-			HTEntity Block 12 $centrex12 $centrey12 $dp $tf;
-			HTEntity Block 33 $centrex33 $centrey33 $dp $tf;
-			HTEntity Block 34 $centrex34 $centrey34 $f_x $dp;
-			
-			# web
-			HTEntity Block 42 $centrex42 $centrey42 $dp $w_y;
-			HTEntity Block 43 $centrex43 $centrey43 $dp $w_y;
 
-			#top flange
-			HTEntity Block 51 $centrex51 $centrey51 $f_x $dp;
-			HTEntity Block 52 $centrex52 $centrey52 $dp $tf;
-			HTEntity Block 71 $centrex71 $centrey71 $f_x $dp;
-			HTEntity Block 73 $centrex73 $centrey73 $dp $tf;
-		} elseif {$stiffened} {
-		puts "protected and stiffened"
-			#left stiffening plate
-			HTEntity Block 1001 $centrex1001 $centrey1001 $plt $dp;
-			HTEntity Block 1002 $centrex1002 $centrey1002 $dp $tf;
-			HTEntity Block 1102 $centrex1102 $centrey1102 $dp $w_y;
-			HTEntity Block 1202 $centrex1202 $centrey1202 $dp $tf;
-			HTEntity Block 1204 $centrex1204 $centrey1204 $plt $dp;
+puts "first set"
+HTEntity Block 1 $centrex111 $centrey111 $b $h;
 
-			#right stiffening plate
-			HTEntity Block 1301 $centrex1301 $centrey1301 $plt $dp;
-			HTEntity Block 1303 $centrex1303 $centrey1303 $dp $tf;
-			HTEntity Block 1403 $centrex1403 $centrey1403 $dp $w_y;
-			HTEntity Block 1503 $centrex1503 $centrey1503 $dp $tf;
-			HTEntity Block 1504 $centrex1504 $centrey1504 $plt $dp;
-		}
-		puts "bottom flange protection"
-		#bottom flange
-		HTEntity Block 11 $centrex11 $centrey11 $f_x $dp;
-		HTEntity Block 21 $centrex21 $centrey21 $tw $dp;
-		HTEntity Block 31 $centrex31 $centrey31 $f_x $dp;
 
-		
-		if {!$composite} {
-		puts "non composite"
-			#top flange
-			HTEntity Block 54 $centrex54 $centrey54 $f_x $dp;
-			HTEntity Block 64 $centrex64 $centrey64 $tw $dp;
-			HTEntity Block 74 $centrex74 $centrey74 $f_x $dp;
-		} elseif {$composite} {
-			if {$dps > 1e-8} {
-				HTEntity Block 81 $centrex81 $centrey81 $s_x $dps;
-				HTEntity Block 91 $centrex91 $centrey91 $s_x $dps;
-			}
-		}
-	}
-}
 puts "creating mesh controls"
-if {$slab} {
-	HTMesh 1 		  1 		 3 -phaseChange 1 -NumCtrl $s_elemx $s_elemy
-	if {$protected} {
-		HTMesh 2 		  2		 3 -phaseChange 0 -NumCtrl $s_elemx $p_elem
-	}
-} else {
-	# HTMesh $meshTag $EntityTag $MaterialTag 
-	  HTMesh 1 		  1 		 1 -phaseChange 1 -NumCtrl $f_elemx $f_elemy
-	  HTMesh 2 		  2 		 1 -phaseChange 1 -NumCtrl $w_elemx $f_elemy
-	  HTMesh 3 		  3 		 1 -phaseChange 1 -NumCtrl $f_elemx $f_elemy
-	  HTMesh 4 		  4 		 1 -phaseChange 1 -NumCtrl $w_elemx $w_elemy
-	  HTMesh 5 		  5 		 1 -phaseChange 1 -NumCtrl $f_elemx $f_elemy
-	  HTMesh 6 		  6 		 1 -phaseChange 1 -NumCtrl $w_elemx $f_elemy
-	  HTMesh 7 		  7 		 1 -phaseChange 1 -NumCtrl $f_elemx $f_elemy
-	  
-	  if {$stiffened} {
-		HTMesh 100 		  100 		 1 -phaseChange 1 -NumCtrl $w_elemx $f_elemy
-		HTMesh 110 		  110 		 1 -phaseChange 1 -NumCtrl $w_elemx $w_elemy
-		HTMesh 120 		  120 		 1 -phaseChange 1 -NumCtrl $w_elemx $f_elemy
 
-		HTMesh 130 		  130 		 1 -phaseChange 1 -NumCtrl $w_elemx $f_elemy
-		HTMesh 140 		  140 		 1 -phaseChange 1 -NumCtrl $w_elemx $w_elemy
-		HTMesh 150 		  150 		 1 -phaseChange 1 -NumCtrl $w_elemx $f_elemy
-	  }
-	  
-	if {$composite} {
-		HTMesh 8 		  8 		 3 -phaseChange 1 -NumCtrl $s_elemx $s_elemy
-		HTMesh 9 		  9 		 3 -phaseChange 1 -NumCtrl $s_elemx $s_elemy
-		HTMesh 54 		  54 		 3 -phaseChange 1 -NumCtrl $f_elemx $s_elemy
-		HTMesh 64 		  64 		 3 -phaseChange 1 -NumCtrl $w_elemx $s_elemy
-		HTMesh 74 		  74 		 3 -phaseChange 1 -NumCtrl $f_elemx $s_elemy
-	}
-	if {$protected} {  
-		if {!$stiffened} {
-			HTMesh 12 		  12 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
-			HTMesh 14 		  14 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
-			HTMesh 33 		  33 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
-			HTMesh 34 		  34 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
-			
-			#web
-			HTMesh 42 		  42 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy 
-			HTMesh 43 		  43 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy
-			
-			#top flange
-			HTMesh 51 		  51 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
-			HTMesh 52 		  52 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
-			HTMesh 71 		  71 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
-			HTMesh 73 		  73 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem  $f_elemy
-		} elseif {$stiffened} {
-			HTMesh 1001 		  1001 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
-			HTMesh 1002 		  1002 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy
-			HTMesh 1102 		  1102 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy
-			HTMesh 1202 		  1202 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy	
-			HTMesh 1204 		  1204 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
+# HTMesh $meshTag $EntityTag $MaterialTag {-phaseChange 1 or 0} {-MeshCtrls $eleSizeX <$eleSizeY $eleSizeZ..>} {-NumCtrl $f_elemx $f_elemy}
+ 
+HTMesh      1         1 		 3 			-phaseChange 		1 		-NumCtrl 	$f_elemx 	$f_elemy
 
-			HTMesh 1301 		  1301 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
-			HTMesh 1303 		  1303 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy
-			HTMesh 1403 		  1403 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $w_elemy
-			HTMesh 1503 		  1503 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $p_elem $f_elemy	
-			HTMesh 1504 		  1504 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
-		}
-		#bottom flange
-		HTMesh 11 		  11 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
-		HTMesh 21 		  21 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
-		HTMesh 31 		  31 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
 
-		if {!$composite} {
-			HTMesh 54 		  54 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
-			HTMesh 64 		  64 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $w_elemx $p_elem
-			HTMesh 74 		  74 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $f_elemx $p_elem
-		} elseif {$composite} {
-			if {$dps > 1e-8} {
-				HTMesh 81 		  81 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $s_elemx $p_elem
-				HTMesh 91 		  91 		 2 -phaseChange $phaseChangeCoeff -NumCtrl $s_elemx $p_elem
-			}
-		}	
-	}
-}
 puts "meshing"
 HTMeshAll
 
-puts "Creating constraint couple-faces"
-if {$slab} {
-	if {$protected} {
-		set MasterFace21 1
-		HTNodeSet $MasterFace21 -Entity 2 -Face 4
-		set SlaveFace21 2
-		HTNodeSet $SlaveFace21 -Entity 1 -Face 1
-	}
-} else {
-	set MasterFace12 1
-	HTNodeSet $MasterFace12 -Entity 1 -Face 3
-	set SlaveFace12 2
-	HTNodeSet $SlaveFace12 -Entity 2 -Face 2
-
-	set MasterFace32 3
-	HTNodeSet $MasterFace32 -Entity 3 -Face 2
-	set SlaveFace32 4
-	HTNodeSet $SlaveFace32 -Entity 2 -Face 3
-
-	set MasterFace24 5
-	HTNodeSet $MasterFace24 -Entity 2 -Face 4
-	set SlaveFace24 6
-	HTNodeSet $SlaveFace24 -Entity 4 -Face 1
-
-	set MasterFace46 7
-	HTNodeSet $MasterFace46 -Entity 4 -Face 4
-	set SlaveFace46 8
-	HTNodeSet $SlaveFace46 -Entity 6 -Face 1
-
-	set MasterFace65 9
-	HTNodeSet $MasterFace65 -Entity 6 -Face 2
-	set SlaveFace65 10
-	HTNodeSet $SlaveFace65 -Entity 5 -Face 3
-
-	set MasterFace67 11
-	HTNodeSet $MasterFace67 -Entity 6 -Face 3
-	set SlaveFace67 12
-	HTNodeSet $SlaveFace67 -Entity 7 -Face 2
-
-	if {$stiffened} {
-		#Left plate
-		set MasterFace1001 13
-		HTNodeSet $MasterFace1001 -Entity 100 -Face 3
-		set SlaveFace1001 14
-		HTNodeSet $SlaveFace1001 -Entity 1 -Face 2
-		
-		set MasterFace110100 15
-		HTNodeSet $MasterFace110100 -Entity 110 -Face 1
-		set SlaveFace110100 16
-		HTNodeSet $SlaveFace110100 -Entity 100 -Face 4
-		
-		set MasterFace110120 17
-		HTNodeSet $MasterFace110120 -Entity 110 -Face 4
-		set SlaveFace110120 18
-		HTNodeSet $SlaveFace110120 -Entity 120 -Face 1
-
-		set MasterFace1205 19
-		HTNodeSet $MasterFace1205 -Entity 120 -Face 3
-		set SlaveFace1205 20
-		HTNodeSet $SlaveFace1205 -Entity 5 -Face 2
-		
-		#Right plate
-		set MasterFace1303 21
-		HTNodeSet $MasterFace1303 -Entity 130 -Face 2
-		set SlaveFace1303 22
-		HTNodeSet $SlaveFace1303 -Entity 3 -Face 3
-		
-		set MasterFace140130 23
-		HTNodeSet $MasterFace140130 -Entity 140 -Face 1
-		set SlaveFace140130 24
-		HTNodeSet $SlaveFace140130 -Entity 130 -Face 4
-		
-		set MasterFace140150 25
-		HTNodeSet $MasterFace140150 -Entity 140 -Face 4
-		set SlaveFace140150 26
-		HTNodeSet $SlaveFace140150 -Entity 150 -Face 1
-		
-		set MasterFace1507 27
-		HTNodeSet $MasterFace1507 -Entity 150 -Face 2
-		set SlaveFace1507 28
-		HTNodeSet $SlaveFace1507 -Entity 7 -Face 3
-	}
-
-	if {$composite} {
-		set MasterFace749 29
-		HTNodeSet $MasterFace749 -Entity 74   -Face 3
-		set SlaveFace749 30
-		HTNodeSet $SlaveFace749 -Entity 9 -Face 2
-		
-		set MasterFace548 31
-		HTNodeSet $MasterFace548 -Entity 54 -Face 2
-		set SlaveFace548 32
-		HTNodeSet $SlaveFace548 -Entity 8 -Face 3
-		
-		set MasterFace554 33
-		HTNodeSet $MasterFace554 -Entity 5 -Face 4
-		set SlaveFace554 34
-		HTNodeSet $SlaveFace554 -Entity 54 -Face 1
-
-		set MasterFace664 35
-		HTNodeSet $MasterFace664 -Entity 6 -Face 4   
-		set SlaveFace664 36
-		HTNodeSet $SlaveFace664 -Entity 64  -Face 1
-
-		set MasterFace774 37  
-		HTNodeSet $MasterFace774 -Entity 7 -Face 4
-		set SlaveFace774  38 
-		HTNodeSet $SlaveFace774 -Entity 74  -Face  1
-		
-		if {$protected && $dps > 1e-8} {
-			set MasterFace919 39
-			HTNodeSet $MasterFace919 -Entity 91  -Face 4
-			set SlaveFace919 40
-			HTNodeSet $SlaveFace919 -Entity 9 -Face 1
-			
-			set MasterFace818 41
-			HTNodeSet $MasterFace818 -Entity 81 -Face 4
-			set SlaveFace818 42
-			HTNodeSet $SlaveFace818 -Entity 8 -Face 1
-		}
-	}
-
-	if {$protected} {
-		if {!$stiffened} {
-			set MasterFace121 43
-			HTNodeSet $MasterFace121 -Entity 12 -Face 3
-			set SlaveFace121 44
-			HTNodeSet $SlaveFace121 -Entity 1 -Face 2
-
-			set MasterFace141 45
-			HTNodeSet $MasterFace141 -Entity 14 -Face 1
-			set SlaveFace141 46
-			HTNodeSet $SlaveFace141 -Entity 1 -Face 4
-
-			set MasterFace333  47
-			HTNodeSet $MasterFace333  -Entity 33  -Face 2 
-			set SlaveFace333   48
-			HTNodeSet $SlaveFace333  -Entity 3 -Face 3
-
-			set MasterFace343 49  
-			HTNodeSet $MasterFace343  -Entity 34  -Face  1
-			set SlaveFace343  50 
-			HTNodeSet $SlaveFace343  -Entity 3 -Face 4	
-			
-			#web
-			set MasterFace424  51
-			HTNodeSet $MasterFace424  -Entity 42  -Face  3
-			set SlaveFace424   52
-			HTNodeSet $SlaveFace424  -Entity 4 -Face 2
-
-			set MasterFace434  53
-			HTNodeSet $MasterFace434  -Entity 43  -Face 2 
-			set SlaveFace434   54
-			HTNodeSet $SlaveFace434  -Entity 4 -Face 3
-			
-			# top flange
-			set MasterFace515 55
-			HTNodeSet $MasterFace515 -Entity 51 -Face 4
-			set SlaveFace515 56
-			HTNodeSet $SlaveFace515 -Entity 5 -Face 1
-
-			set MasterFace525 57
-			HTNodeSet $MasterFace525 -Entity 52 -Face 3
-			set SlaveFace525 58
-			HTNodeSet $SlaveFace525 -Entity 5 -Face 2
-			
-			set MasterFace717  59
-			HTNodeSet $MasterFace717  -Entity 71  -Face  4
-			set SlaveFace717   60
-			HTNodeSet $SlaveFace717  -Entity 7 -Face 1
-
-			set MasterFace737  61
-			HTNodeSet $MasterFace737  -Entity 73  -Face 2 
-			set SlaveFace737   62
-			HTNodeSet $SlaveFace737  -Entity 7 -Face 3
-		} elseif {$stiffened} {
-			#left stiffening plate
-			set MasterFace1001100 63
-			HTNodeSet $MasterFace1001100 -Entity 1001 -Face 4
-			set SlaveFace1001100 64
-			HTNodeSet $SlaveFace1001100 -Entity 100 -Face 1
-			
-			set MasterFace1002100 65
-			HTNodeSet $MasterFace1002100 -Entity 1002 -Face 3
-			set SlaveFace1002100 66
-			HTNodeSet $SlaveFace1002100 -Entity 100 -Face 2
-			
-			set MasterFace1102110 67
-			HTNodeSet $MasterFace1102110 -Entity 1102 -Face 3
-			set SlaveFace1102110 68
-			HTNodeSet $SlaveFace1102110 -Entity 110 -Face 2
-			
-			set MasterFace1202120 69
-			HTNodeSet $MasterFace1202120 -Entity 1202 -Face 3
-			set SlaveFace1202120 70
-			HTNodeSet $SlaveFace1202120 -Entity 120 -Face 2
-			
-			set MasterFace1204120 71
-			HTNodeSet $MasterFace1204120 -Entity 1204 -Face 1
-			set SlaveFace1204120 72
-			HTNodeSet $SlaveFace1204120 -Entity 120 -Face 4
-			
-			#right stiffening plate
-			set MasterFace1301130 73
-			HTNodeSet $MasterFace1301130 -Entity 1301 -Face 4
-			set SlaveFace1301130 74
-			HTNodeSet $SlaveFace1301130 -Entity 130 -Face 1
-
-			set MasterFace1303130 75
-			HTNodeSet $MasterFace1303130 -Entity 1303 -Face 2
-			set SlaveFace1303130 76
-			HTNodeSet $SlaveFace1303130 -Entity 130 -Face 3
-
-			set MasterFace1403140 77
-			HTNodeSet $MasterFace1403140 -Entity 1403 -Face 2
-			set SlaveFace1403140 78
-			HTNodeSet $SlaveFace1403140 -Entity 140 -Face 3
-
-			set MasterFace1503150 79
-			HTNodeSet $MasterFace1503150 -Entity 1503 -Face 2
-			set SlaveFace1503150 80
-			HTNodeSet $SlaveFace1503150 -Entity 150 -Face 3
-
-			set MasterFace1504150 81
-			HTNodeSet $MasterFace1504150 -Entity 1504 -Face 1
-			set SlaveFace1504150 82
-			HTNodeSet $SlaveFace1504150 -Entity 150 -Face 4		
-		}
-		# bottom flange
-		set MasterFace111 83
-		HTNodeSet $MasterFace111 -Entity 11 -Face 4
-		set SlaveFace111 84
-		HTNodeSet $SlaveFace111 -Entity 1 -Face 1
-		
-		set MasterFace212 85
-		HTNodeSet $MasterFace212 -Entity 21  -Face 4 
-		set SlaveFace212 86
-		HTNodeSet $SlaveFace212 -Entity 2 -Face 1 
-
-		set MasterFace313  87
-		HTNodeSet $MasterFace313  -Entity 31  -Face  4
-		set SlaveFace313   88
-		HTNodeSet $SlaveFace313  -Entity 3 -Face 1
-
-		if {!$composite} {
-			set MasterFace545 89
-			HTNodeSet $MasterFace545 -Entity 54 -Face 1
-			set SlaveFace545 90
-			HTNodeSet $SlaveFace545 -Entity 5 -Face 4
-
-			set MasterFace646 91
-			HTNodeSet $MasterFace646 -Entity 64  -Face 1 
-			set SlaveFace646 92
-			HTNodeSet $SlaveFace646 -Entity 6 -Face 4 
-
-			set MasterFace747 93  
-			HTNodeSet $MasterFace747  -Entity 74  -Face  1
-			set SlaveFace747  94 
-			HTNodeSet $SlaveFace747  -Entity 7 -Face 4
-		}
-	}
-}
 
 SetInitialT 293.15
 HTConstants 1 $hfire 293.15 0.85 0.85
@@ -822,330 +129,861 @@ if {$FireExposure == 1} {
 }
 
 HTPattern fire 1 model 1 {
-	if {$slab} {
-		if {$protected} {
-			HTCoupleT -HTNodeSet $MasterFace21 $SlaveFace21;
-			HeatFluxBC -HTEntity 2 -face 1 -type -ConvecAndRad -HTConstants 1
-		} else {
-			HeatFluxBC -HTEntity 1 -face 1 -type -ConvecAndRad -HTConstants 1
-		}
-	} else {
-		# coupling
-		HTCoupleT -HTNodeSet $MasterFace12 $SlaveFace12;
-		HTCoupleT -HTNodeSet $MasterFace32 $SlaveFace32;
-		HTCoupleT -HTNodeSet $MasterFace24 $SlaveFace24;
-		HTCoupleT -HTNodeSet $MasterFace46 $SlaveFace46;
-		HTCoupleT -HTNodeSet $MasterFace65 $SlaveFace65;
-		HTCoupleT -HTNodeSet $MasterFace67 $SlaveFace67;
-		if {$stiffened} {
-			HTCoupleT -HTNodeSet $MasterFace1001 $SlaveFace1001;
-			HTCoupleT -HTNodeSet $MasterFace110100 $SlaveFace110100;
-			HTCoupleT -HTNodeSet $MasterFace110120 $SlaveFace110120;
-			HTCoupleT -HTNodeSet $MasterFace1205 $SlaveFace1205;
-			
-			HTCoupleT -HTNodeSet $MasterFace1303 $SlaveFace1303;
-			HTCoupleT -HTNodeSet $MasterFace140130 $SlaveFace140130;
-			HTCoupleT -HTNodeSet $MasterFace140150 $SlaveFace140150;
-			HTCoupleT -HTNodeSet $MasterFace1507 $SlaveFace1507;
-		}
-		if {$composite} {
-			HTCoupleT -HTNodeSet $MasterFace554 $SlaveFace554;
-			HTCoupleT -HTNodeSet $MasterFace664 $SlaveFace664;
-			HTCoupleT -HTNodeSet $MasterFace774 $SlaveFace774;
-			HTCoupleT -HTNodeSet $MasterFace749 $SlaveFace749;
-			HTCoupleT -HTNodeSet $MasterFace548 $SlaveFace548;
-		}
-
-		if {$protected} {
-			if {!$stiffened} {
-				HTCoupleT -HTNodeSet $MasterFace121 $SlaveFace121;
-				HTCoupleT -HTNodeSet $MasterFace141 $SlaveFace141;
-				HTCoupleT -HTNodeSet $MasterFace333 $SlaveFace333;
-				HTCoupleT -HTNodeSet $MasterFace343 $SlaveFace343;
-				# web
-				HTCoupleT -HTNodeSet $MasterFace424 $SlaveFace424;
-				HTCoupleT -HTNodeSet $MasterFace434 $SlaveFace434;
-				# top flange
-				HTCoupleT -HTNodeSet $MasterFace515 $SlaveFace515;
-				HTCoupleT -HTNodeSet $MasterFace525 $SlaveFace525;
-				HTCoupleT -HTNodeSet $MasterFace717 $SlaveFace717;
-				HTCoupleT -HTNodeSet $MasterFace737 $SlaveFace737;
-			} elseif {$stiffened} {
-				# left plate
-				HTCoupleT -HTNodeSet $MasterFace1001100 $SlaveFace1001100;
-				HTCoupleT -HTNodeSet $MasterFace1002100 $SlaveFace1002100;
-				HTCoupleT -HTNodeSet $MasterFace1102110 $SlaveFace1102110;
-				HTCoupleT -HTNodeSet $MasterFace1202120 $SlaveFace1202120;
-				HTCoupleT -HTNodeSet $MasterFace1204120 $SlaveFace1204120;
-				
-				# right plate
-				HTCoupleT -HTNodeSet $MasterFace1301130 $SlaveFace1301130;
-				HTCoupleT -HTNodeSet $MasterFace1303130 $SlaveFace1303130;
-				HTCoupleT -HTNodeSet $MasterFace1403140 $SlaveFace1403140;
-				HTCoupleT -HTNodeSet $MasterFace1503150 $SlaveFace1503150;
-				HTCoupleT -HTNodeSet $MasterFace1504150 $SlaveFace1504150;
-			}
-			# bottom flange
-			HTCoupleT -HTNodeSet $MasterFace111 $SlaveFace111;
-			HTCoupleT -HTNodeSet $MasterFace212 $SlaveFace212;
-			HTCoupleT -HTNodeSet $MasterFace313 $SlaveFace313;
-			if {!$composite} {
-				HTCoupleT -HTNodeSet $MasterFace545 $SlaveFace545;
-				HTCoupleT -HTNodeSet $MasterFace646 $SlaveFace646;
-				HTCoupleT -HTNodeSet $MasterFace747 $SlaveFace747;
-			} elseif {$composite && $dps > 1e-8} {
-				HTCoupleT -HTNodeSet $MasterFace818 $SlaveFace818;
-				HTCoupleT -HTNodeSet $MasterFace919 $SlaveFace919;
-			}
+			HeatFluxBC -HTEntity 1 -face 1 2 3 -type -ConvecAndRad -HTConstants 1
 		}
 		
-		# heat flux
-		if {$protected} {
-			# bottom flange
-			HeatFluxBC -HTEntity 11 -face 1 -type -ConvecAndRad -HTConstants 1
-			HeatFluxBC -HTEntity 21 -face 1 -type -ConvecAndRad -HTConstants 1
-			HeatFluxBC -HTEntity 31 -face 1 -type -ConvecAndRad -HTConstants 1
-			if {!$stiffened} { 
-				HeatFluxBC -HTEntity 12 -face 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 14 -face 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 33 -face 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 34 -face 4 -type -ConvecAndRad -HTConstants 1
-				# web
-				HeatFluxBC -HTEntity 42 -face 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 43 -face 3 -type -ConvecAndRad -HTConstants 1
-				# top flange	
-				HeatFluxBC -HTEntity 51 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 52 -face 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 71 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 73 -face 3 -type -ConvecAndRad -HTConstants 1
-			} elseif {$stiffened} {
-				#left plate
-				HeatFluxBC -HTEntity 1001 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1002 -face 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1102 -face 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1202 -face 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1204 -face 4 -type -ConvecAndRad -HTConstants 1
-				
-				#right plate
-				HeatFluxBC -HTEntity 1301 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1303 -face 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1403 -face 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1503 -face 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 1504 -face 4 -type -ConvecAndRad -HTConstants 1
-			}
 
-			if {$sidesHeated == 4 && !$composite} {
-				HeatFluxBC -HTEntity 54 -face 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 64 -face 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 74 -face 4 -type -ConvecAndRad -HTConstants 1
-			} elseif {$composite && $dps > 1e-8} {
-				HeatFluxBC -HTEntity 91 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 81 -face 1 -type -ConvecAndRad -HTConstants 1
-			} elseif {$composite && $dps <= 1e-8} {
-				HeatFluxBC -HTEntity 8 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 9 -face 1 -type -ConvecAndRad -HTConstants 1
-			}
-		} else {
-			if {!$stiffened} {
-				HeatFluxBC -HTEntity 1 -face 1 2 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 2 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 3 -face 1 3 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 4 -face 2 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 5 -face 1 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 7 -face 1 3 -type -ConvecAndRad -HTConstants 1
-				if {$sidesHeated == 4 && !$composite} {
-					HeatFluxBC -HTEntity 5 -face 4 -type -ConvecAndRad -HTConstants 1
-					HeatFluxBC -HTEntity 6 -face 4 -type -ConvecAndRad -HTConstants 1
-					HeatFluxBC -HTEntity 7 -face 4 -type -ConvecAndRad -HTConstants 1
-				} elseif {$composite} {
-					HeatFluxBC -HTEntity 8 -face 1 -type -ConvecAndRad -HTConstants 1
-					HeatFluxBC -HTEntity 9 -face 1 -type -ConvecAndRad -HTConstants 1
-				}
-			} elseif {$stiffened} {
-				HeatFluxBC -HTEntity 1 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 2 -face 1 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 3 -face 1 -type -ConvecAndRad -HTConstants 1
-				
-				HeatFluxBC -HTEntity 130 -face 1 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 140 -face 3 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 150 -face 3 4 -type -ConvecAndRad -HTConstants 1
-				
-				HeatFluxBC -HTEntity 7 -face 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 6 -face 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 5 -face 4 -type -ConvecAndRad -HTConstants 1
-				
-				HeatFluxBC -HTEntity 120 -face 2 4 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 110 -face 2 -type -ConvecAndRad -HTConstants 1
-				HeatFluxBC -HTEntity 100 -face 2 1 -type -ConvecAndRad -HTConstants 1
-			}
-		}
-	}
-}
-
-if {$composite} {
-	HTPattern AmbientBC 2 {
-		HeatFluxBC -HTEntity 54 -face 4 -type -ConvecAndRad -HTConstants 2
-		HeatFluxBC -HTEntity 64 -face 4 -type -ConvecAndRad -HTConstants 2
-		HeatFluxBC -HTEntity 74 -face 4 -type -ConvecAndRad -HTConstants 2
-		HeatFluxBC -HTEntity 8 -face 4 -type -ConvecAndRad -HTConstants 2
-		HeatFluxBC -HTEntity 9 -face 4 -type -ConvecAndRad -HTConstants 2
-	}
-} elseif {$slab} {
 HTPattern AmbientBC 2 {
 		HeatFluxBC -HTEntity 1 -face 4 -type -ConvecAndRad -HTConstants 2
 	}
-}
-
+	
 puts "creating nodesets and recorders"
-if {$slab} {
-	set sT1 201
-	HTNodeSet $sT1 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts]
-	set sT2 202
-	HTNodeSet $sT2 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 1*$ts/8]
-	set sT3 203
-	HTNodeSet $sT3 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 2*$ts/8]
-	set sT4 204
-	HTNodeSet $sT4 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 3*$ts/8]
-	set sT5 205
-	HTNodeSet $sT5 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 4*$ts/8]
-	set sT6 206
-	HTNodeSet $sT6 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 5*$ts/8]
-	set sT7 207
-	HTNodeSet $sT7 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 6*$ts/8]
-	set sT8 208
-	HTNodeSet $sT8 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 7*$ts/8]
-	set sT9 209
-	HTNodeSet $sT9 -Entity 1 -Locx 0.0 -Locy [expr -0.5*$ts + 8*$ts/8]
-	
-	set slabTemp 210
-	HTNodeSet $slabTemp -NodeSet $sT1 $sT2 $sT3 $sT4 $sT5 $sT6 $sT7 $sT8 $sT9
-	HTRecorder -file "Thermal_load\\Slab$ID.dat" -NodeSet $slabTemp
-} else {
+set a 0.0526315789473
 
-	#Web
-	set T1 101
-	HTNodeSet $T1 -Entity 4 -Locx 0.0 -Locy [expr -0.5*$w_y]
-	set T2 102
-	HTNodeSet $T2 -Entity 4 -Locx 0.0 -Locy [expr -0.25*$w_y]
-	set T3 103
-	HTNodeSet $T3 -Entity 4 -Locx 0.0 -Locy 0.0
-	set T4 104
-	HTNodeSet $T4 -Entity 4 -Locx 0.0 -Locy [expr 0.25*$w_y]
-	set T5 105
-	HTNodeSet $T5 -Entity 4 -Locx 0.0 -Locy [expr 0.5*$w_y]
-	# puts "reached line 536. Put your break points and enter any random string."
-	# gets stdin randomString
-	# Bottom flange
-	set ix [expr round($f_elemx*(0.5*$f_x - 0.25*$tw)/$f_x)]
-	if { [expr 0.25*$b - 0.5*$tw] < 0} {
-		set exact_quarter [expr 0.25*$b]
-		set web_x_size [expr $tw/$w_elemx]
-		set num_to_quarter [expr round($exact_quarter/$web_x_size)]
-		puts "exact_quarter: $exact_quarter\nweb_x_size: $web_x_size\nnum_to_quarter: $num_to_quarter"
-		set f_quarter [expr $num_to_quarter*$web_x_size]
-		set T7_entity 2
-		set T9_entity 2
-		set T12_entity 6
-		set T14_entity 6
-		
-	} else {
-		set f_quarter [expr 0.5*$tw + $ix*$f_x/$f_elemx]
-		set T7_entity 1
-		set T9_entity 3
-		set T12_entity 5
-		set T14_entity 7
-	}
-	puts "f_elemx: $f_elemx"
-	puts "ix: $ix"
-	puts "f_quarter: $f_quarter"
-	
-	set err [expr $f_quarter - 0.25*$b]
-	puts "The selected point is [expr $err*1000] mm farther from the web than the actual quarter point. \n"
-	set T6 106
-	HTNodeSet $T6 -Entity 1 -Locx [expr -0.5*$b] -Locy [expr -0.5*$h + 0.5*$tf]
-	set T7 107
-	HTNodeSet $T7 -Entity $T7_entity -Locx [expr -$f_quarter] -Locy [expr -0.5*$h + 0.5*$tf]
-	set T8 108
-	HTNodeSet $T8 -Entity 2 -Locx 0.0 -Locy [expr -0.5*$h + 0.5*$tf]
-	set T9 109
-	HTNodeSet $T9 -Entity $T9_entity -Locx [expr $f_quarter] -Locy [expr -0.5*$h + 0.5*$tf]
-	set T10 110
-	HTNodeSet $T10 -Entity 3 -Locx [expr 0.5*$b] -Locy [expr -0.5*$h + 0.5*$tf]
+#Temperature point (1st column -20 points)
+set T1 101
+HTNodeSet $T1 -Entity 1 -Locx 0.0   -Locy 0.0 
+set T2 102                          
+HTNodeSet $T2 -Entity 1 -Locx 0.0   -Locy [expr 1.0*$h*$a]
+set T3 103                          
+HTNodeSet $T3 -Entity 1 -Locx 0.0   -Locy [expr 2.0*$h*$a]
+set T4 104                          
+HTNodeSet $T4 -Entity 1 -Locx 0.0   -Locy [expr 3.0*$h*$a]
+set T5 105                          
+HTNodeSet $T5 -Entity 1 -Locx 0.0   -Locy [expr 4.0*$h*$a]
+set T6 106                          
+HTNodeSet $T6 -Entity 1 -Locx 0.0   -Locy [expr 5.0*$h*$a]
+set T7 107                          
+HTNodeSet $T7 -Entity 1 -Locx 0.0   -Locy [expr 6.0*$h*$a]
+set T8 108                          
+HTNodeSet $T8 -Entity 1 -Locx 0.0   -Locy [expr 7.0*$h*$a]
+set T9 109                          
+HTNodeSet $T9 -Entity 1 -Locx 0.0   -Locy [expr 8.0*$h*$a]
+set T10 110
+HTNodeSet $T10 -Entity 1 -Locx 0.0  -Locy [expr 9.0*$h*$a]
+set T11 111
+HTNodeSet $T11 -Entity 1 -Locx 0.0  -Locy [expr 10.0*$h*$a]
+set T12 112
+HTNodeSet $T12 -Entity 1 -Locx 0.0  -Locy [expr 11.0*$h*$a]
+set T13 113
+HTNodeSet $T13 -Entity 1 -Locx 0.0  -Locy [expr 12.0*$h*$a]
+set T14 114
+HTNodeSet $T14 -Entity 1 -Locx 0.0  -Locy [expr 13.0*$h*$a]
+set T15 115
+HTNodeSet $T15 -Entity 1 -Locx 0.0  -Locy [expr 14.0*$h*$a]
+set T16 116
+HTNodeSet $T16 -Entity 1 -Locx 0.0  -Locy [expr 15.0*$h*$a]
+set T17 117
+HTNodeSet $T17 -Entity 1 -Locx 0.0  -Locy [expr 16.0*$h*$a]
+set T18 118
+HTNodeSet $T18 -Entity 1 -Locx 0.0  -Locy [expr 17.0*$h*$a]
+set T19 119
+HTNodeSet $T19 -Entity 1 -Locx 0.0  -Locy [expr 18.0*$h*$a]
+set T20 120
+HTNodeSet $T20 -Entity 1 -Locx 0.0  -Locy [expr 19.0*$h*$a]
 
-	# Top flange
-	set T11 111
-	HTNodeSet $T11 -Entity 5 -Locx [expr -0.5*$b] -Locy [expr 0.5*$h - 0.5*$tf]
-	set T12 112
-	HTNodeSet $T12 -Entity $T12_entity -Locx [expr -$f_quarter] -Locy [expr 0.5*$h - 0.5*$tf]
-	set T13 113
-	HTNodeSet $T13 -Entity 6 -Locx 0.0 -Locy [expr 0.5*$h - 0.5*$tf]
-	set T14 114
-	HTNodeSet $T14 -Entity $T14_entity -Locx [expr $f_quarter] -Locy [expr 0.5*$h - 0.5*$tf]
-	set T15 115
-	HTNodeSet $T15 -Entity 7 -Locx [expr 0.5*$b] -Locy [expr 0.5*$h - 0.5*$tf]
 
-	# Beam thermal load 3D
-	set beamTemp 116
-	HTNodeSet $beamTemp -NodeSet $T1 $T2 $T3 $T4 $T5 $T6 $T7 $T8 $T9 $T10 $T11 $T12 $T13 $T14 $T15
-	if {!$stiffened} {
-		HTRecorder -file "Thermal_load\\BeamColumn$ID.dat" -NodeSet $beamTemp
-	}
-	# Slab thermal load
-	if {$composite} {
-		set sT1 201
-		HTNodeSet $sT1 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h]
-		set sT2 202
-		HTNodeSet $sT2 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 1*$ts/8]
-		set sT3 203
-		HTNodeSet $sT3 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 2*$ts/8]
-		set sT4 204
-		HTNodeSet $sT4 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 3*$ts/8]
-		set sT5 205
-		HTNodeSet $sT5 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 4*$ts/8]
-		set sT6 206
-		HTNodeSet $sT6 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 5*$ts/8]
-		set sT7 207
-		HTNodeSet $sT7 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 6*$ts/8]
-		set sT8 208
-		HTNodeSet $sT8 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 7*$ts/8]
-		set sT9 209
-		HTNodeSet $sT9 -Entity 64 -Locx 0.0 -Locy [expr 0.5*$h + 8*$ts/8]
-		
-		set slabTemp 210
-		HTNodeSet $slabTemp -NodeSet $sT1 $sT2 $sT3 $sT4 $sT5 $sT6 $sT7 $sT8 $sT9
-		HTRecorder -file "Thermal_load\\Slab$ID.dat" -NodeSet $slabTemp
-	}
+#Temperature point (2st column -20 points)
+set T21 201
+HTNodeSet $T21 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy 0.0 
+set T22 202                                            
+HTNodeSet $T22 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 1.0*$h*$a]
+set T23 203                                            
+HTNodeSet $T23 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 2.0*$h*$a]
+set T24 204                                            
+HTNodeSet $T24 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 3.0*$h*$a]
+set T25 205                                            
+HTNodeSet $T25 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 4.0*$h*$a]
+set T26 206                                            
+HTNodeSet $T26 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 5.0*$h*$a]
+set T27 207                                            
+HTNodeSet $T27 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 6.0*$h*$a]
+set T28 208                                            
+HTNodeSet $T28 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 7.0*$h*$a]
+set T29 209                                            
+HTNodeSet $T29 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 8.0*$h*$a]
+set T30 210                                            
+HTNodeSet $T30 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 9.0*$h*$a]
+set T31 211                                            
+HTNodeSet $T31 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 10.0*$h*$a]
+set T32 212                                            
+HTNodeSet $T32 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 11.0*$h*$a]
+set T33 213                                            
+HTNodeSet $T33 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 12.0*$h*$a]
+set T34 214                                            
+HTNodeSet $T34 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 13.0*$h*$a]
+set T35 215                                            
+HTNodeSet $T35 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 14.0*$h*$a]
+set T36 216                                            
+HTNodeSet $T36 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 15.0*$h*$a]
+set T37 217                                            
+HTNodeSet $T37 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 16.0*$h*$a]
+set T38 218                                            
+HTNodeSet $T38 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 17.0*$h*$a]
+set T39 219                                            
+HTNodeSet $T39 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 18.0*$h*$a]
+set T40 220                                            
+HTNodeSet $T40 -Entity 1 -Locx [expr 1.0*$b*$a]   -Locy [expr 19.0*$h*$a]
 
-	if {$stiffened} {
-		#left plate
-		set lplT1 301
-		HTNodeSet $lplT1 -Entity 100 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr -0.5*$w_y - 0.5*$tf]
-		set lplT2 302
-		HTNodeSet $lplT2 -Entity 110 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr -0.25*$w_y]
-		set lplT3 303
-		HTNodeSet $lplT3 -Entity 110 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy 0.0
-		set lplT4 304
-		HTNodeSet $lplT4 -Entity 110 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr 0.25*$w_y]
-		set lplT5 305
-		HTNodeSet $lplT5 -Entity 120 -Locx [expr -$f_x-0.5*$tw - 0.5*$plt] -Locy [expr 0.5*$w_y + 0.5*$tf]
-		
-		#right plate
-		set rplT1 306
-		HTNodeSet $rplT1 -Entity 130 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr -0.5*$w_y - 0.5*$tf]
-		set rplT2 307
-		HTNodeSet $rplT2 -Entity 140 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr -0.25*$w_y]
-		set rplT3 308
-		HTNodeSet $rplT3 -Entity 140 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy 0.0
-		set rplT4 309
-		HTNodeSet $rplT4 -Entity 140 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr 0.25*$w_y]
-		set rplT5 310
-		HTNodeSet $rplT5 -Entity 150 -Locx [expr $f_x+0.5*$tw+0.5*$plt] -Locy [expr 0.5*$w_y + 0.5*$tf]
-		
-		set StiffenedBeamTemp 311
-		HTNodeSet $StiffenedBeamTemp -NodeSet $beamTemp $lplT1 $lplT2 $lplT3 $lplT4 $lplT5 $rplT1 $rplT2 $rplT3 $rplT4 $rplT5
-		HTRecorder -file "Thermal_load\\BeamColumn$ID.dat" -NodeSet $StiffenedBeamTemp
-	}
-}
+#Temperature point (3st column -20 points)
+set T41 301                    
+HTNodeSet $T41 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy 0.0 
+set T42 302                                              
+HTNodeSet $T42 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 1.0*$h*$a]
+set T43 303                                              
+HTNodeSet $T43 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 2.0*$h*$a]
+set T44 304                                              
+HTNodeSet $T44 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 3.0*$h*$a]
+set T45 305                                              
+HTNodeSet $T45 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 4.0*$h*$a]
+set T46 306                                              
+HTNodeSet $T46 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 5.0*$h*$a]
+set T47 307                                              
+HTNodeSet $T47 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 6.0*$h*$a]
+set T48 308                                              
+HTNodeSet $T48 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 7.0*$h*$a]
+set T49 309                                              
+HTNodeSet $T49 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 8.0*$h*$a]
+set T50 310                                              
+HTNodeSet $T50 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 9.0*$h*$a]
+set T51 311                                              
+HTNodeSet $T51 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 10.0*$h*$a]
+set T52 312                                              
+HTNodeSet $T52 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 11.0*$h*$a]
+set T53 313                                              
+HTNodeSet $T53 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 12.0*$h*$a]
+set T54 314                                              
+HTNodeSet $T54 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 13.0*$h*$a]
+set T55 315                                              
+HTNodeSet $T55 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 14.0*$h*$a]
+set T56 316                                              
+HTNodeSet $T56 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 15.0*$h*$a]
+set T57 317                                              
+HTNodeSet $T57 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 16.0*$h*$a]
+set T58 318                                              
+HTNodeSet $T58 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 17.0*$h*$a]
+set T59 319                                              
+HTNodeSet $T59 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 18.0*$h*$a]
+set T60 320                                              
+HTNodeSet $T60 -Entity 1 -Locx [expr 2.0*$b*$a]     -Locy [expr 19.0*$h*$a]
+
+#Temperature point (4th column -20 points)
+set T61   401
+HTNodeSet $T61 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy 0.0 
+set T62   402                                             
+HTNodeSet $T62 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 1.0*$h*$a]
+set T63   403                                             
+HTNodeSet $T63 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 2.0*$h*$a]
+set T64   404                                             
+HTNodeSet $T64 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 3.0*$h*$a]
+set T65   405                                             
+HTNodeSet $T65 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 4.0*$h*$a]
+set T66   406                                             
+HTNodeSet $T66 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 5.0*$h*$a]
+set T67   407                                             
+HTNodeSet $T67 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 6.0*$h*$a]
+set T68   408                                             
+HTNodeSet $T68 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 7.0*$h*$a]
+set T69   409                                             
+HTNodeSet $T69 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 8.0*$h*$a]
+set T70   410                                             
+HTNodeSet $T70 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 9.0*$h*$a]
+set T71   411                                             
+HTNodeSet $T71 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 10.0*$h*$a]
+set T72   412                                             
+HTNodeSet $T72 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 11.0*$h*$a]
+set T73   413                                             
+HTNodeSet $T73 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 12.0*$h*$a]
+set T74   414                                             
+HTNodeSet $T74 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 13.0*$h*$a]
+set T75   415                                             
+HTNodeSet $T75 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 14.0*$h*$a]
+set T76   416                                             
+HTNodeSet $T76 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 15.0*$h*$a]
+set T77   417                                             
+HTNodeSet $T77 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 16.0*$h*$a]
+set T78   418                                             
+HTNodeSet $T78 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 17.0*$h*$a]
+set T79   419                                             
+HTNodeSet $T79 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 18.0*$h*$a]
+set T80   420                                             
+HTNodeSet $T80 -Entity 1 -Locx [expr 3.0*$b*$a]      -Locy [expr 19.0*$h*$a]
+
+#Temperature point (5st column -20 points)
+set T81   501
+HTNodeSet $T81 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy 0.0 
+set T82   502                                          
+HTNodeSet $T82 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 1.0*$h*$a]
+set T83   503                                          
+HTNodeSet $T83 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 2.0*$h*$a]
+set T84   504                                          
+HTNodeSet $T84 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 3.0*$h*$a]
+set T85   505                                          
+HTNodeSet $T85 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 4.0*$h*$a]
+set T86   506                                          
+HTNodeSet $T86 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 5.0*$h*$a]
+set T87   507                                          
+HTNodeSet $T87 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 6.0*$h*$a]
+set T88   508                                          
+HTNodeSet $T88 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 7.0*$h*$a]
+set T89   509                                          
+HTNodeSet $T89 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 8.0*$h*$a]
+set T90   510                                          
+HTNodeSet $T90 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 9.0*$h*$a]
+set T91   511                                          
+HTNodeSet $T91 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 10.0*$h*$a]
+set T92   512                                          
+HTNodeSet $T92 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 11.0*$h*$a]
+set T93   513                                          
+HTNodeSet $T93 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 12.0*$h*$a]
+set T94   514                                          
+HTNodeSet $T94 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 13.0*$h*$a]
+set T95   515                                          
+HTNodeSet $T95 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 14.0*$h*$a]
+set T96   516                                          
+HTNodeSet $T96 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 15.0*$h*$a]
+set T97   517                                          
+HTNodeSet $T97 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 16.0*$h*$a]
+set T98   518                                          
+HTNodeSet $T98 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 17.0*$h*$a]
+set T99   519                                          
+HTNodeSet $T99 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 18.0*$h*$a]
+set T100  520                                          
+HTNodeSet $T100 -Entity 1 -Locx [expr 4.0*$b*$a]   -Locy [expr 19.0*$h*$a]
+
+#Temperature point (6th column -20 points)
+set T101   601
+HTNodeSet $T101 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy 0.0 
+set T102   602                                         
+HTNodeSet $T102 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 1.0*$h*$a]
+set T103   603                                         
+HTNodeSet $T103 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 2.0*$h*$a]
+set T104   604                                         
+HTNodeSet $T104 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 3.0*$h*$a]
+set T105   605                                         
+HTNodeSet $T105 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 4.0*$h*$a]
+set T106   606                                         
+HTNodeSet $T106 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 5.0*$h*$a]
+set T107   607                                         
+HTNodeSet $T107 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 6.0*$h*$a]
+set T108   608                                         
+HTNodeSet $T108 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 7.0*$h*$a]
+set T109   609                                         
+HTNodeSet $T109 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 8.0*$h*$a]
+set T110   610                                         
+HTNodeSet $T110 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 9.0*$h*$a]
+set T111   611                                         
+HTNodeSet $T111 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 10.0*$h*$a]
+set T112   612                                         
+HTNodeSet $T112 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 11.0*$h*$a]
+set T113   613                                         
+HTNodeSet $T113 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 12.0*$h*$a]
+set T114   614                                         
+HTNodeSet $T114 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 13.0*$h*$a]
+set T115   615                                         
+HTNodeSet $T115 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 14.0*$h*$a]
+set T116   616                                         
+HTNodeSet $T116 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 15.0*$h*$a]
+set T117   617                                         
+HTNodeSet $T117 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 16.0*$h*$a]
+set T118   618                                         
+HTNodeSet $T118 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 17.0*$h*$a]
+set T119   619                                         
+HTNodeSet $T119 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 18.0*$h*$a]
+set T120   620                                         
+HTNodeSet $T120 -Entity 1 -Locx [expr 5.0*$b*$a]  -Locy [expr 19.0*$h*$a]
+
+#Temperature point (7th column -20 points)
+set T121   701
+HTNodeSet $T121 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy 0.0 
+set T122   702                                         
+HTNodeSet $T122 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 1.0*$h*$a]
+set T123   703                                         
+HTNodeSet $T123 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 2.0*$h*$a]
+set T124   704                                         
+HTNodeSet $T124 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 3.0*$h*$a]
+set T125   705                                         
+HTNodeSet $T125 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 4.0*$h*$a]
+set T126   706                                         
+HTNodeSet $T126 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 5.0*$h*$a]
+set T127   707                                         
+HTNodeSet $T127 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 6.0*$h*$a]
+set T128   708                                         
+HTNodeSet $T128 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 7.0*$h*$a]
+set T129   709                                         
+HTNodeSet $T129 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 8.0*$h*$a]
+set T130   710                                         
+HTNodeSet $T130 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 9.0*$h*$a]
+set T131   711                                         
+HTNodeSet $T131 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 10.0*$h*$a]
+set T132   712                                         
+HTNodeSet $T132 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 11.0*$h*$a]
+set T133   713                                         
+HTNodeSet $T133 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 12.0*$h*$a]
+set T134   714                                         
+HTNodeSet $T134 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 13.0*$h*$a]
+set T135   715                                         
+HTNodeSet $T135 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 14.0*$h*$a]
+set T136   716                                         
+HTNodeSet $T136 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 15.0*$h*$a]
+set T137   717                                         
+HTNodeSet $T137 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 16.0*$h*$a]
+set T138   718                                         
+HTNodeSet $T138 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 17.0*$h*$a]
+set T139   719                                         
+HTNodeSet $T139 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 18.0*$h*$a]
+set T140   720                                         
+HTNodeSet $T140 -Entity 1 -Locx [expr 6.0*$b*$a]  -Locy [expr 19.0*$h*$a]
+
+#Temperature point (8th column -20 points)
+set T141   801
+HTNodeSet $T141 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy 0.0 
+set T142   802                                          
+HTNodeSet $T142 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 1.0*$h*$a]
+set T143   803                                          
+HTNodeSet $T143 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 2.0*$h*$a]
+set T144   804                                          
+HTNodeSet $T144 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 3.0*$h*$a]
+set T145   805                                          
+HTNodeSet $T145 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 4.0*$h*$a]
+set T146   806                                          
+HTNodeSet $T146 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 5.0*$h*$a]
+set T147   807                                          
+HTNodeSet $T147 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 6.0*$h*$a]
+set T148   808                                          
+HTNodeSet $T148 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 7.0*$h*$a]
+set T149   809                                          
+HTNodeSet $T149 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 8.0*$h*$a]
+set T150   810                                          
+HTNodeSet $T150 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 9.0*$h*$a]
+set T151   811                                          
+HTNodeSet $T151 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 10.0*$h*$a]
+set T152   812                                          
+HTNodeSet $T152 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 11.0*$h*$a]
+set T153   813                                          
+HTNodeSet $T153 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 12.0*$h*$a]
+set T154   814                                          
+HTNodeSet $T154 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 13.0*$h*$a]
+set T155   815                                          
+HTNodeSet $T155 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 14.0*$h*$a]
+set T156   816                                          
+HTNodeSet $T156 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 15.0*$h*$a]
+set T157   817                                          
+HTNodeSet $T157 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 16.0*$h*$a]
+set T158   818                                          
+HTNodeSet $T158 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 17.0*$h*$a]
+set T159   819                                          
+HTNodeSet $T159 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 18.0*$h*$a]
+set T160   820                                          
+HTNodeSet $T160 -Entity 1 -Locx [expr 7.0*$b*$a]   -Locy [expr 19.0*$h*$a]
+
+#Temperature point (9th column -20 points)
+set T161   901
+HTNodeSet $T161 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy 0.0 
+set T162   902                                            
+HTNodeSet $T162 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 1.0*$h*$a]
+set T163   903                                            
+HTNodeSet $T163 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 2.0*$h*$a]
+set T164   904                                            
+HTNodeSet $T164 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 3.0*$h*$a]
+set T165   905                                            
+HTNodeSet $T165 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 4.0*$h*$a]
+set T166   906                                            
+HTNodeSet $T166 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 5.0*$h*$a]
+set T167   907                                            
+HTNodeSet $T167 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 6.0*$h*$a]
+set T168   908                                            
+HTNodeSet $T168 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 7.0*$h*$a]
+set T169   909                                            
+HTNodeSet $T169 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 8.0*$h*$a]
+set T170   910                                            
+HTNodeSet $T170 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 9.0*$h*$a]
+set T171   911                                            
+HTNodeSet $T171 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 10.0*$h*$a]
+set T172   912                                            
+HTNodeSet $T172 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 11.0*$h*$a]
+set T173   913                                            
+HTNodeSet $T173 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 12.0*$h*$a]
+set T174   914                                            
+HTNodeSet $T174 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 13.0*$h*$a]
+set T175   915                                            
+HTNodeSet $T175 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 14.0*$h*$a]
+set T176   916                                            
+HTNodeSet $T176 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 15.0*$h*$a]
+set T177   917                                            
+HTNodeSet $T177 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 16.0*$h*$a]
+set T178   918                                            
+HTNodeSet $T178 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 17.0*$h*$a]
+set T179   919                                            
+HTNodeSet $T179 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 18.0*$h*$a]
+set T180   920                                            
+HTNodeSet $T180 -Entity 1  -Locx [expr 8.0*$b*$a]    -Locy [expr 19.0*$h*$a]
+						   
+#Temperature point (10th column -20 points)
+set T181   1001
+HTNodeSet $T181 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy 0.0 
+set T182   1002                                          
+HTNodeSet $T182 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 1.0*$h*$a]
+set T183   1003                                          
+HTNodeSet $T183 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 2.0*$h*$a]
+set T184   1004                                          
+HTNodeSet $T184 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 3.0*$h*$a]
+set T185   1005                                          
+HTNodeSet $T185 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 4.0*$h*$a]
+set T186   1006                                          
+HTNodeSet $T186 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 5.0*$h*$a]
+set T187   1007                                          
+HTNodeSet $T187 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 6.0*$h*$a]
+set T188   1008                                          
+HTNodeSet $T188 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 7.0*$h*$a]
+set T189   1009                                          
+HTNodeSet $T189 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 8.0*$h*$a]
+set T190   1010                                          
+HTNodeSet $T190 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 9.0*$h*$a]
+set T191   1011                                          
+HTNodeSet $T191 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 10.0*$h*$a]
+set T192   1012                                          
+HTNodeSet $T192 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 11.0*$h*$a]
+set T193   1013                                          
+HTNodeSet $T193 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 12.0*$h*$a]
+set T194   1014                                          
+HTNodeSet $T194 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 13.0*$h*$a]
+set T195   1015                                          
+HTNodeSet $T195 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 14.0*$h*$a]
+set T196   1016                                          
+HTNodeSet $T196 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 15.0*$h*$a]
+set T197   1017                                          
+HTNodeSet $T197 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 16.0*$h*$a]
+set T198   1018                                          
+HTNodeSet $T198 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 17.0*$h*$a]
+set T199   1019                                          
+HTNodeSet $T199 -Entity 1 -Locx [expr 9.0*$b*$a]    -Locy [expr 18.0*$h*$a]
+set T200   1020                                          
+HTNodeSet $T200 -Entity 1 -Locx [expr 3.0*$b*$a]    -Locy [expr 19.0*$h*$a]
+
+#Temperature 9oint (11th column -20 points)
+set T201   1101
+HTNodeSet $T201 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy 0.0 
+set T202   1102                                           
+HTNodeSet $T202 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 1.0*$h*$a]
+set T203   1103                                           
+HTNodeSet $T203 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 2.0*$h*$a]
+set T204   1104                                           
+HTNodeSet $T204 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 3.0*$h*$a]
+set T205   1105                                           
+HTNodeSet $T205 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 4.0*$h*$a]
+set T206   1106                                           
+HTNodeSet $T206 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 5.0*$h*$a]
+set T207   1107                                           
+HTNodeSet $T207 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 6.0*$h*$a]
+set T208   1108                                           
+HTNodeSet $T208 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 7.0*$h*$a]
+set T209   1109                                           
+HTNodeSet $T209 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 8.0*$h*$a]
+set T210   1110                                           
+HTNodeSet $T210 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 9.0*$h*$a]
+set T211   1111                                           
+HTNodeSet $T211 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 10.0*$h*$a]
+set T212   1112                                           
+HTNodeSet $T212 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 11.0*$h*$a]
+set T213   1113                                           
+HTNodeSet $T213 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 12.0*$h*$a]
+set T214   1114                                           
+HTNodeSet $T214 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 13.0*$h*$a]
+set T215   1115                                           
+HTNodeSet $T215 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 14.0*$h*$a]
+set T216   1116                                           
+HTNodeSet $T216 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 15.0*$h*$a]
+set T217   1117                                           
+HTNodeSet $T217 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 16.0*$h*$a]
+set T218   1118                                           
+HTNodeSet $T218 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 17.0*$h*$a]
+set T219   1119                                           
+HTNodeSet $T219 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 18.0*$h*$a]
+set T220   1120                                           
+HTNodeSet $T220 -Entity 1 -Locx [expr 10.0*$b*$a]    -Locy [expr 19.0*$h*$a]
+
+#Temperature point (12th column -20 points)
+set T221   1201
+HTNodeSet $T221 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy 0.0 
+set T222   1202                                           
+HTNodeSet $T222 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 1.0*$h*$a]
+set T223   1203                                           
+HTNodeSet $T223 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 2.0*$h*$a]
+set T224   1204                                           
+HTNodeSet $T224 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 3.0*$h*$a]
+set T225   1205                                           
+HTNodeSet $T225 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 4.0*$h*$a]
+set T226   1206                                           
+HTNodeSet $T226 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 5.0*$h*$a]
+set T227   1207                                           
+HTNodeSet $T227 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 6.0*$h*$a]
+set T228   1208                                           
+HTNodeSet $T228 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 7.0*$h*$a]
+set T229   1209                                           
+HTNodeSet $T229 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 8.0*$h*$a]
+set T230   1210                                           
+HTNodeSet $T230 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 9.0*$h*$a]
+set T231   1211                                           
+HTNodeSet $T231 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 10.0*$h*$a]
+set T232   1212                                           
+HTNodeSet $T232 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 11.0*$h*$a]
+set T233   1213                                           
+HTNodeSet $T233 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 12.0*$h*$a]
+set T234   1214                                           
+HTNodeSet $T234 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 13.0*$h*$a]
+set T235   1215                                           
+HTNodeSet $T235 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 14.0*$h*$a]
+set T236   1216                                           
+HTNodeSet $T236 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 15.0*$h*$a]
+set T237   1217                                           
+HTNodeSet $T237 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 16.0*$h*$a]
+set T238   1218                                           
+HTNodeSet $T238 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 17.0*$h*$a]
+set T239   1219                                           
+HTNodeSet $T239 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 18.0*$h*$a]
+set T240   1220                                           
+HTNodeSet $T240 -Entity 1 -Locx [expr 11.0*$b*$a]    -Locy [expr 19.0*$h*$a]
+
+#Temperature point (13th column -20 points)
+set T241   1301
+HTNodeSet $T241 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy 0.0 
+set T242   1302                                          
+HTNodeSet $T242 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 1.0*$h*$a]
+set T243   1303                                          
+HTNodeSet $T243 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 2.0*$h*$a]
+set T244   1304                                          
+HTNodeSet $T244 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 3.0*$h*$a]
+set T245   1305                                          
+HTNodeSet $T245 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 4.0*$h*$a]
+set T246   1306                                          
+HTNodeSet $T246 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 5.0*$h*$a]
+set T247   1307                                          
+HTNodeSet $T247 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 6.0*$h*$a]
+set T248   1308                                          
+HTNodeSet $T248 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 7.0*$h*$a]
+set T249   1309                                          
+HTNodeSet $T249 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 8.0*$h*$a]
+set T250   1310                                          
+HTNodeSet $T250 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 9.0*$h*$a]
+set T251   1311                                          
+HTNodeSet $T251 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 10.0*$h*$a]
+set T252   1312                                          
+HTNodeSet $T252 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 11.0*$h*$a]
+set T253   1313                                          
+HTNodeSet $T253 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 12.0*$h*$a]
+set T254   1314                                          
+HTNodeSet $T254 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 13.0*$h*$a]
+set T255   1315                                          
+HTNodeSet $T255 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 14.0*$h*$a]
+set T256   1316                                          
+HTNodeSet $T256 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 15.0*$h*$a]
+set T257   1317                                          
+HTNodeSet $T257 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 16.0*$h*$a]
+set T258   1318                                          
+HTNodeSet $T258 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 17.0*$h*$a]
+set T259   1319                                          
+HTNodeSet $T259 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 18.0*$h*$a]
+set T260   1320                                          
+HTNodeSet $T260 -Entity 1 -Locx [expr 12.0*$b*$a]   -Locy [expr 19.0*$h*$a]
+
+#Temperature point (14th column -20 points)
+set T261   1401
+HTNodeSet $T261 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy 0.0 
+set T262   1402                                          
+HTNodeSet $T262 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 1.0*$h*$a]
+set T263   1403                                          
+HTNodeSet $T263 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 2.0*$h*$a]
+set T264   1404                                          
+HTNodeSet $T264 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 3.0*$h*$a]
+set T265   1405                                          
+HTNodeSet $T265 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 4.0*$h*$a]
+set T266   1406                                          
+HTNodeSet $T266 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 5.0*$h*$a]
+set T267   1407                                          
+HTNodeSet $T267 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 6.0*$h*$a]
+set T268   1408                                          
+HTNodeSet $T268 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 7.0*$h*$a]
+set T269   1409                                          
+HTNodeSet $T269 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 8.0*$h*$a]
+set T270   1410                                          
+HTNodeSet $T270 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 9.0*$h*$a]
+set T271   1411                                          
+HTNodeSet $T271 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 10.0*$h*$a]
+set T272   1412                                          
+HTNodeSet $T272 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 11.0*$h*$a]
+set T273   1413                                          
+HTNodeSet $T273 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 12.0*$h*$a]
+set T274   1414                                          
+HTNodeSet $T274 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 13.0*$h*$a]
+set T275   1415                                          
+HTNodeSet $T275 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 14.0*$h*$a]
+set T276   1416                                          
+HTNodeSet $T276 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 15.0*$h*$a]
+set T277   1417                                          
+HTNodeSet $T277 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 16.0*$h*$a]
+set T278   1418                                          
+HTNodeSet $T278 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 17.0*$h*$a]
+set T279   1419                                          
+HTNodeSet $T279 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 18.0*$h*$a]
+set T280   1420                                          
+HTNodeSet $T280 -Entity 1 -Locx [expr 13.0*$b*$a]   -Locy [expr 19.0*$h*$a]
+
+#Temperature point (15th column -20 points)
+set T281   1501
+HTNodeSet $T281 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy 0.0 
+set T282   1502                                            
+HTNodeSet $T282 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 1.0*$h*$a]
+set T283   1503                                            
+HTNodeSet $T283 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 2.0*$h*$a]
+set T284   1504                                            
+HTNodeSet $T284 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 3.0*$h*$a]
+set T285   1505                                            
+HTNodeSet $T285 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 4.0*$h*$a]
+set T286   1506                                            
+HTNodeSet $T286 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 5.0*$h*$a]
+set T287   1507                                            
+HTNodeSet $T287 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 6.0*$h*$a]
+set T288   1508                                            
+HTNodeSet $T288 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 7.0*$h*$a]
+set T289   1509                                            
+HTNodeSet $T289 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 8.0*$h*$a]
+set T290   1510                                            
+HTNodeSet $T290 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 9.0*$h*$a]
+set T291   1511                                            
+HTNodeSet $T291 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 10.0*$h*$a]
+set T292   1512                                            
+HTNodeSet $T292 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 11.0*$h*$a]
+set T293   1513                                            
+HTNodeSet $T293 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 12.0*$h*$a]
+set T294   1514                                            
+HTNodeSet $T294 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 13.0*$h*$a]
+set T295   1515                                            
+HTNodeSet $T295 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 14.0*$h*$a]
+set T296   1516                                            
+HTNodeSet $T296 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 15.0*$h*$a]
+set T297   1517                                            
+HTNodeSet $T297 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 16.0*$h*$a]
+set T298   1518                                            
+HTNodeSet $T298 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 17.0*$h*$a]
+set T299   1519                                            
+HTNodeSet $T299 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 18.0*$h*$a]
+set T300   1520                                            
+HTNodeSet $T300 -Entity 1 -Locx [expr 14.0*$b*$a]     -Locy [expr 19.0*$h*$a]
+
+#Temperature point (16th column -20 points)
+set T301   1601
+HTNodeSet $T301 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy 0.0 
+set T302   1602                                             
+HTNodeSet $T302 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 1.0*$h*$a]
+set T303   1603                                             
+HTNodeSet $T303 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 2.0*$h*$a]
+set T304   1604                                             
+HTNodeSet $T304 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 3.0*$h*$a]
+set T305   1605                                             
+HTNodeSet $T305 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 4.0*$h*$a]
+set T306   1606                                             
+HTNodeSet $T306 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 5.0*$h*$a]
+set T307   1607                                             
+HTNodeSet $T307 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 6.0*$h*$a]
+set T308   1608                                             
+HTNodeSet $T308 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 7.0*$h*$a]
+set T309   1609                                             
+HTNodeSet $T309 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 8.0*$h*$a]
+set T310   1610                                             
+HTNodeSet $T310 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 9.0*$h*$a]
+set T311   1611                                             
+HTNodeSet $T311 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 10.0*$h*$a]
+set T312   1612                                             
+HTNodeSet $T312 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 11.0*$h*$a]
+set T313   1613                                             
+HTNodeSet $T313 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 12.0*$h*$a]
+set T314   1614                                             
+HTNodeSet $T314 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 13.0*$h*$a]
+set T315   1615                                             
+HTNodeSet $T315 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 14.0*$h*$a]
+set T316   1616                                             
+HTNodeSet $T316 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 15.0*$h*$a]
+set T317   1617                                             
+HTNodeSet $T317 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 16.0*$h*$a]
+set T318   1618                                             
+HTNodeSet $T318 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 17.0*$h*$a]
+set T319   1619                                             
+HTNodeSet $T319 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 18.0*$h*$a]
+set T320   1620                                             
+HTNodeSet $T320 -Entity 1 -Locx [expr 15.0*$b*$a]      -Locy [expr 19.0*$h*$a]
+
+#Temperature point (17th column -20 points)
+set T321   1701
+HTNodeSet $T321 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy 0.0 
+set T322   1702                                             
+HTNodeSet $T322 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 1.0*$h*$a]
+set T323   1703                                             
+HTNodeSet $T323 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 2.0*$h*$a]
+set T324   1704                                             
+HTNodeSet $T324 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 3.0*$h*$a]
+set T325   1705                                             
+HTNodeSet $T325 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 4.0*$h*$a]
+set T326   1706                                             
+HTNodeSet $T326 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 5.0*$h*$a]
+set T327   1707                                             
+HTNodeSet $T327 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 6.0*$h*$a]
+set T328   1708                                             
+HTNodeSet $T328 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 7.0*$h*$a]
+set T329   1709                                             
+HTNodeSet $T329 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 8.0*$h*$a]
+set T330   1710                                             
+HTNodeSet $T330 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 9.0*$h*$a]
+set T331   1711                                             
+HTNodeSet $T331 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 10.0*$h*$a]
+set T332   1712                                             
+HTNodeSet $T332 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 11.0*$h*$a]
+set T333   1713                                             
+HTNodeSet $T333 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 12.0*$h*$a]
+set T334   1714                                             
+HTNodeSet $T334 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 13.0*$h*$a]
+set T335   1715                                             
+HTNodeSet $T335 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 14.0*$h*$a]
+set T336   1716                                             
+HTNodeSet $T336 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 15.0*$h*$a]
+set T337   1717                                             
+HTNodeSet $T337 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 16.0*$h*$a]
+set T338   1718                                             
+HTNodeSet $T338 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 17.0*$h*$a]
+set T339   1719                                             
+HTNodeSet $T339 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 18.0*$h*$a]
+set T340   1720                                             
+HTNodeSet $T340 -Entity 1 -Locx [expr 16.0*$b*$a]      -Locy [expr 19.0*$h*$a]
+
+#Temperature point (18th column -20 points)
+set T341   1801
+HTNodeSet $T341 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy 0.0 
+set T342  1802                                            
+HTNodeSet $T342 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 1.0*$h*$a]
+set T343   1803                                           
+HTNodeSet $T343 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 2.0*$h*$a]
+set T344   1804                                           
+HTNodeSet $T344 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 3.0*$h*$a]
+set T345   1805                                           
+HTNodeSet $T345 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 4.0*$h*$a]
+set T346   1806                                           
+HTNodeSet $T346 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 5.0*$h*$a]
+set T347   1807                                           
+HTNodeSet $T347 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 6.0*$h*$a]
+set T348   1808                                           
+HTNodeSet $T348 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 7.0*$h*$a]
+set T349   1809                                           
+HTNodeSet $T349 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 8.0*$h*$a]
+set T350   1810                                           
+HTNodeSet $T350 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 9.0*$h*$a]
+set T351   1811                                           
+HTNodeSet $T351 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 10.0*$h*$a]
+set T352   1812                                           
+HTNodeSet $T352 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 11.0*$h*$a]
+set T353   1813                                           
+HTNodeSet $T353 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 12.0*$h*$a]
+set T354   1814                                           
+HTNodeSet $T354 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 13.0*$h*$a]
+set T355   1815                                           
+HTNodeSet $T355 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 14.0*$h*$a]
+set T356   1816                                           
+HTNodeSet $T356 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 15.0*$h*$a]
+set T357   1817                                           
+HTNodeSet $T357 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 16.0*$h*$a]
+set T358   1818                                           
+HTNodeSet $T358 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 17.0*$h*$a]
+set T359   1819                                           
+HTNodeSet $T359 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 18.0*$h*$a]
+set T360   1820                                           
+HTNodeSet $T360 -Entity 1 -Locx [expr 17.0*$b*$a]    -Locy [expr 19.0*$h*$a]
+
+#Temperature point (19th column -20 points)
+set T361   1901
+HTNodeSet $T361 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy 0.0 
+set T362   1902                                            
+HTNodeSet $T362 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 1.0*$h*$a]
+set T363   1903                                            
+HTNodeSet $T363 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 2.0*$h*$a]
+set T364   1904                                            
+HTNodeSet $T364 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 3.0*$h*$a]
+set T365   1905                                            
+HTNodeSet $T365 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 4.0*$h*$a]
+set T366   1906                                            
+HTNodeSet $T366 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 5.0*$h*$a]
+set T367   1907                                            
+HTNodeSet $T367 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 6.0*$h*$a]
+set T368   1908                                            
+HTNodeSet $T368 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 7.0*$h*$a]
+set T369   1909                                            
+HTNodeSet $T369 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 8.0*$h*$a]
+set T370   1910                                            
+HTNodeSet $T370 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 9.0*$h*$a]
+set T371   1911                                            
+HTNodeSet $T371 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 10.0*$h*$a]
+set T372   1912                                            
+HTNodeSet $T372 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 11.0*$h*$a]
+set T373   1913                                            
+HTNodeSet $T373 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 12.0*$h*$a]
+set T374   1914                                            
+HTNodeSet $T374 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 13.0*$h*$a]
+set T375   1915                                            
+HTNodeSet $T375 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 14.0*$h*$a]
+set T376   1916                                            
+HTNodeSet $T376 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 15.0*$h*$a]
+set T377   1917                                            
+HTNodeSet $T377 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 16.0*$h*$a]
+set T378   1918                                            
+HTNodeSet $T378 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 17.0*$h*$a]
+set T379   1919                                            
+HTNodeSet $T379 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 18.0*$h*$a]
+set T380   1920                                            
+HTNodeSet $T380 -Entity 1 -Locx [expr 18.0*$b*$a]     -Locy [expr 19.0*$h*$a]
+
+#Temperature point (20th column -20 points)
+set T381   2001
+HTNodeSet $T381 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy 0.0 
+set T382   2002                                           
+HTNodeSet $T382 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 1.0*$h*$a]
+set T383   2003                                           
+HTNodeSet $T383 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 2.0*$h*$a]
+set T384   2004                                           
+HTNodeSet $T384 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 3.0*$h*$a]
+set T385   2005                                           
+HTNodeSet $T385 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 4.0*$h*$a]
+set T386   2006                                           
+HTNodeSet $T386 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 5.0*$h*$a]
+set T387   2007                                           
+HTNodeSet $T387 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 6.0*$h*$a]
+set T388   2008                                           
+HTNodeSet $T388 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 7.0*$h*$a]
+set T389   2009                                           
+HTNodeSet $T389 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 8.0*$h*$a]
+set T390   2010                                           
+HTNodeSet $T390 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 9.0*$h*$a]
+set T391   2011                                           
+HTNodeSet $T391 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 10.0*$h*$a]
+set T392   2012                                           
+HTNodeSet $T392 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 11.0*$h*$a]
+set T393   2013                                           
+HTNodeSet $T393 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 12.0*$h*$a]
+set T394   2014                                           
+HTNodeSet $T394 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 13.0*$h*$a]
+set T395   2015                                           
+HTNodeSet $T395 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 14.0*$h*$a]
+set T396   2016                                           
+HTNodeSet $T396 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 15.0*$h*$a]
+set T397   2017                                           
+HTNodeSet $T397 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 16.0*$h*$a]
+set T398   2018                                           
+HTNodeSet $T398 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 17.0*$h*$a]
+set T399   2019                                           
+HTNodeSet $T399 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 18.0*$h*$a]
+set T400   2020                                           
+HTNodeSet $T400 -Entity 1 -Locx [expr 19.0*$b*$a]    -Locy [expr 19.0*$h*$a]
+
+set beamTemp 2021
+HTNodeSet $beamTemp -NodeSet $T1 $T2 $T3 $T4 $T5 $T6 $T7 $T8 $T9 $T10	$T11	$T12	$T13	$T14	$T15	$T16	$T17	$T18	$T19	$T20	$T21	$T22	$T23	$T24	$T25	$T26	$T27	$T28	$T29	$T30	$T31	$T32	$T33	$T34	$T35	$T36	$T37	$T38	$T39	$T40	$T41	$T42	$T43	$T44	$T45	$T46	$T47	$T48	$T49	$T50	$T51	$T52	$T53	$T54	$T55	$T56	$T57	$T58	$T59	$T60	$T61	$T62	$T63	$T64	$T65	$T66	$T67	$T68	$T69	$T70	$T71	$T72	$T73	$T74	$T75	$T76	$T77	$T78	$T79	$T80	$T81	$T82	$T83	$T84	$T85	$T86	$T87	$T88	$T89	$T90	$T91	$T92	$T93	$T94	$T95	$T96	$T97	$T98	$T99	$T100	$T101	$T102	$T103	$T104	$T105	$T106	$T107	$T108	$T109	$T110	$T111	$T112	$T113	$T114	$T115	$T116	$T117	$T118	$T119	$T120	$T121	$T122	$T123	$T124	$T125	$T126	$T127	$T128	$T129	$T130	$T131	$T132	$T133	$T134	$T135	$T136	$T137	$T138	$T139	$T140	$T141	$T142	$T143	$T144	$T145	$T146	$T147	$T148	$T149	$T150	$T151	$T152	$T153	$T154	$T155	$T156	$T157	$T158	$T159	$T160	$T161	$T162	$T163	$T164	$T165	$T166	$T167	$T168	$T169	$T170	$T171	$T172	$T173	$T174	$T175	$T176	$T177	$T178	$T179	$T180	$T181	$T182	$T183	$T184	$T185	$T186	$T187	$T188	$T189	$T190	$T191	$T192	$T193	$T194	$T195	$T196	$T197	$T198	$T199	$T200	$T201	$T202	$T203	$T204	$T205	$T206	$T207	$T208	$T209	$T210	$T211	$T212	$T213	$T214	$T215	$T216	$T217	$T218	$T219	$T220	$T221	$T222	$T223	$T224	$T225	$T226	$T227	$T228	$T229	$T230	$T231	$T232	$T233	$T234	$T235	$T236	$T237	$T238	$T239	$T240	$T241	$T242	$T243	$T244	$T245	$T246	$T247	$T248	$T249	$T250	$T251	$T252	$T253	$T254	$T255	$T256	$T257	$T258	$T259	$T260	$T261	$T262	$T263	$T264	$T265	$T266	$T267	$T268	$T269	$T270	$T271	$T272	$T273	$T274	$T275	$T276	$T277	$T278	$T279	$T280	$T281	$T282	$T283	$T284	$T285	$T286	$T287	$T288	$T289	$T290	$T291	$T292	$T293	$T294	$T295	$T296	$T297	$T298	$T299	$T300	$T301	$T302	$T303	$T304	$T305	$T306	$T307	$T308	$T309	$T310	$T311	$T312	$T313	$T314	$T315	$T316	$T317	$T318	$T319	$T320	$T321	$T322	$T323	$T324	$T325	$T326	$T327	$T328	$T329	$T330	$T331	$T332	$T333	$T334	$T335	$T336	$T337	$T338	$T339	$T340	$T341	$T342	$T343	$T344	$T345	$T346	$T347	$T348	$T349	$T350	$T351	$T352	$T353	$T354	$T355	$T356	$T357	$T358	$T359	$T360	$T361	$T362	$T363	$T364	$T365	$T366	$T367	$T368	$T369	$T370	$T371	$T372	$T373	$T374	$T375	$T376	$T377	$T378	$T379	$T380	$T381	$T382	$T383	$T384	$T385	$T386	$T387	$T388	$T389	$T390	$T391	$T392	$T393	$T394	$T395	$T396	$T397	$T398	$T399	$T400
+HTRecorder -file "Thermal_load\\BeamColumn$ID.dat" -NodeSet $beamTemp
 
 proc RelaxTolerance { dt tolerance lastTime } {
 	set tolerance [expr $tolerance*2]

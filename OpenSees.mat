@@ -37,10 +37,10 @@
 BOOK: Standard_Uniaxial_Materials
 
 
-MATERIAL: Elastic
+MATERIAL: ElasticThermal
 COMMENT: \n\tUpdate material window to assign selected Class/Type.\n\tSelect 'Custom' to enter user values.\n\tSelect Force-Deformation/Moment-Rotation formulation\n\tin order to use this material for zeroLength elements.\n
-QUESTION: Material:#CB#(Elastic)
-VALUE: Elastic
+QUESTION: Material:#CB#(ElasticThermal)
+VALUE: ElasticThermal
 HELP: Elastic uniaxial material object
 TKWIDGET: TK_UpdateInfoBar
 IMAGE: img/Materials/Elastic.png
@@ -61,6 +61,8 @@ QUESTION: Steel_grade#CB#(S235,S275,S355,S450,B500)
 VALUE: S235
 QUESTION: Elastic_modulus_E#UNITS#
 VALUE: 30 GPa
+QUESTION: alpha/deg_C
+VALUE: 0.0000234
 HELP: Young modulus of elasticity E, considering stress-strain diagram
 QUESTION: Stiffness_K#UNITS#
 VALUE: 4000 kN/m
